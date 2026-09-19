@@ -1,4 +1,4 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 
@@ -95,3 +95,26 @@ def test_report_queries(db: Storage):
     assert {(o.search.destination, o.offer.price_total) for o in best} == {("BKK", 5500), ("DXB", 3000)}
     hist = db.route_observations("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS)
     assert [o.offer.price_total for o in hist] == [5500, 6000]
+
+
+def test_save_result_is_atomic(db: Storage, monkeypatch):
+    run = db.start_run(NOW, planned=1)
+
+    def boom(self, search_id, offers):
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(Storage, "_insert_offers", boom)
+    with pytest.raises(RuntimeError):
+        db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(5000)]), NOW)
+    assert db.searches_in_run(run, "ok") == []
+    assert db.last_observed(req()) is None
+
+
+def test_timestamps_normalized_to_utc(db: Storage):
+    run = db.start_run(NOW, planned=1)
+    local_now = datetime(2026, 9, 21, 7, 0, tzinfo=timezone(timedelta(hours=2)))  # == 05:00 UTC
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(5000)]), local_now)
+    assert db.last_observed(req()) == local_now
+    stored = db.conn.execute("SELECT requested_at FROM searches LIMIT 1").fetchone()["requested_at"]
+    assert stored.endswith("+00:00")
+

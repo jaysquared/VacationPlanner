@@ -1,3 +1,5 @@
+BEGIN;
+
 CREATE TABLE runs (
   id INTEGER PRIMARY KEY,
   started_at TEXT NOT NULL,
@@ -69,3 +71,7 @@ WHERE o.id = (
   WHERE o2.search_id = o.search_id
   ORDER BY o2.price_total ASC, o2.id ASC LIMIT 1
 );
+
+INSERT INTO schema_version (version) VALUES (1);
+
+COMMIT;

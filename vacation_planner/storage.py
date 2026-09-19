@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 import sqlite3
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from importlib import resources
 from pathlib import Path
 
@@ -11,7 +11,9 @@ from .models import DealReason, Offer, Provider, SearchRequest, SearchResult, Se
 
 
 def _iso(dt: datetime) -> str:
-    return dt.isoformat()
+    if dt.tzinfo is None:
+        raise ValueError("naive datetime is not allowed; pass a timezone-aware datetime")
+    return dt.astimezone(timezone.utc).isoformat()
 
 
 def _dt(s: str | None) -> datetime | None:
@@ -127,9 +129,17 @@ class Storage:
             version = int(f.name.split("_", 1)[0])
             if version <= current:
                 continue
-            with self.conn:
+            # Each migration script owns its own explicit BEGIN/COMMIT (and writes its own
+            # schema_version row) so the DDL and the version marker commit atomically together.
+            # executescript() always flushes any pending transaction before it runs, so we cannot
+            # rely on wrapping it in `with self.conn:` here -- and since sqlite3_exec does not
+            # auto-rollback on a mid-script error, we roll back explicitly on failure so a failed
+            # migration never leaves partially-applied DDL behind.
+            try:
                 self.conn.executescript(f.read_text())
-                self.conn.execute("INSERT INTO schema_version (version) VALUES (?)", (version,))
+            except Exception:
+                self.conn.rollback()
+                raise
 
     # ---- runs ----
     def start_run(self, now: datetime, planned: int) -> int:
@@ -148,33 +158,41 @@ class Storage:
         return self.conn.execute("SELECT MAX(id) AS id FROM runs").fetchone()["id"]
 
     # ---- searches / offers ----
+    def _insert_search(self, run_id: int, req: SearchRequest, provider: Provider, status: str,
+                       now: datetime, error: str | None = None, raw_path: str | None = None) -> int:
+        cur = self.conn.execute(
+            """INSERT INTO searches (run_id, slot_id, origin, destination, outbound_date, return_date,
+               seat, adults, children, provider, requested_at, status, error, raw_path)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            (run_id, req.slot_id, req.origin, req.destination, req.outbound_date.isoformat(),
+             req.return_date.isoformat(), req.seat.value, req.adults, req.children,
+             provider.value, _iso(now), status, error, raw_path))
+        return cur.lastrowid
+
     def record_search(self, run_id: int, req: SearchRequest, provider: Provider, status: str,
                       now: datetime, error: str | None = None, raw_path: str | None = None) -> int:
         with self.conn:
-            cur = self.conn.execute(
-                """INSERT INTO searches (run_id, slot_id, origin, destination, outbound_date, return_date,
-                   seat, adults, children, provider, requested_at, status, error, raw_path)
-                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                (run_id, req.slot_id, req.origin, req.destination, req.outbound_date.isoformat(),
-                 req.return_date.isoformat(), req.seat.value, req.adults, req.children,
-                 provider.value, _iso(now), status, error, raw_path))
-        return cur.lastrowid
+            return self._insert_search(run_id, req, provider, status, now, error, raw_path)
+
+    def _insert_offers(self, search_id: int, offers: list[Offer]) -> None:
+        self.conn.executemany(
+            """INSERT INTO offers (search_id, provider, price_total, currency, per_person, airlines_json,
+               stops, duration_minutes, departs_at, arrives_at, price_level, typical_low, typical_high,
+               google_url, flight_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            [(search_id, o.provider.value, o.price_total, o.currency, o.per_person,
+              json.dumps(o.airlines), o.stops, o.duration_minutes, o.departs_at, o.arrives_at,
+              o.price_level, o.typical_low, o.typical_high, o.google_url, json.dumps(o.raw, default=str))
+             for o in offers])
 
     def record_offers(self, search_id: int, offers: list[Offer]) -> None:
         with self.conn:
-            self.conn.executemany(
-                """INSERT INTO offers (search_id, provider, price_total, currency, per_person, airlines_json,
-                   stops, duration_minutes, departs_at, arrives_at, price_level, typical_low, typical_high,
-                   google_url, flight_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
-                [(search_id, o.provider.value, o.price_total, o.currency, o.per_person,
-                  json.dumps(o.airlines), o.stops, o.duration_minutes, o.departs_at, o.arrives_at,
-                  o.price_level, o.typical_low, o.typical_high, o.google_url, json.dumps(o.raw, default=str))
-                 for o in offers])
+            self._insert_offers(search_id, offers)
 
     def save_result(self, run_id: int, result: SearchResult, now: datetime) -> int:
+        # Single transaction: search + offers commit or roll back together.
         with self.conn:
-            sid = self.record_search(run_id, result.request, result.provider, "ok", now, raw_path=result.raw_path)
-            self.record_offers(sid, result.offers)
+            sid = self._insert_search(run_id, result.request, result.provider, "ok", now, raw_path=result.raw_path)
+            self._insert_offers(sid, result.offers)
         return sid
 
     def last_observed(self, req: SearchRequest) -> datetime | None:
