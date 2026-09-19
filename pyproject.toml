@@ -12,6 +12,7 @@ dependencies = [
     "python-dotenv>=1.0",
     "fast-flights>=3.1,<4",
     "typing_extensions>=4.12",
+    "primp>=2.0",
 ]
 
 [project.scripts]

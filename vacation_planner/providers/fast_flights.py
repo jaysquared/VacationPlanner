@@ -3,17 +3,41 @@ from __future__ import annotations
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
-from fast_flights import FlightQuery, FlightsNotFound, Passengers, create_query, get_flights
-from fast_flights.parser import ResultList
+from fast_flights import FlightQuery, FlightsNotFound, Passengers, create_query
+from fast_flights.fetcher import URL as _GOOGLE_FLIGHTS_URL
+from fast_flights.integrations.base import FetchIntegration
+from fast_flights.parser import ResultList, parse
 from fast_flights.querying import Query
+from primp import Client
 
 from ..config import Settings
 from ..models import Offer, Provider, SearchRequest, SearchResult, SeatClass
 from .base import ProviderError, filter_excluded, per_person
 
 SEAT = {SeatClass.ECONOMY: "economy", SeatClass.BUSINESS: "business"}
+
+CONSENT_COOKIE = "SOCS=CAI"   # skips Google's EU consent interstitial
+
+
+class ConsentFetch(FetchIntegration):
+    """Fetch the Google Flights page with a consent cookie so EU IPs get the data page, not the consent wall."""
+
+    def __init__(self, client_factory: Callable[..., Any] = Client):
+        self._client_factory = client_factory
+
+    def fetch_html(self, q: Query | str, /) -> str:
+        client = self._client_factory(
+            impersonate="chrome_145", impersonate_os="macos", referer=True,
+            cookie_store=True, headers={"Cookie": CONSENT_COOKIE},
+        )
+        params = q.params() if isinstance(q, Query) else {"q": q}
+        return client.get(_GOOGLE_FLIGHTS_URL, params=params).text
+
+
+def fetch_with_consent(q: Query) -> ResultList:
+    return parse(ConsentFetch().fetch_html(q))
 
 
 def _fmt(sd) -> str:
@@ -57,7 +81,7 @@ def parse_results(results: ResultList, req: SearchRequest, url: str, price_is_to
 class FastFlightsClient:
     provider = Provider.FAST_FLIGHTS
 
-    def __init__(self, settings: Settings, fetch: Callable[[Query], ResultList] = get_flights,
+    def __init__(self, settings: Settings, fetch: Callable[[Query], ResultList] = fetch_with_consent,
                  sleep: Callable[[float], None] = time.sleep):
         self.settings = settings
         self.fetch = fetch

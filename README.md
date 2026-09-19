@@ -26,6 +26,10 @@ Weekly flight deal scanner for Hamburg school holidays. See
 
 Runs happen Mondays 05:00 UTC. Change the cron and `budget.runs_per_month` together.
 
+## First live run
+
+The SerpApi fixture in `tests/fixtures/serpapi_ham_bkk.json` is synthetic until the first real search is recorded (see `docs/superpowers/plans/2026-09-19-vacation-planner.md` Task 16 for the steps). `fast-flights` sends a `SOCS=CAI` consent cookie with its requests so it works from EU networks, where Google would otherwise return a consent interstitial instead of the flights page.
+
 ## Config
 
 - `config/holidays.yaml` — the slots and, per slot, which destinations to search (`targets`). Only listed targets are ever searched.

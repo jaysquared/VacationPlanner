@@ -7,6 +7,7 @@ from vacation_planner.config import load_config
 from vacation_planner.models import Provider, SearchRequest, SeatClass
 from vacation_planner.providers.base import ProviderError
 from vacation_planner.providers.fast_flights import FastFlightsClient, parse_results
+from tests.conftest import REPO_CONFIG
 from tests.fixtures.fast_flights_result import build
 
 REQ = SearchRequest("herbst-2026", "HAM", "BKK", date(2026, 10, 17), date(2026, 10, 31), SeatClass.BUSINESS, 2, 1)
@@ -60,3 +61,30 @@ def test_search_wraps_failures(settings):
 
     with pytest.raises(ProviderError):
         FastFlightsClient(settings, fetch=empty, sleep=lambda s: None).search(REQ)
+
+
+def test_consent_fetch_sends_cookie_and_returns_text():
+    from vacation_planner.providers.fast_flights import CONSENT_COOKIE, ConsentFetch
+    calls = {}
+
+    class FakeResp:
+        text = "<html>ok</html>"
+
+    class FakeClient:
+        def __init__(self, **kw):
+            calls["kw"] = kw
+        def get(self, url, params=None):
+            calls["url"], calls["params"] = url, params
+            return FakeResp()
+
+    q = FastFlightsClient(load_config(REPO_CONFIG, env={}).settings).build_query(REQ)
+    html = ConsentFetch(client_factory=FakeClient).fetch_html(q)
+    assert html == "<html>ok</html>"
+    assert calls["kw"]["headers"] == {"Cookie": CONSENT_COOKIE}
+    assert calls["url"].startswith("https://www.google.com/travel/flights")
+    assert calls["params"]["tfs"] == q.params()["tfs"]
+
+
+def test_default_fetch_is_consent_aware(settings):
+    from vacation_planner.providers.fast_flights import fetch_with_consent
+    assert FastFlightsClient(settings).fetch is fetch_with_consent
