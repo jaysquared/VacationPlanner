@@ -69,6 +69,32 @@ def test_backup_failure_is_error():
     p, b = Primary(fail={("HAM", "BKK")}), Backup(fail={("HAM", "BKK")})
     s = execute([PlannedSearch(req("BKK"), Provider.SERPAPI)], {Provider.SERPAPI: p, Provider.FAST_FLIGHTS: b}, db, settings(), lambda: NOW)
     assert (s.ok, s.errors, s.status) == (0, 1, "partial")
+    row = db.searches_in_run(s.run_id, "error")[0]
+    assert row.provider is Provider.FAST_FLIGHTS and "; backup: " in row.error
+    assert len(db.searches_in_run(s.run_id, "error")) == 1
+
+
+def test_primary_quota_then_backup_error_records_once_and_keeps_primary_dead():
+    db = Storage(":memory:")
+    p, b = Primary(quota_after=0), Backup(fail={("HAM", "DXB")})
+    planned = [PlannedSearch(req(d), Provider.SERPAPI) for d in ("BKK", "DXB", "MLE")]
+    s = execute(planned, {Provider.SERPAPI: p, Provider.FAST_FLIGHTS: b}, db, settings(), lambda: NOW)
+    # BKK ok on primary; DXB: primary quota -> backup fails -> one error row on backup; MLE: primary dead -> backup ok
+    assert (s.ok, s.errors, s.skipped, s.fallbacks, s.status) == (2, 1, 0, 2, "partial")
+    assert len(p.calls) == 2
+    err = db.searches_in_run(s.run_id, "error")
+    assert len(err) == 1 and err[0].destination == "DXB" and err[0].provider is Provider.FAST_FLIGHTS and "; backup: " in err[0].error
+    assert db.searches_in_run(s.run_id)[-1].provider is Provider.FAST_FLIGHTS  # MLE went to backup
+
+
+def test_backup_planned_quota_does_not_kill_primary():
+    db = Storage(":memory:")
+    p, b = Primary(), Backup(quota_after=-1)   # backup raises quota on its first call
+    planned = [PlannedSearch(req("BKK"), Provider.FAST_FLIGHTS), PlannedSearch(req("DXB"), Provider.SERPAPI)]
+    s = execute(planned, {Provider.SERPAPI: p, Provider.FAST_FLIGHTS: b}, db, settings(), lambda: NOW)
+    assert (s.ok, s.errors, s.skipped, s.fallbacks) == (1, 1, 0, 0)
+    assert db.searches_in_run(s.run_id, "error")[0].provider is Provider.FAST_FLIGHTS
+    assert db.searches_in_run(s.run_id)[0].destination == "DXB" and len(p.calls) == 1
 
 
 def test_empty_plan():
