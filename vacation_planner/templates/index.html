@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Vacation Planner{% endblock %}
+{% block body %}
+<h1>Vacation Planner</h1>
+<p class="muted">Hamburg school holidays · 2 adults + 1 child · Business outside Europe</p>
+
+<h2>New deals</h2>
+{% if data.new_deals %}
+<div class="wrap"><table>
+<tr><th>Slot</th><th>Route</th><th>Dates</th><th class="num">Total</th><th class="num">Per person</th><th>Airlines</th><th>Why</th><th></th></tr>
+{% for d in data.new_deals %}
+<tr class="deal">
+  <td>{{ slot_name(d.search.slot_id) }}</td>
+  <td>{{ d.search.origin }} → {{ d.search.destination }} <span class="badge">{{ d.search.seat.value }}</span></td>
+  <td>{{ d.search.outbound_date }} – {{ d.search.return_date }} ({{ (d.search.return_date - d.search.outbound_date).days }} n)</td>
+  <td class="num">{{ money(d.offer.price_total) }}</td>
+  <td class="num">{{ money(d.offer.per_person) }}</td>
+  <td>{{ d.offer.airlines|join(', ') }} · {{ d.offer.stops }} stop{{ '' if d.offer.stops == 1 else 's' }}</td>
+  <td>{% for r in d.reasons %}<span class="badge deal">{{ r.value.replace('_', ' ') }}</span> {% endfor %}</td>
+  <td><a href="{{ d.offer.google_url }}">Google Flights</a></td>
+</tr>
+{% endfor %}
+</table></div>
+{% else %}
+<p class="muted">No deals in the last run.</p>
+{% endif %}
+
+{% for slot, window, routes in data.slots %}
+<h2>{{ slot.name }} <span class="muted">· free {{ window.start }} – {{ window.end }} ({{ window.days }} days)</span></h2>
+{% if not slot.targets %}
+<p class="muted">No targets configured.</p>
+{% elif not routes %}
+<p class="muted">Not searched yet.</p>
+{% else %}
+<div class="wrap"><table>
+<tr><th>Destination</th><th>Dates</th><th class="num">Total</th><th class="num">Per person</th><th class="num">vs median</th><th>Level</th><th>Airlines</th><th>Searched</th><th></th></tr>
+{% for r in routes %}
+<tr class="{{ 'deal' if r.is_deal else '' }}">
+  <td>{{ r.destination.name }} ({{ r.destination.code }}) <span class="badge">{{ r.seat.value }}</span>{% if r.is_deal %} <span class="badge deal">deal</span>{% endif %}</td>
+  <td>{{ r.best.search.outbound_date }} – {{ r.best.search.return_date }}</td>
+  <td class="num">{{ money(r.best.offer.price_total) }}</td>
+  <td class="num">{{ money(r.best.offer.per_person) }}</td>
+  <td class="num">{% if r.ratio %}{{ '%+.0f%%'|format((r.ratio - 1) * 100) }}{% else %}–{% endif %}</td>
+  <td class="level-{{ r.best.offer.price_level or 'none' }}">{{ r.best.offer.price_level or '–' }}</td>
+  <td>{{ r.best.offer.airlines|join(', ') }} · {{ r.best.offer.stops }} stop{{ '' if r.best.offer.stops == 1 else 's' }}</td>
+  <td>{{ r.best.search.requested_at.strftime('%Y-%m-%d') }} · {{ r.best.search.provider.value }}</td>
+  <td><a href="{{ r.best.offer.google_url }}">Book</a> · <a href="{{ r.page }}">History</a></td>
+</tr>
+{% endfor %}
+</table></div>
+{% endif %}
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Vacation Planner{% endblock %}</title>
+<style>
+  :root { --bg:#fff; --fg:#1a1a1a; --muted:#666; --line:#e3e3e3; --deal:#0a7d32; --dealbg:#e6f6ec; --low:#0a7d32; --high:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111; --fg:#eee; --muted:#aaa; --line:#333; --dealbg:#10301c; } }
+  body { margin:0; padding:16px; background:var(--bg); color:var(--fg); font:15px/1.45 system-ui, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; } h2 { font-size: 1.2rem; margin: 28px 0 8px; }
+  .muted { color: var(--muted); }
+  table { width:100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align:left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+  td.num, th.num { text-align:right; font-variant-numeric: tabular-nums; }
+  .wrap { overflow-x:auto; }
+  .deal { background: var(--dealbg); }
+  .badge { display:inline-block; padding:1px 6px; border-radius: 4px; font-size: 12px; border:1px solid var(--line); }
+  .badge.deal { color: var(--deal); border-color: var(--deal); }
+  .level-low { color: var(--low); } .level-high { color: var(--high); }
+  footer { margin-top: 32px; font-size: 13px; color: var(--muted); }
+  a { color: inherit; }
+</style>
+</head>
+<body><main>
+{% block body %}{% endblock %}
+<footer>Generated {{ data.generated_at.strftime('%Y-%m-%d %H:%M UTC') }} · SerpApi searches this month: {{ data.serpapi_used_this_month }} / {{ data.serpapi_budget }}</footer>
+</main></body>
+</html>
