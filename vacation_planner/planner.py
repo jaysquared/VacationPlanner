@@ -4,7 +4,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from .calendar import Window, free_window, pax_for
 from .config import BudgetSettings, Config
-from .models import Nights, PlannedSearch, SearchRequest, Slot, seat_for
+from .models import Nights, PlannedSearch, Provider, SearchRequest, Slot, seat_for
 from .storage import Storage
 
 
@@ -54,7 +54,12 @@ def plan(config: Config, storage: Storage, today: date) -> list[PlannedSearch]:
             for dest_code in slot.targets:
                 requests.extend(_route_requests(config, storage, slot, origin, dest_code, today))
 
-    primary_n = serpapi_share(s.budget)
+    # The cron fires on Mondays, so a month can have five runs: the per-run share alone
+    # (serpapi_per_month / runs_per_month) would overshoot the free tier. Cap by what this
+    # calendar month has actually spent.
+    month_start = datetime(today.year, today.month, 1, tzinfo=timezone.utc)
+    used = storage.searches_by_provider_since(Provider.SERPAPI, month_start)
+    primary_n = max(0, min(serpapi_share(s.budget), s.budget.serpapi_per_month - used))
     backup = s.providers.backup
     limit = s.budget.max_searches_per_run if backup else primary_n
     out = []

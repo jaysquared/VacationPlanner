@@ -10,7 +10,7 @@ providers:
   price_is_total: true
 budget:
   serpapi_per_month: 100
-  runs_per_month: 4
+  runs_per_month: 4               # Mondays: 4-5 runs/month; the planner also caps by actual monthly usage
   max_searches_per_run: 60
   max_pairs_per_route_per_run: 3
 deals:

@@ -2,7 +2,7 @@ from datetime import date, datetime, timezone
 
 from vacation_planner.calendar import Window
 from vacation_planner.config import load_config
-from vacation_planner.models import Nights, Provider, SearchResult, SeatClass
+from vacation_planner.models import Nights, Provider, SearchRequest, SearchResult, SeatClass
 from vacation_planner.planner import candidate_pairs, plan, serpapi_share
 from vacation_planner.storage import Storage
 
@@ -96,3 +96,41 @@ def test_plan_never_searches_past_outbound_dates(config_dir):
     herbst = [p.request for p in ps if p.request.slot_id == "herbst-2026"]
     assert herbst
     assert all(p.outbound_date > today for p in herbst)
+
+
+SEED_AT = datetime(2026, 9, 10, tzinfo=timezone.utc)
+
+
+def seed_serpapi(db: Storage, n: int) -> None:
+    """n SerpApi searches already spent this month, on a route nothing plans."""
+    run = db.start_run(SEED_AT, n)
+    r = SearchRequest("seed", "XXX", "YYY", date(2026, 12, 1), date(2026, 12, 8), SeatClass.ECONOMY, 2, 1)
+    for _ in range(n):
+        db.record_search(run, r, Provider.SERPAPI, "ok", SEED_AT)
+
+
+def test_plan_caps_serpapi_at_the_remaining_monthly_budget(config_dir):
+    cfg = load_config_dir(config_dir)
+    db = Storage(":memory:")
+    seed_serpapi(db, 90)
+    ps = plan(cfg, db, TODAY)
+    assert sum(1 for p in ps if p.provider is Provider.SERPAPI) == 10
+    assert all(p.provider is Provider.SERPAPI for p in ps[:10])
+    assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[10:])
+
+
+def test_plan_uses_only_the_backup_when_the_month_is_spent(config_dir):
+    cfg = load_config_dir(config_dir)
+    db = Storage(":memory:")
+    seed_serpapi(db, 100)
+    ps = plan(cfg, db, TODAY)
+    assert ps and all(p.provider is Provider.FAST_FLIGHTS for p in ps)
+
+
+def test_plan_is_empty_when_the_month_is_spent_and_no_backup(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("backup: fast_flights", "backup: null"))
+    cfg = load_config_dir(config_dir)
+    db = Storage(":memory:")
+    seed_serpapi(db, 100)
+    assert plan(cfg, db, TODAY) == []

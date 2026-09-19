@@ -183,7 +183,7 @@ providers:
   backup_pause_seconds: 5
 budget:
   serpapi_per_month: 100
-  runs_per_month: 4               # weekly, matches the CI cron
+  runs_per_month: 4               # weekly (Mondays: 4-5 runs/month), matches the CI cron
   max_searches_per_run: 60        # hard cap incl. backup
   max_pairs_per_route_per_run: 3
 deals:
@@ -245,8 +245,11 @@ Input: config, today's date, storage (for freshness). Output: ordered list of
    first. Take at most `max_pairs_per_route_per_run`.
 4. Concatenate routes in slot order and cut at `max_searches_per_run`.
    The first `serpapi_per_month / runs_per_month` (rounded down, minimum 1)
-   are assigned to the primary provider, the rest to the backup. With no
-   backup configured the cut is at the primary share.
+   are assigned to the primary provider, the rest to the backup. That share is
+   additionally capped at `serpapi_per_month` minus the primary searches already
+   recorded this calendar month, because a month with five Mondays would
+   otherwise spend five shares. With no backup configured the cut is at the
+   (capped) primary share, so a spent month plans nothing.
 
 The `plan` CLI command prints this list and its count without spending
 anything.
@@ -343,7 +346,9 @@ Entry point `vacation-planner` (typer):
 
 GitHub Actions workflow `scan.yml`:
 
-- Triggers: cron Monday 05:00 UTC (4 runs/month, matching `runs_per_month`),
+- Triggers: cron Monday 05:00 UTC (4-5 runs/month depending on the month;
+  `runs_per_month` sets the per-run share and the planner caps it by the
+  primary searches actually recorded this month),
   `workflow_dispatch` with optional `limit`.
 - Steps: checkout, set up Python 3.12, install with `uv sync`,
   `vacation-planner run`, commit `data/planner.sqlite` and `docs/site/` with
