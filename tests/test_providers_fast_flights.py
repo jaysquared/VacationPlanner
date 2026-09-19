@@ -5,7 +5,7 @@ import pytest
 from fast_flights import FlightsNotFound
 
 from vacation_planner.config import load_config
-from vacation_planner.models import Provider, SearchRequest, SeatClass
+from vacation_planner.models import Leg, Provider, SearchRequest, SeatClass
 from vacation_planner.providers.base import ProviderError
 from vacation_planner.providers.fast_flights import FastFlightsClient, parse_results
 from tests.conftest import REPO_CONFIG
@@ -35,6 +35,8 @@ def test_parse_results_maps_codes_and_times():
     assert o.departs_at == "2026-10-17 10:35" and o.arrives_at == "2026-10-18 06:10"
     assert o.duration_minutes == 1175 and o.price_level is None and o.google_url == "https://g/url"
     assert o.per_person == 1980
+    assert o.legs == [Leg("HAM", "FRA", "2026-10-17 10:35", "2026-10-17 11:45"),
+                      Leg("FRA", "BKK", "2026-10-17 13:55", "2026-10-18 06:10")]
 
 
 def test_search_filters_excluded_and_pauses(settings):
@@ -46,7 +48,8 @@ def test_search_filters_excluded_and_pauses(settings):
 
     c = FastFlightsClient(settings, fetch=fetch, sleep=sleeps.append)
     res = c.search(REQ)
-    assert [o.price_total for o in res.offers] == [5940, 6100]
+    # 4100 is Air India (excluded); 6100 stops in DXB 23:05 -> 03:30 (too long, and at night)
+    assert [o.price_total for o in res.offers] == [5940]
     assert sleeps == [5.0] and len(calls) == 1 and res.raw_path is None
 
 
@@ -127,13 +130,21 @@ def test_excluded_airline_is_dropped_by_name_too(settings):
     assert all("Air India" not in o.airlines and "AI" not in o.airlines for o in res.offers)
 
 
-def test_unmapped_airline_name_warns_and_keeps_the_raw_name(settings, caplog):
+def test_unmapped_airline_name_warns_and_keeps_the_raw_name(caplog):
     rl = build()
     rl.metadata.airlines = [a for a in rl.metadata.airlines if a.name != "Emirates"]
     with caplog.at_level("WARNING", logger="vacation_planner.providers.fast_flights"):
-        res = FastFlightsClient(settings, fetch=lambda q: rl, sleep=lambda s: None).search(REQ)
-    assert ["Emirates"] in [o.airlines for o in res.offers]
+        offers = parse_results(rl, REQ, "https://g/url", price_is_total=True)
+    assert ["Emirates"] in [o.airlines for o in offers]
     assert "Emirates" in caplog.text
+
+
+def test_search_drops_a_night_stop(settings):
+    """The Emirates itinerary waits in DXB from 23:05 to 03:30."""
+    offers = parse_results(build(), REQ, "https://g/url", price_is_total=True)
+    assert 6100 in [o.price_total for o in offers]          # parsing keeps it
+    res = FastFlightsClient(settings, fetch=lambda q: build(), sleep=lambda s: None).search(REQ)
+    assert 6100 not in [o.price_total for o in res.offers]  # the client drops it
 
 
 def test_pause_comes_from_the_provider_entry(config_dir):

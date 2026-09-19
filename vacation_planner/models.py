@@ -71,6 +71,16 @@ class Travellers:
 
 
 @dataclass(frozen=True)
+class Leg:
+    """One flight inside an itinerary. Times are local, "YYYY-MM-DD HH:MM"."""
+
+    origin: str
+    destination: str
+    departs_at: str
+    arrives_at: str
+
+
+@dataclass(frozen=True)
 class SearchRequest:
     slot_id: str
     origin: str
@@ -106,6 +116,7 @@ class Offer:
     typical_high: float | None
     google_url: str
     raw: dict = field(default_factory=dict)
+    legs: list[Leg] = field(default_factory=list)
 
 
 @dataclass

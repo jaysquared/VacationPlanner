@@ -14,8 +14,8 @@ from fast_flights.querying import Query
 from primp import Client
 
 from ..config import Settings
-from ..models import Offer, Provider, SearchRequest, SearchResult, SeatClass
-from .base import ProviderError, filter_excluded, per_person
+from ..models import Leg, Offer, Provider, SearchRequest, SearchResult, SeatClass
+from .base import ProviderError, filter_excluded, filter_layovers, per_person
 
 log = logging.getLogger(__name__)
 
@@ -77,6 +77,8 @@ def parse_results(results: ResultList, req: SearchRequest, url: str, price_is_to
             duration_minutes=_minutes_between(first.departure, last.arrival),
             departs_at=_fmt(first.departure), arrives_at=_fmt(last.arrival),
             price_level=None, typical_low=None, typical_high=None, google_url=url,
+            legs=[Leg(l.from_airport.code, l.to_airport.code, _fmt(l.departure), _fmt(l.arrival))
+                  for l in it.flights],
             raw={"type": it.type, "airlines": it.airlines,
                  "legs": [{"from": l.from_airport.code, "to": l.to_airport.code, "dep": _fmt(l.departure),
                            "arr": _fmt(l.arrival), "duration": l.duration, "plane": l.plane_type} for l in it.flights]},
@@ -136,4 +138,5 @@ class FastFlightsClient:
         except Exception as e:   # layout change in the scraped page
             raise ProviderError(f"fast_flights: parse failed: {type(e).__name__}: {e}") from e
         offers = filter_excluded(parsed, excluded_terms)
+        offers = filter_layovers(offers, self.settings.layovers)
         return SearchResult(req, self.provider, offers, None)

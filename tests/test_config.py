@@ -30,7 +30,17 @@ def test_loads_repo_config(config_dir: Path):
     assert [e.name for e in cfg.settings.providers.budgeted()] == [Provider.SERPAPI, Provider.SEARCHAPI]
     assert cfg.settings.budget.max_searches_per_run == 120
     assert cfg.settings.nights == Nights(7, 14)
+    assert cfg.settings.max_stops == 2
+    assert cfg.settings.layovers.max_minutes == 180
+    assert cfg.settings.layovers.forbidden_window == ("23:00", "05:00")
     assert cfg.secrets.serpapi_key is None and cfg.secrets.searchapi_key is None
+
+
+def test_layovers_can_be_switched_off(config_dir: Path):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace('forbidden_window: ["23:00", "05:00"]', "forbidden_window: null"))
+    cfg = load_config(config_dir, env={})
+    assert cfg.settings.layovers.forbidden_window is None
 
 
 def test_origins_default_to_none_and_are_read_per_destination(config_dir: Path):

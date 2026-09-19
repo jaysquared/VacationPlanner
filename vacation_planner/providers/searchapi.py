@@ -8,8 +8,9 @@ from typing import Callable
 import httpx
 
 from ..config import Settings
-from ..models import Offer, Provider, SearchRequest, SearchResult, SeatClass
-from .base import AuthError, ProviderError, QuotaExhausted, filter_excluded, per_person, redact
+from ..models import Leg, Offer, Provider, SearchRequest, SearchResult, SeatClass
+from .base import (AuthError, ProviderError, QuotaExhausted, filter_excluded, filter_layovers,
+                   per_person, redact)
 from .serpapi import airline_codes   # same `flight_number` shape on the legs
 
 URL = "https://www.searchapi.io/api/v1/search"
@@ -23,6 +24,11 @@ __all__ = ["SearchApiClient", "airline_codes", "parse_response"]
 def _when(airport: dict) -> str:
     # SearchApi splits what SerpApi joins; the stored format stays "YYYY-MM-DD HH:MM".
     return f"{airport['date']} {airport['time']}"
+
+
+def itinerary_legs(flights: list[dict]) -> list[Leg]:
+    return [Leg(f["departure_airport"]["id"], f["arrival_airport"]["id"],
+                _when(f["departure_airport"]), _when(f["arrival_airport"])) for f in flights]
 
 
 def parse_response(data: dict, req: SearchRequest, price_is_total: bool) -> list[Offer]:
@@ -42,7 +48,7 @@ def parse_response(data: dict, req: SearchRequest, price_is_total: bool) -> list
             departs_at=_when(legs[0]["departure_airport"]), arrives_at=_when(legs[-1]["arrival_airport"]),
             price_level=insights.get("price_level"),
             typical_low=rng.get("low_price"), typical_high=rng.get("high_price"),
-            google_url=url, raw=it,
+            google_url=url, raw=it, legs=itinerary_legs(legs),
         ))
     return offers
 
@@ -129,4 +135,5 @@ class SearchApiClient:
         except Exception as e:   # layout change: the raw JSON above is kept for a fixture
             raise ProviderError(self._safe(f"searchapi: parse failed: {type(e).__name__}: {e}")) from e
         offers = filter_excluded(parsed, self.settings.excluded_airlines)
+        offers = filter_layovers(offers, self.settings.layovers)
         return SearchResult(req, self.provider, offers, raw_path)

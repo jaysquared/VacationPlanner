@@ -8,8 +8,9 @@ from typing import Callable
 import httpx
 
 from ..config import Settings
-from ..models import Offer, Provider, SearchRequest, SearchResult, SeatClass
-from .base import AuthError, ProviderError, QuotaExhausted, filter_excluded, per_person, redact
+from ..models import Leg, Offer, Provider, SearchRequest, SearchResult, SeatClass
+from .base import (AuthError, ProviderError, QuotaExhausted, filter_excluded, filter_layovers,
+                   per_person, redact)
 
 URL = "https://serpapi.com/search.json"
 TRAVEL_CLASS = {SeatClass.ECONOMY: "1", SeatClass.BUSINESS: "3"}
@@ -24,6 +25,11 @@ def airline_codes(itinerary: dict) -> list[str]:
         if code not in codes:
             codes.append(code)
     return codes
+
+
+def itinerary_legs(flights: list[dict]) -> list[Leg]:
+    return [Leg(f["departure_airport"]["id"], f["arrival_airport"]["id"],
+                f["departure_airport"]["time"], f["arrival_airport"]["time"]) for f in flights]
 
 
 def parse_response(data: dict, req: SearchRequest, price_is_total: bool) -> list[Offer]:
@@ -42,7 +48,7 @@ def parse_response(data: dict, req: SearchRequest, price_is_total: bool) -> list
             duration_minutes=int(it.get("total_duration") or sum(l.get("duration", 0) for l in legs)),
             departs_at=legs[0]["departure_airport"]["time"], arrives_at=legs[-1]["arrival_airport"]["time"],
             price_level=insights.get("price_level"), typical_low=rng[0], typical_high=rng[1],
-            google_url=url, raw=it,
+            google_url=url, raw=it, legs=itinerary_legs(legs),
         ))
     return offers
 
@@ -120,4 +126,5 @@ class SerpApiClient:
         except Exception as e:   # layout change: the raw JSON above is kept for a fixture
             raise ProviderError(self._safe(f"serpapi: parse failed: {type(e).__name__}: {e}")) from e
         offers = filter_excluded(parsed, self.settings.excluded_airlines)
+        offers = filter_layovers(offers, self.settings.layovers)
         return SearchResult(req, self.provider, offers, raw_path)

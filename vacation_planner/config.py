@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, time
 from pathlib import Path
 from typing import Literal, Mapping
 
@@ -123,6 +123,25 @@ class BudgetSettings(BaseModel):
         return v
 
 
+class LayoverSettings(BaseModel):
+    """Limits on the stops of an itinerary (see `itinerary.passes_layover_rule`)."""
+
+    max_minutes: int = 180
+    #: Local-time window no stop may touch, e.g. ["23:00", "05:00"]. None disables the check.
+    forbidden_window: tuple[str, str] | None = ("23:00", "05:00")
+
+    @field_validator("forbidden_window")
+    @classmethod
+    def _parseable(cls, v: tuple[str, str] | None) -> tuple[str, str] | None:
+        for text in v or ():
+            try:
+                hour, minute = text.split(":")
+                time(int(hour), int(minute))
+            except (ValueError, TypeError):
+                raise ValueError(f"expected a HH:MM time, got {text!r}") from None
+        return v
+
+
 class DealSettings(BaseModel):
     median_ratio: float
     min_history_points: int
@@ -143,6 +162,7 @@ class Settings(BaseModel):
     nights: Nights
     bridge_days: BridgeDays = BridgeDays()
     max_stops: int = 1
+    layovers: LayoverSettings = LayoverSettings()
     excluded_airlines: list[str] = []
     providers: ProviderSettings
     budget: BudgetSettings

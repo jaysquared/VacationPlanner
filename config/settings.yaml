@@ -2,6 +2,9 @@ origins: [HAM]
 nights: { min: 7, max: 14 }
 bridge_days: { before: 0, after: 0 }
 max_stops: 2
+layovers:
+  max_minutes: 180                        # each individual stop
+  forbidden_window: ["23:00", "05:00"]    # local time; a stop touching this window is rejected
 excluded_airlines: [AI]
 providers:
   order:

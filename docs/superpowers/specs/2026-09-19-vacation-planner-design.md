@@ -242,7 +242,10 @@ Plain dataclasses / pydantic models shared by all stages:
   adults, children, slot_id. Hashable; equality is the dedup key.
 - `Offer` — search reference, price_total, currency, per_person, airlines,
   stops, duration_minutes, departs_at, arrives_at, price_level,
-  typical_low, typical_high, google_url, raw flight JSON.
+  typical_low, typical_high, google_url, raw flight JSON, `legs`.
+- `Leg` — one flight of an itinerary: origin, destination, departs_at,
+  arrives_at (local times, "YYYY-MM-DD HH:MM", as the provider reports them).
+  The gaps between consecutive legs are the layovers (5.4a).
 - `Deal` — offer reference, slot_id, reasons (list of enum), score,
   detected_at, notified_at.
 
@@ -304,6 +307,19 @@ implementations plus a fake for tests.
 - `providers/executor.py`: walks the plan, tries the providers per 2.5,
   and writes each result through storage in its own transaction.
 
+### 5.4a Layover rule
+
+`settings.layovers` sets `max_minutes` (per individual stop) and an optional
+`forbidden_window` of local times, e.g. `["23:00", "05:00"]`.
+`itinerary.layovers(legs)` turns consecutive legs into `Layover(airport,
+starts_at, ends_at, minutes)`; `itinerary.passes_layover_rule(legs,
+settings)` is false as soon as one layover is longer than `max_minutes` or
+its half-open interval `[starts_at, ends_at)` overlaps the window on any day
+it spans (the window wraps midnight when its start is later than its end).
+Every client applies it through `providers.base.filter_layovers` directly
+after the excluded-airline filter; an offer whose legs the provider did not
+report is kept.
+
 ### 5.5 `storage` — SQLite
 
 File `data/planner.sqlite`, committed to the repo. Schema managed by numbered
@@ -315,7 +331,9 @@ migration scripts applied on startup.
   error)`
 - `offers(id, search_id, provider, price_total, currency, per_person, airlines_json,
   stops, duration_minutes, departs_at, arrives_at, price_level, typical_low,
-  typical_high, google_url, flight_json)`
+  typical_high, google_url, flight_json, legs_json)` — `legs_json` added by
+  migration `002_offer_legs.sql` (default `'[]'`), so the layover rule can be
+  re-checked from stored data
 - `deals(id, offer_id, slot_id, reasons_json, score, detected_at,
   notified_at)`
 - View: `cheapest_per_search`, plus the `route_observations` query method

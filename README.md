@@ -63,3 +63,21 @@ destinations:
 
 Each (origin, destination) pair is a route of its own, so
 `budget.max_pairs_per_route_per_run` applies per origin.
+
+### Layovers
+
+Up to `max_stops` stops per direction, and every single stop must be short and
+outside the night:
+
+```yaml
+layovers:
+  max_minutes: 180                        # each individual stop
+  forbidden_window: ["23:00", "05:00"]    # local time; a stop touching this window is rejected
+```
+
+A stop is measured in the stopover airport's local time, from the arrival of one
+leg to the departure of the next. It is rejected when it is longer than
+`max_minutes` or overlaps the window on any day it spans — so 23:00–05:00 kills a
+22:30–01:00 wait and a 04:30–06:00 one, while 05:00–07:00 is fine. Set
+`forbidden_window: null` to check the duration only. Itineraries a provider
+reports without legs are never rejected by this rule.
