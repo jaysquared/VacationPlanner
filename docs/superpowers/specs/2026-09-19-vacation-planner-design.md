@@ -1,7 +1,7 @@
 # Vacation Planner — Design Spec
 
 Date: 2026-09-19
-Status: draft for review
+Status: approved 2026-09-19
 
 ## 1. Purpose
 
@@ -48,9 +48,13 @@ test fixture):
   implementation. Offers store the raw price and the passenger counts so the
   per-person figure is derived, never guessed.
 
-Budget: free tier is 100 searches/month, the first paid plan is 5,000/month.
-The planner takes a monthly budget from config and never exceeds the per-run
-share of it.
+Budget: free tier is 100 searches/month; the first paid plan is 5,000/month
+at roughly USD 900/year, which is not planned. The project starts on the free
+tier with a small number of targets. The planner takes a monthly budget from
+config and never exceeds the per-run share of it. Because the per-run share
+is what limits coverage, the default schedule is twice weekly (about 12
+searches per run) rather than daily (3 per run). The `FlightClient` protocol
+keeps a later switch to another provider contained in one module.
 
 ## 3. Configuration
 
@@ -103,12 +107,12 @@ holidays:
     name: Herbstferien 2026
     start: 2026-10-19
     end: 2026-10-30
-    targets: [BKK, DXB]
+    targets: [BKK]
   - id: weihnachten-2026
     name: Weihnachtsferien 2026/27
     start: 2026-12-21
     end: 2027-01-01
-    targets: [MLE, CPT]
+    targets: [MLE]
     nights: { min: 10, max: 14 }     # optional override of settings
   - id: fruehjahr-2027
     name: Frühjahrsferien 2027
@@ -124,11 +128,12 @@ holidays:
     name: Sommerferien 2027
     start: 2027-07-01
     end: 2027-08-11
-    targets: [JFK, CUN]
+    targets: [JFK]
     nights: { min: 14, max: 21 }
 ```
 
-Seed data covers 2026/27 through 2029/30 from the PDF. The Halbjahrespause
+Seed data covers 2026/27 through 2029/30 from the PDF, with targets only on
+the 2026/27 slots and at most two per slot to stay inside the free tier. The Halbjahrespause
 (single Friday) is deliberately not seeded: with the enclosing weekend it is
 three days, always below the minimum trip length.
 
@@ -151,7 +156,7 @@ max_stops: 1                    # 0 nonstop, 1 one stop, 2 two stops (Google par
 excluded_airlines: [AI]
 budget:
   searches_per_month: 100
-  runs_per_month: 30
+  runs_per_month: 8               # twice weekly, matches the CI cron
   max_pairs_per_route_per_run: 3
 deals:
   median_ratio: 0.85            # price <= 85% of historical median
@@ -299,7 +304,8 @@ Entry point `vacation-planner` (typer):
 
 GitHub Actions workflow `scan.yml`:
 
-- Triggers: cron daily 05:00 UTC, `workflow_dispatch` with optional `limit`.
+- Triggers: cron Monday and Thursday 05:00 UTC (8 runs/month, matching
+  `runs_per_month`), `workflow_dispatch` with optional `limit`.
 - Steps: checkout, set up Python 3.12, install with `uv sync`,
   `vacation-planner run`, commit `data/planner.sqlite` and `docs/site/` with
   message `scan: <date> (<n> searches, <m> new deals)`, upload `data/raw/`
