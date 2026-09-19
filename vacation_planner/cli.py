@@ -64,28 +64,41 @@ def _guard_fake(c: Ctx, fake: bool) -> None:
         )
 
 
+KEY_ENV = {Provider.SERPAPI: "SERPAPI_KEY", Provider.SEARCHAPI: "SEARCHAPI_KEY"}
+
+
 def build_clients(config: Config, fake: bool) -> dict[Provider, FlightClient]:
-    ps = config.settings.providers
-    wanted = [ps.primary] + ([ps.backup] if ps.backup else [])
+    wanted = [e.name for e in config.settings.providers.order]
     if fake:
-        clients = {}
+        clients: dict[Provider, FlightClient] = {}
         for p in wanted:
             c = FakeFlightClient()
             c.provider = p
             clients[p] = c
         return clients
-    clients: dict[Provider, FlightClient] = {}
+
+    clients = {}
     for p in wanted:
         if p is Provider.SERPAPI:
             if not config.secrets.serpapi_key:
-                raise typer.BadParameter("SERPAPI_KEY is not set (put it in .env or the environment)")
+                log.warning("provider %s skipped: %s not set", p.value, KEY_ENV[p])
+                continue
             from .providers.serpapi import SerpApiClient
             clients[p] = SerpApiClient(config.secrets.serpapi_key, config.settings)
+        elif p is Provider.SEARCHAPI:
+            if not config.secrets.searchapi_key:
+                log.warning("provider %s skipped: %s not set", p.value, KEY_ENV[p])
+                continue
+            from .providers.searchapi import SearchApiClient
+            clients[p] = SearchApiClient(config.secrets.searchapi_key, config.settings)
         elif p is Provider.FAST_FLIGHTS:
             from .providers.fast_flights import FastFlightsClient
             clients[p] = FastFlightsClient(config.settings)
         else:
             raise typer.BadParameter(f"unsupported provider {p.value}")
+    if not clients:
+        names = ", ".join(KEY_ENV[p] for p in wanted if p in KEY_ENV)
+        raise typer.BadParameter(f"no usable provider: set {names} (in .env or the environment)")
     return clients
 
 

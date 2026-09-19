@@ -41,8 +41,7 @@ class ReportData:
     generated_at: datetime
     new_deals: list[NewDeal]
     slots: list[tuple[Slot, Window, list[RouteSummary]]]
-    serpapi_used_this_month: int
-    serpapi_budget: int
+    usage: list[tuple[Provider, int, int]]   # provider, searches this month, monthly budget
 
 
 def route_page_name(slot_id: str, origin: str, destination: str, seat: SeatClass) -> str:
@@ -92,8 +91,9 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
         slots.append((slot, window, routes))
 
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    used = storage.searches_by_provider_since(Provider.SERPAPI, month_start)
-    return ReportData(now, new_deals, slots, used, config.settings.budget.serpapi_per_month)
+    usage = [(e.name, storage.searches_by_provider_since(e.name, month_start), e.monthly_budget)
+             for e in config.settings.providers.budgeted()]
+    return ReportData(now, new_deals, slots, usage)
 
 
 def _env() -> Environment:

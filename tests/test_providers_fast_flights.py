@@ -134,3 +134,19 @@ def test_unmapped_airline_name_warns_and_keeps_the_raw_name(settings, caplog):
         res = FastFlightsClient(settings, fetch=lambda q: rl, sleep=lambda s: None).search(REQ)
     assert ["Emirates"] in [o.airlines for o in res.offers]
     assert "Emirates" in caplog.text
+
+
+def test_pause_comes_from_the_provider_entry(config_dir):
+    settings = load_config(config_dir, env={}).settings
+    sleeps = []
+    FastFlightsClient(settings, fetch=lambda q: build(), sleep=sleeps.append).search(REQ)
+    assert sleeps == [5.0]
+
+
+def test_pause_defaults_to_zero_when_fast_flights_is_not_listed(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(re.sub(r"    - \{ name: fast_flights.*\n", "", st.read_text()))
+    settings = load_config(config_dir, env={}).settings
+    sleeps = []
+    FastFlightsClient(settings, fetch=lambda q: build(), sleep=sleeps.append).search(REQ)
+    assert sleeps == [0.0]

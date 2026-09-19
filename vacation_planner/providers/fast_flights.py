@@ -92,6 +92,10 @@ class FastFlightsClient:
         self.settings = settings
         self.fetch = fetch
         self.sleep = sleep
+        try:   # keyless and unlimited, so it is rate-limited by a pause instead of a budget
+            self.pause_seconds = settings.providers.entry(Provider.FAST_FLIGHTS).pause_seconds
+        except KeyError:
+            self.pause_seconds = 0.0
 
     def build_query(self, req: SearchRequest) -> Query:
         ms = self.settings.max_stops
@@ -107,7 +111,7 @@ class FastFlightsClient:
 
     def search(self, req: SearchRequest, raw_dir: Path | None = None) -> SearchResult:
         q = self.build_query(req)
-        self.sleep(self.settings.providers.backup_pause_seconds)
+        self.sleep(self.pause_seconds)
         try:
             results = self.fetch(q)
         except FlightsNotFound as e:

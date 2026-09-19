@@ -32,6 +32,7 @@ jobs:
       - name: Run planner
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          SEARCHAPI_KEY: ${{ secrets.SEARCHAPI_KEY }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}

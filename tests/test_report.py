@@ -45,7 +45,7 @@ def test_build_report_summarises_best_and_median(config_dir):
     r = herbst[0]
     assert r.destination.code == "BKK" and r.best.offer.price_total == 7000
     assert r.median == 8800 and round(r.ratio, 3) == 0.795 and r.is_deal is True   # median of 9000, 8800, 9100, 7000, 7600
-    assert data.serpapi_used_this_month == 5 and data.serpapi_budget == 100
+    assert data.usage == [(Provider.SERPAPI, 5, 250), (Provider.SEARCHAPI, 0, 100)]
     # past slots are hidden, future slots without targets are shown
     ids = [slot.id for slot, _, _ in data.slots]
     assert "herbst-2027" in ids and ids == sorted(ids, key=lambda i: next(s.start for s in cfg.slots if s.id == i))
@@ -62,6 +62,7 @@ def test_render_writes_index_and_route_pages(config_dir, tmp_path):
     assert "google low" in index and "below median" in index and "new low" in index   # reason badges
     assert 'class="level-low"' in index
     assert "<script" not in index
+    assert "serpapi 5 / 250" in index and "searchapi 0 / 100" in index   # budget footer
     route = (tmp_path / "routes" / "herbst-2026-HAM-BKK-business.html").read_text()
     assert route.count("<tr") >= 6  # header + 5 observations
     assert all(p.exists() for p in written)

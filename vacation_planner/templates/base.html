@@ -25,6 +25,6 @@
 </head>
 <body><main>
 {% block body %}{% endblock %}
-<footer>Generated {{ data.generated_at.strftime('%Y-%m-%d %H:%M UTC') }} · SerpApi searches this month: {{ data.serpapi_used_this_month }} / {{ data.serpapi_budget }}</footer>
+<footer>Generated {{ data.generated_at.strftime('%Y-%m-%d %H:%M UTC') }}{% if data.usage %} · searches this month: {% for provider, used, budget in data.usage %}{{ provider.value }} {{ used }} / {{ budget }}{% if not loop.last %} · {% endif %}{% endfor %}{% endif %}</footer>
 </main></body>
 </html>
