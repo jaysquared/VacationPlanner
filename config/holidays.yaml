@@ -1,10 +1,10 @@
 source: https://www.hamburg.de/resource/blob/134372/5bc131bdd36a604f67b361d21f7df37e/ferienordnung-hamburg-2024-2030-data.pdf
 holidays:
-  - { id: herbst-2026,      name: "Herbstferien 2026",           start: 2026-10-19, end: 2026-10-30, targets: [BKK] }
-  - { id: weihnachten-2026, name: "Weihnachtsferien 2026/27",    start: 2026-12-21, end: 2027-01-01, targets: [MLE], nights: { min: 10, max: 14 } }
-  - { id: fruehjahr-2027,   name: "Frühjahrsferien 2027",        start: 2027-03-01, end: 2027-03-12, targets: [DXB] }
-  - { id: pfingsten-2027,   name: "Himmelfahrt/Pfingsten 2027",  start: 2027-05-07, end: 2027-05-14, targets: [PMI, LIS], nights: { min: 7, max: 9 } }
-  - { id: sommer-2027,      name: "Sommerferien 2027",           start: 2027-07-01, end: 2027-08-11, targets: [JFK], nights: { min: 14, max: 21 } }
+  - { id: herbst-2026,      name: "Herbstferien 2026",           start: 2026-10-19, end: 2026-10-30, targets: [] }
+  - { id: weihnachten-2026, name: "Weihnachtsferien 2026/27",    start: 2026-12-21, end: 2027-01-01, targets: [HKT, BKK, MLE, CMB, CUN, PUJ, BGI, SIN, MRU, CPT, DPS, ZNZ, SEZ, SGN, PQC, KUL, LGK], nights: { min: 10, max: 14 } }
+  - { id: fruehjahr-2027,   name: "Frühjahrsferien 2027",        start: 2027-03-01, end: 2027-03-12, targets: [] }
+  - { id: pfingsten-2027,   name: "Himmelfahrt/Pfingsten 2027",  start: 2027-05-07, end: 2027-05-14, targets: [TFS, LPA, FUE], nights: { min: 7, max: 9 } }
+  - { id: sommer-2027,      name: "Sommerferien 2027",           start: 2027-07-01, end: 2027-08-11, targets: [], nights: { min: 14, max: 21 } }
   - { id: herbst-2027,      name: "Herbstferien 2027",           start: 2027-10-11, end: 2027-10-22, targets: [] }
   - { id: weihnachten-2027, name: "Weihnachtsferien 2027/28",    start: 2027-12-20, end: 2027-12-31, targets: [] }
   - { id: fruehjahr-2028,   name: "Frühjahrsferien 2028",        start: 2028-03-06, end: 2028-03-17, targets: [] }

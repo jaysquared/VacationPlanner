@@ -1,7 +1,7 @@
 origins: [HAM]
 nights: { min: 7, max: 14 }
 bridge_days: { before: 0, after: 0 }
-max_stops: 1
+max_stops: 2
 excluded_airlines: [AI]
 providers:
   order:

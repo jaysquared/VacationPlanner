@@ -1,21 +1,25 @@
 destinations:
-  # Europe: any cabin
-  - { code: LIS, name: Lisbon, cabin: any }
-  - { code: PMI, name: Palma de Mallorca, cabin: any }
-  - { code: ATH, name: Athens, cabin: any }
-  - { code: FNC, name: Madeira, cabin: any }
+  # Europe / short haul: any cabin, Hamburg only
   - { code: TFS, name: Tenerife South, cabin: any }
-  - { code: LCA, name: Larnaca, cabin: any }
-  # Long haul: Business only
-  - { code: BKK, name: Bangkok, cabin: business, max_price_per_person: 2200 }
-  - { code: HKT, name: Phuket, cabin: business, max_price_per_person: 2400 }
-  - { code: DXB, name: Dubai, cabin: business, max_price_per_person: 1500 }
-  - { code: MLE, name: Malé, cabin: business, max_price_per_person: 2800 }
-  - { code: CPT, name: Cape Town, cabin: business, max_price_per_person: 2500 }
-  - { code: MRU, name: Mauritius, cabin: business, max_price_per_person: 2800 }
-  - { code: JFK, name: New York, cabin: business, max_price_per_person: 1900 }
-  - { code: MIA, name: Miami, cabin: business, max_price_per_person: 2200 }
-  - { code: CUN, name: Cancún, cabin: business, max_price_per_person: 2500 }
-  - { code: NRT, name: Tokyo Narita, cabin: business, max_price_per_person: 2800 }
-  - { code: SIN, name: Singapore, cabin: business, max_price_per_person: 2500 }
-  - { code: DPS, name: Bali, cabin: business, max_price_per_person: 2900 }
+  - { code: LPA, name: Gran Canaria, cabin: any }
+  - { code: FUE, name: Fuerteventura, cabin: any }
+  - { code: PMI, name: Palma de Mallorca, cabin: any }
+  - { code: LIS, name: Lisbon, cabin: any }
+  # Long haul: Business only, Hamburg or Frankfurt (FRA must beat HAM by the configured margin)
+  - { code: HKT, name: Phuket, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+  - { code: BKK, name: Bangkok, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+  - { code: MLE, name: Malé (Maldives), cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: CMB, name: Colombo (Sri Lanka), cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+  - { code: CUN, name: Cancún, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: PUJ, name: Punta Cana, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: BGI, name: Barbados, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: SIN, name: Singapore, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: MRU, name: Mauritius, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: CPT, name: Cape Town, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: DPS, name: Bali (Denpasar), cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: ZNZ, name: Zanzibar, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: SEZ, name: Seychelles (Mahé), cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: SGN, name: Ho Chi Minh City, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+  - { code: PQC, name: Phu Quoc, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+  - { code: KUL, name: Kuala Lumpur, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+  - { code: LGK, name: Langkawi, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
