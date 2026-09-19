@@ -44,7 +44,7 @@ def test_params_mapping(client):
     assert p["flight_type"] == "round_trip" and p["travel_class"] == "business"
     assert p["adults"] == "2" and p["children"] == "1"
     assert p["currency"] == "EUR" and p["hl"] == "en" and p["gl"] == "de"
-    assert p["stops"] == "one_stop_or_fewer" and p["exclude_airlines"] == "AI"
+    assert p["stops"] == "two_stops_or_fewer" and p["exclude_airlines"] == "AI"   # max_stops 2
     assert "api_key" not in p   # the key travels in the Authorization header, not the URL
 
 
@@ -67,7 +67,7 @@ def test_errors_never_carry_the_key(client, httpx_mock):
                                                  (2, "two_stops_or_fewer"), (3, "any")])
 def test_stops_mapping(config_dir, max_stops, expected):
     st = config_dir / "settings.yaml"
-    st.write_text(st.read_text().replace("max_stops: 1", f"max_stops: {max_stops}"))
+    st.write_text(st.read_text().replace("max_stops: 2", f"max_stops: {max_stops}"))
     cfg = load_config(config_dir, env={})
     assert SearchApiClient("KEY", cfg.settings).params_for(REQ)["stops"] == expected
 

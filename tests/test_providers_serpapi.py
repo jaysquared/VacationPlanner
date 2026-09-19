@@ -42,7 +42,7 @@ def test_params_mapping(client):
     assert p["engine"] == "google_flights" and p["departure_id"] == "HAM" and p["arrival_id"] == "BKK"
     assert p["outbound_date"] == "2026-10-17" and p["return_date"] == "2026-10-31" and p["type"] == "1"
     assert p["travel_class"] == "3" and p["adults"] == "2" and p["children"] == "1"
-    assert p["currency"] == "EUR" and p["stops"] == "2" and p["exclude_airlines"] == "AI"
+    assert p["currency"] == "EUR" and p["stops"] == "3" and p["exclude_airlines"] == "AI"   # max_stops 2
     assert p["api_key"] == "KEY"
 
 

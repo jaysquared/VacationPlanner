@@ -48,19 +48,24 @@ def test_plan_orders_by_slot_and_assigns_providers(config_dir):
     cfg = load_config_dir(config_dir)
     db = Storage(":memory:")
     ps = plan(cfg, db, TODAY)
-    # herbst-2026 first (BKK business), only slots with targets, no past slots
-    assert ps[0].request.slot_id == "herbst-2026"
-    assert ps[0].request.destination == "BKK" and ps[0].request.seat is SeatClass.BUSINESS
-    assert ps[0].request.adults == 2 and ps[0].request.children == 1
+    # weihnachten-2026 first (17 long-haul business targets), only slots with targets, no past slots
+    first = ps[0].request
+    assert first.slot_id == "weihnachten-2026"
+    assert first.destination == "HKT" and first.seat is SeatClass.BUSINESS
+    assert first.adults == 2 and first.children == 1
+    assert first.origin == "HAM"
+    # free window Sat 19 Dec 2026 .. Sun 3 Jan 2027, slot nights 10-14
+    assert first.outbound_date == date(2026, 12, 19) and 10 <= first.nights <= 14
+    assert first.return_date <= date(2027, 1, 3)
     slots = [p.request.slot_id for p in ps]
-    assert "fruehjahr-2027" in slots and "herbst-2027" not in slots  # herbst-2027 has no targets
+    assert "pfingsten-2027" in slots and "herbst-2026" not in slots  # herbst-2026 has no targets
     # per-route cap 3
-    assert sum(1 for p in ps if p.request.slot_id == "herbst-2026") == 3
-    # 18 searches, all inside the SerpApi per-run share of 62
-    assert len(ps) == 18 and all(p.provider is Provider.SERPAPI for p in ps)
-    # PMI in pfingsten is economy (cabin any)
-    pmi = next(p for p in ps if p.request.destination == "PMI")
-    assert pmi.request.seat is SeatClass.ECONOMY and 7 <= pmi.request.nights <= 9
+    assert sum(1 for p in ps if p.request.destination == "HKT") == 3
+    # 20 routes x 3 pairs, all inside the SerpApi per-run share of 62
+    assert len(ps) == 60 and all(p.provider is Provider.SERPAPI for p in ps)
+    # TFS in pfingsten is economy (cabin any)
+    tfs = next(p for p in ps if p.request.destination == "TFS")
+    assert tfs.request.seat is SeatClass.ECONOMY and 7 <= tfs.request.nights <= 9
 
 
 def test_plan_walks_down_the_provider_order_as_shares_run_out(config_dir):
@@ -69,7 +74,7 @@ def test_plan_walks_down_the_provider_order_as_shares_run_out(config_dir):
                                 .replace("monthly_budget: 100", "monthly_budget: 4"))
     cfg = load_config_dir(config_dir)
     ps = plan(cfg, Storage(":memory:"), TODAY)
-    assert len(ps) == 18
+    assert len(ps) == 60
     assert [p.provider for p in ps[:3]] == [Provider.SERPAPI, Provider.SERPAPI, Provider.SEARCHAPI]
     assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[3:])
 
@@ -81,7 +86,7 @@ def test_plan_skips_a_provider_whose_month_is_spent(config_dir):
     db = Storage(":memory:")
     seed(db, Provider.SERPAPI, 250)
     ps = plan(cfg, db, TODAY)
-    assert len(ps) == 36
+    assert len(ps) == 120   # 20 routes x 6 pairs, exactly the max_searches_per_run cap
     assert all(p.provider is Provider.SEARCHAPI for p in ps[:25])
     assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[25:])
 
@@ -121,15 +126,15 @@ def test_plan_prefers_unseen_pairs(config_dir):
     seen = first[0].request
     db.save_result(run, SearchResult(seen, Provider.SERPAPI, []), datetime(2026, 9, 21, tzinfo=timezone.utc))
     second = plan(cfg, db, TODAY)
-    herbst = [p.request for p in second if p.request.slot_id == "herbst-2026"]
-    assert seen not in herbst[:2]  # two unseen pairs come before the seen one
+    hkt = [p.request for p in second if p.request.destination == "HKT"]
+    assert hkt and seen not in hkt  # unseen pairs crowd the observed one out of the per-route cap
 
 
 def test_plan_skips_started_slots_and_far_future(config_dir):
     cfg = load_config_dir(config_dir)
     db = Storage(":memory:")
-    ps = plan(cfg, db, date(2026, 10, 20))  # herbst-2026 already started
-    assert all(p.request.slot_id != "herbst-2026" for p in ps)
+    ps = plan(cfg, db, date(2026, 12, 22))  # weihnachten-2026 already started
+    assert ps and all(p.request.slot_id != "weihnachten-2026" for p in ps)
     ps = plan(cfg, db, date(2025, 1, 1))  # everything > 330 days away
     assert ps == []
 
@@ -137,11 +142,11 @@ def test_plan_skips_started_slots_and_far_future(config_dir):
 def test_plan_never_searches_past_outbound_dates(config_dir):
     cfg = load_config_dir(config_dir)
     db = Storage(":memory:")
-    today = date(2026, 10, 17)  # herbst-2026 free window starts here; slot.start (19 Oct) is still eligible
+    today = date(2026, 12, 19)  # weihnachten-2026 free window starts here; slot.start (21 Dec) is still eligible
     ps = plan(cfg, db, today)
-    herbst = [p.request for p in ps if p.request.slot_id == "herbst-2026"]
-    assert herbst
-    assert all(p.outbound_date > today for p in herbst)
+    weihnachten = [p.request for p in ps if p.request.slot_id == "weihnachten-2026"]
+    assert weihnachten
+    assert all(p.outbound_date > today for p in weihnachten)
 
 
 SEED_AT = datetime(2026, 9, 10, tzinfo=timezone.utc)

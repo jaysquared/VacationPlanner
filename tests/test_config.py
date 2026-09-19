@@ -14,8 +14,13 @@ def test_loads_repo_config(config_dir: Path):
     assert cfg.travellers.children[0].birthdate == date(2019, 4, 21)
     assert cfg.destination("BKK").cabin is Cabin.BUSINESS
     assert cfg.destination("PMI").cabin is Cabin.ANY
+    weihnachten = next(s for s in cfg.slots if s.id == "weihnachten-2026")
+    assert weihnachten.start == date(2026, 12, 21) and weihnachten.nights == Nights(10, 14)
+    assert weihnachten.targets[0] == "HKT" and len(weihnachten.targets) == 17
+    pfingsten = next(s for s in cfg.slots if s.id == "pfingsten-2027")
+    assert pfingsten.targets == ("TFS", "LPA", "FUE")
     herbst = next(s for s in cfg.slots if s.id == "herbst-2026")
-    assert herbst.start == date(2026, 10, 19) and herbst.targets == ("BKK",)
+    assert herbst.start == date(2026, 10, 19) and herbst.targets == ()   # not searched this year
     order = cfg.settings.providers.order
     assert [e.name for e in order] == [Provider.SERPAPI, Provider.SEARCHAPI, Provider.FAST_FLIGHTS]
     assert [e.monthly_budget for e in order] == [250, 100, None]
@@ -37,7 +42,7 @@ def test_secrets_from_env(config_dir: Path):
 
 def test_unknown_target_is_rejected(config_dir: Path):
     hol = config_dir / "holidays.yaml"
-    hol.write_text(hol.read_text().replace("targets: [BKK]", "targets: [XXX]", 1))
+    hol.write_text(hol.read_text().replace("targets: [TFS, LPA, FUE]", "targets: [XXX]", 1))
     with pytest.raises(ConfigError, match="XXX"):
         load_config(config_dir, env={})
 
@@ -51,7 +56,7 @@ def test_duplicate_slot_id_is_rejected(config_dir: Path):
 
 def test_bad_yaml_value_names_file_and_key(config_dir: Path):
     st = config_dir / "settings.yaml"
-    st.write_text(st.read_text().replace("max_stops: 1", "max_stops: many"))
+    st.write_text(st.read_text().replace("max_stops: 2", "max_stops: many"))
     with pytest.raises(ConfigError, match="settings.yaml.*max_stops"):
         load_config(config_dir, env={})
 
