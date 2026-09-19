@@ -1,4 +1,5 @@
 import json
+import re
 from datetime import date
 from pathlib import Path
 
@@ -84,3 +85,13 @@ def test_malformed_payload_raises_provider_error_and_keeps_raw(client, httpx_moc
     with pytest.raises(ProviderError, match="serpapi: parse failed: TypeError"):
         client.search(REQ, raw_dir=tmp_path)
     assert list(tmp_path.glob("serpapi_*.json"))   # raw response kept for the fixture
+
+
+def test_client_reads_its_own_price_flag(config_dir, httpx_mock):
+    st = config_dir / "settings.yaml"
+    st.write_text(re.sub(r"( +)serpapi: true", r"\1serpapi: false", st.read_text()))
+    cfg = load_config(config_dir, env={})
+    c = SerpApiClient("KEY", cfg.settings, sleep=lambda s: None)
+    httpx_mock.add_response(json=json.loads(FIX.read_text()))
+    o = c.search(REQ).offers[0]
+    assert (o.per_person, o.price_total) == (5940, 5940 * 3)   # per-person price, 3 travellers

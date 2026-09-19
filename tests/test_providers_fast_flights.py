@@ -1,3 +1,4 @@
+import re
 from datetime import date
 
 import pytest
@@ -96,3 +97,12 @@ def test_malformed_result_raises_provider_error(settings):
 
     with pytest.raises(ProviderError, match="fast_flights: parse failed"):
         FastFlightsClient(settings, fetch=lambda q: rl, sleep=lambda s: None).search(REQ)
+
+
+def test_client_reads_its_own_price_flag(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(re.sub(r"( +)fast_flights: true", r"\1fast_flights: false", st.read_text()))
+    settings = load_config(config_dir, env={}).settings
+    c = FastFlightsClient(settings, fetch=lambda q: build(), sleep=lambda s: None)
+    o = c.search(REQ).offers[0]
+    assert (o.per_person, o.price_total) == (5940, 5940 * 3)   # per-person price, 3 travellers

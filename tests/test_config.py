@@ -1,9 +1,10 @@
+import re
 from datetime import date
 from pathlib import Path
 
 import pytest
 
-from vacation_planner.config import ConfigError, load_config
+from vacation_planner.config import ConfigError, ProviderSettings, load_config
 from vacation_planner.models import Cabin, Nights, Provider
 
 
@@ -48,3 +49,20 @@ def test_bad_yaml_value_names_file_and_key(config_dir: Path):
     st.write_text(st.read_text().replace("max_stops: 1", "max_stops: many"))
     with pytest.raises(ConfigError, match="settings.yaml.*max_stops"):
         load_config(config_dir, env={})
+
+
+def test_price_is_total_is_per_provider(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    assert cfg.settings.providers.price_is_total == {Provider.SERPAPI: True, Provider.FAST_FLIGHTS: True}
+
+
+def test_price_is_total_accepts_a_bare_bool(config_dir: Path):
+    st = config_dir / "settings.yaml"
+    st.write_text(re.sub(r"  price_is_total:\n(?:    .*\n)+", "  price_is_total: false\n", st.read_text()))
+    cfg = load_config(config_dir, env={})
+    assert cfg.settings.providers.price_is_total == {Provider.SERPAPI: False, Provider.FAST_FLIGHTS: False}
+
+
+def test_price_is_total_defaults_to_total_for_both_providers():
+    ps = ProviderSettings(primary=Provider.SERPAPI, backup=Provider.FAST_FLIGHTS)
+    assert ps.price_is_total == {Provider.SERPAPI: True, Provider.FAST_FLIGHTS: True}

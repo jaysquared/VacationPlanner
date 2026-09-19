@@ -65,7 +65,15 @@ class ProviderSettings(BaseModel):
     primary: Provider
     backup: Provider | None = None
     backup_pause_seconds: float = 5.0
-    price_is_total: bool = True
+    # Per provider: the two are verified independently, so one flag for both would be a guess.
+    price_is_total: dict[Provider, bool] = {Provider.SERPAPI: True, Provider.FAST_FLIGHTS: True}
+
+    @field_validator("price_is_total", mode="before")
+    @classmethod
+    def _expand_bare_bool(cls, v: object) -> object:
+        if isinstance(v, bool):   # older config shape: one flag for both providers
+            return {Provider.SERPAPI: v, Provider.FAST_FLIGHTS: v}
+        return v
 
 
 class BudgetSettings(BaseModel):

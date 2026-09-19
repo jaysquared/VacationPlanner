@@ -111,7 +111,7 @@ class FastFlightsClient:
         if not results:
             raise ProviderError("fast_flights: empty result")
         try:
-            parsed = parse_results(results, req, q.url(), self.settings.providers.price_is_total)
+            parsed = parse_results(results, req, q.url(), self.settings.providers.price_is_total[Provider.FAST_FLIGHTS])
         except ProviderError:
             raise
         except Exception as e:   # layout change in the scraped page

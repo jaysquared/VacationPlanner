@@ -7,7 +7,10 @@ providers:
   primary: serpapi
   backup: fast_flights
   backup_pause_seconds: 5
-  price_is_total: true
+  # fast_flights verified live (16,824 EUR = 3 travellers); serpapi UNVERIFIED until the first real search
+  price_is_total:
+    serpapi: true
+    fast_flights: true
 budget:
   serpapi_per_month: 100
   runs_per_month: 4               # Mondays: 4-5 runs/month; the planner also caps by actual monthly usage

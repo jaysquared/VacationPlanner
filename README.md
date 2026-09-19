@@ -28,7 +28,7 @@ Runs happen Mondays 05:00 UTC. Change the cron and `budget.runs_per_month` toget
 
 ## First live run
 
-The SerpApi fixture in `tests/fixtures/serpapi_ham_bkk.json` is synthetic until the first real search is recorded (see `docs/superpowers/plans/2026-09-19-vacation-planner.md` Task 16 for the steps). `fast-flights` sends a `SOCS=CAI` consent cookie with its requests so it works from EU networks, where Google would otherwise return a consent interstitial instead of the flights page.
+The SerpApi fixture in `tests/fixtures/serpapi_ham_bkk.json` is synthetic until the first real search is recorded (see `docs/superpowers/plans/2026-09-19-vacation-planner.md` Task 16 for the steps). `providers.price_is_total.serpapi` is still **unverified**: run the workflow once via `workflow_dispatch` with `limit: 1` and cross-check the reported price against the Google Flights link in the report (per person vs. total for 3 travellers) before the weekly schedule runs; `fast_flights` is verified live (16,824 EUR = 3 travellers). `fast-flights` sends a `SOCS=CAI` consent cookie with its requests so it works from EU networks, where Google would otherwise return a consent interstitial instead of the flights page.
 
 ## Config
 
