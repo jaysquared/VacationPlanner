@@ -54,6 +54,13 @@ def execute(planned: list[PlannedSearch], clients: Mapping[Provider, FlightClien
                 primary_dead = True
         except ProviderError as e:
             error = str(e)
+        except Exception as e:
+            # A client bug (layout change, bad cast) must never take the whole run down:
+            # record this search as an error and keep going. Spec section 7.
+            storage.record_search(run_id, req, provider, "error", now(),
+                                  error=f"unexpected {type(e).__name__}: {e}")
+            summary.errors += 1
+            continue
 
         if provider == primary and backup is not None:
             summary.fallbacks += 1

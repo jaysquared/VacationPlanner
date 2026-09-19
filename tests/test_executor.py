@@ -101,3 +101,23 @@ def test_empty_plan():
     db = Storage(":memory:")
     s = execute([], {}, db, settings(), lambda: NOW)
     assert s.status == "empty" and s.planned == 0
+
+
+class BrokenPrimary(Primary):
+    """A client with a bug: it raises a raw exception instead of a ProviderError."""
+
+    def search(self, req, raw_dir=None):
+        raise KeyError("departure_airport")
+
+
+def test_client_bug_is_recorded_as_error_and_run_still_finishes():
+    db = Storage(":memory:")
+    s = execute([PlannedSearch(req("BKK"), Provider.SERPAPI)],
+                {Provider.SERPAPI: BrokenPrimary(), Provider.FAST_FLIGHTS: Backup()},
+                db, settings(), lambda: NOW)
+    assert (s.ok, s.errors, s.status) == (0, 1, "partial")
+    err = db.searches_in_run(s.run_id, "error")
+    assert len(err) == 1 and err[0].provider is Provider.SERPAPI
+    assert err[0].error == "unexpected KeyError: 'departure_airport'"
+    run = db.conn.execute("SELECT finished_at, status FROM runs WHERE id=?", (s.run_id,)).fetchone()
+    assert run["finished_at"] is not None and run["status"] == "partial"

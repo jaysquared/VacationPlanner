@@ -75,3 +75,12 @@ def test_transient_then_success(client, httpx_mock):
     httpx_mock.add_exception(httpx.ConnectError("boom"))
     httpx_mock.add_response(json=json.loads(FIX.read_text()))
     assert len(client.search(REQ).offers) == 2
+
+
+def test_malformed_payload_raises_provider_error_and_keeps_raw(client, httpx_mock, tmp_path):
+    data = json.loads(FIX.read_text())
+    data["best_flights"] = {"price": 1}          # layout change: object instead of list
+    httpx_mock.add_response(json=data)
+    with pytest.raises(ProviderError, match="serpapi: parse failed: TypeError"):
+        client.search(REQ, raw_dir=tmp_path)
+    assert list(tmp_path.glob("serpapi_*.json"))   # raw response kept for the fixture

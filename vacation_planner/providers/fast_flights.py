@@ -110,6 +110,11 @@ class FastFlightsClient:
             raise ProviderError(f"fast_flights: {type(e).__name__}: {e}") from e
         if not results:
             raise ProviderError("fast_flights: empty result")
-        offers = filter_excluded(parse_results(results, req, q.url(), self.settings.providers.price_is_total),
-                                 self.settings.excluded_airlines)
+        try:
+            parsed = parse_results(results, req, q.url(), self.settings.providers.price_is_total)
+        except ProviderError:
+            raise
+        except Exception as e:   # layout change in the scraped page
+            raise ProviderError(f"fast_flights: parse failed: {type(e).__name__}: {e}") from e
+        offers = filter_excluded(parsed, self.settings.excluded_airlines)
         return SearchResult(req, self.provider, offers, None)

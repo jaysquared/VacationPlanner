@@ -88,3 +88,11 @@ def test_consent_fetch_sends_cookie_and_returns_text():
 def test_default_fetch_is_consent_aware(settings):
     from vacation_planner.providers.fast_flights import fetch_with_consent
     assert FastFlightsClient(settings).fetch is fetch_with_consent
+
+
+def test_malformed_result_raises_provider_error(settings):
+    rl = build()
+    rl[0].flights[0].departure = None            # layout change: missing departure
+
+    with pytest.raises(ProviderError, match="fast_flights: parse failed"):
+        FastFlightsClient(settings, fetch=lambda q: rl, sleep=lambda s: None).search(REQ)

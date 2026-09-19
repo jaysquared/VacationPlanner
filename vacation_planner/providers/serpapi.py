@@ -106,6 +106,9 @@ class SerpApiClient:
             f = raw_dir / f"serpapi_{req.origin}-{req.destination}_{req.outbound_date}_{req.return_date}_{req.seat.value}.json"
             f.write_text(json.dumps(data))
             raw_path = str(f)
-        offers = filter_excluded(parse_response(data, req, self.settings.providers.price_is_total),
-                                 self.settings.excluded_airlines)
+        try:
+            parsed = parse_response(data, req, self.settings.providers.price_is_total)
+        except Exception as e:   # layout change: the raw JSON above is kept for a fixture
+            raise ProviderError(f"serpapi: parse failed: {type(e).__name__}: {e}") from e
+        offers = filter_excluded(parsed, self.settings.excluded_airlines)
         return SearchResult(req, self.provider, offers, raw_path)
