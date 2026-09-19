@@ -39,8 +39,12 @@ def test_primary_error_falls_back():
     db = Storage(":memory:")
     p, b = Primary(fail={("HAM", "BKK")}), Backup()
     s = execute([PlannedSearch(req("BKK"), Provider.SERPAPI)], {Provider.SERPAPI: p, Provider.FAST_FLIGHTS: b}, db, settings(), lambda: NOW)
-    assert (s.ok, s.fallbacks, s.status) == (1, 1, "ok")
+    assert (s.ok, s.errors, s.fallbacks, s.status) == (1, 0, 1, "ok")
     assert db.searches_in_run(s.run_id)[0].provider is Provider.FAST_FLIGHTS
+    # the failed primary attempt is recorded too: SerpApi charged for it
+    err = db.searches_in_run(s.run_id, "error")
+    assert len(err) == 1 and err[0].provider is Provider.SERPAPI
+    assert db.searches_by_provider_since(Provider.SERPAPI, NOW) == 1
 
 
 def test_quota_marks_primary_dead_for_rest_of_run():
@@ -69,9 +73,9 @@ def test_backup_failure_is_error():
     p, b = Primary(fail={("HAM", "BKK")}), Backup(fail={("HAM", "BKK")})
     s = execute([PlannedSearch(req("BKK"), Provider.SERPAPI)], {Provider.SERPAPI: p, Provider.FAST_FLIGHTS: b}, db, settings(), lambda: NOW)
     assert (s.ok, s.errors, s.status) == (0, 1, "partial")
-    row = db.searches_in_run(s.run_id, "error")[0]
-    assert row.provider is Provider.FAST_FLIGHTS and "; backup: " in row.error
-    assert len(db.searches_in_run(s.run_id, "error")) == 1
+    err = db.searches_in_run(s.run_id, "error")
+    assert [r.provider for r in err] == [Provider.SERPAPI, Provider.FAST_FLIGHTS]
+    assert "; backup: " in err[-1].error
 
 
 def test_primary_quota_then_backup_error_records_once_and_keeps_primary_dead():
@@ -83,7 +87,8 @@ def test_primary_quota_then_backup_error_records_once_and_keeps_primary_dead():
     assert (s.ok, s.errors, s.skipped, s.fallbacks, s.status) == (2, 1, 0, 2, "partial")
     assert len(p.calls) == 2
     err = db.searches_in_run(s.run_id, "error")
-    assert len(err) == 1 and err[0].destination == "DXB" and err[0].provider is Provider.FAST_FLIGHTS and "; backup: " in err[0].error
+    assert [(r.destination, r.provider) for r in err] == [("DXB", Provider.SERPAPI), ("DXB", Provider.FAST_FLIGHTS)]
+    assert "; backup: " in err[-1].error
     assert db.searches_in_run(s.run_id)[-1].provider is Provider.FAST_FLIGHTS  # MLE went to backup
 
 
@@ -121,3 +126,28 @@ def test_client_bug_is_recorded_as_error_and_run_still_finishes():
     assert err[0].error == "unexpected KeyError: 'departure_airport'"
     run = db.conn.execute("SELECT finished_at, status FROM runs WHERE id=?", (s.run_id,)).fetchone()
     assert run["finished_at"] is not None and run["status"] == "partial"
+
+
+def test_fallback_still_counts_the_primary_against_the_monthly_budget():
+    db = Storage(":memory:")
+    p, b = Primary(fail={("HAM", "BKK"), ("HAM", "DXB")}), Backup()
+    planned = [PlannedSearch(req(d), Provider.SERPAPI) for d in ("BKK", "DXB", "MLE")]
+    s = execute(planned, {Provider.SERPAPI: p, Provider.FAST_FLIGHTS: b}, db, settings(), lambda: NOW)
+    assert (s.ok, s.errors, s.fallbacks) == (3, 0, 2)   # a fallback that worked is not an error
+    assert db.searches_by_provider_since(Provider.SERPAPI, NOW) == 3   # 2 failed attempts + 1 ok
+
+
+class BrokenBackup(Backup):
+    def search(self, req, raw_dir=None):
+        raise TypeError("bad layout")
+
+
+def test_client_bug_in_the_backup_is_also_contained():
+    db = Storage(":memory:")
+    s = execute([PlannedSearch(req("BKK"), Provider.SERPAPI)],
+                {Provider.SERPAPI: Primary(fail={("HAM", "BKK")}), Provider.FAST_FLIGHTS: BrokenBackup()},
+                db, settings(), lambda: NOW)
+    assert (s.ok, s.errors, s.status) == (0, 1, "partial")
+    err = db.searches_in_run(s.run_id, "error")
+    assert [r.provider for r in err] == [Provider.SERPAPI, Provider.FAST_FLIGHTS]
+    assert "backup: unexpected TypeError: bad layout" in err[-1].error

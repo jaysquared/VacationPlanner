@@ -63,6 +63,9 @@ def execute(planned: list[PlannedSearch], clients: Mapping[Provider, FlightClien
             continue
 
         if provider == primary and backup is not None:
+            # Record the failed primary attempt on its own: the monthly budget counter reads
+            # searches, and a fallback must not hide the credit the primary already spent.
+            storage.record_search(run_id, req, primary, "error", now(), error=error)
             summary.fallbacks += 1
             try:
                 storage.save_result(run_id, attempt(backup, req), now())
@@ -70,6 +73,8 @@ def execute(planned: list[PlannedSearch], clients: Mapping[Provider, FlightClien
                 continue
             except ProviderError as e:
                 error = f"{error}; backup: {e}"
+            except Exception as e:   # a backup client bug must not take the run down either
+                error = f"{error}; backup: unexpected {type(e).__name__}: {e}"
             provider = backup
 
         storage.record_search(run_id, req, provider, "error", now(), error=error)
