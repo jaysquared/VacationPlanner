@@ -106,3 +106,31 @@ def test_client_reads_its_own_price_flag(config_dir):
     c = FastFlightsClient(settings, fetch=lambda q: build(), sleep=lambda s: None)
     o = c.search(REQ).offers[0]
     assert (o.per_person, o.price_total) == (5940, 5940 * 3)   # per-person price, 3 travellers
+
+
+def test_missing_airline_metadata_is_an_error_not_a_silent_bypass(settings):
+    rl = build()
+    rl.metadata = None                      # no code <-> name mapping at all
+    with pytest.raises(ProviderError, match="no airline metadata"):
+        FastFlightsClient(settings, fetch=lambda q: rl, sleep=lambda s: None).search(REQ)
+
+    rl2 = build()
+    rl2.metadata.airlines = []
+    with pytest.raises(ProviderError, match="no airline metadata"):
+        FastFlightsClient(settings, fetch=lambda q: rl2, sleep=lambda s: None).search(REQ)
+
+
+def test_excluded_airline_is_dropped_by_name_too(settings):
+    """`AI` is excluded; the itinerary only names 'Air India', mapped via the result metadata."""
+    rl = build()
+    res = FastFlightsClient(settings, fetch=lambda q: rl, sleep=lambda s: None).search(REQ)
+    assert all("Air India" not in o.airlines and "AI" not in o.airlines for o in res.offers)
+
+
+def test_unmapped_airline_name_warns_and_keeps_the_raw_name(settings, caplog):
+    rl = build()
+    rl.metadata.airlines = [a for a in rl.metadata.airlines if a.name != "Emirates"]
+    with caplog.at_level("WARNING", logger="vacation_planner.providers.fast_flights"):
+        res = FastFlightsClient(settings, fetch=lambda q: rl, sleep=lambda s: None).search(REQ)
+    assert ["Emirates"] in [o.airlines for o in res.offers]
+    assert "Emirates" in caplog.text

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from datetime import datetime
 from pathlib import Path
@@ -15,6 +16,8 @@ from primp import Client
 from ..config import Settings
 from ..models import Offer, Provider, SearchRequest, SearchResult, SeatClass
 from .base import ProviderError, filter_excluded, per_person
+
+log = logging.getLogger(__name__)
 
 SEAT = {SeatClass.ECONOMY: "economy", SeatClass.BUSINESS: "business"}
 
@@ -61,7 +64,10 @@ def parse_results(results: ResultList, req: SearchRequest, url: str, price_is_to
         total, pp = per_person(it.price, req, price_is_total)
         codes = []
         for name in it.airlines:
-            code = name_to_code.get(name, name)
+            code = name_to_code.get(name)
+            if code is None:
+                log.warning("fast_flights: no IATA code for airline %r; keeping the raw name", name)
+                code = name
             if code not in codes:
                 codes.append(code)
         first, last = it.flights[0], it.flights[-1]
@@ -110,11 +116,20 @@ class FastFlightsClient:
             raise ProviderError(f"fast_flights: {type(e).__name__}: {e}") from e
         if not results:
             raise ProviderError("fast_flights: empty result")
+        meta = getattr(results, "metadata", None)
+        airlines = list(meta.airlines) if meta else []
+        excluded = {e.upper() for e in self.settings.excluded_airlines}
+        if excluded and not airlines:
+            # Itineraries carry airline names, the config carries IATA codes: without the
+            # mapping an excluded airline would pass the filter unnoticed.
+            raise ProviderError("fast_flights: response has no airline metadata; cannot enforce exclusions")
+        code_to_name = {a.code.upper(): a.name for a in airlines}
+        excluded_terms = excluded | {code_to_name[c] for c in excluded if c in code_to_name}
         try:
             parsed = parse_results(results, req, q.url(), self.settings.providers.price_is_total[Provider.FAST_FLIGHTS])
         except ProviderError:
             raise
         except Exception as e:   # layout change in the scraped page
             raise ProviderError(f"fast_flights: parse failed: {type(e).__name__}: {e}") from e
-        offers = filter_excluded(parsed, self.settings.excluded_airlines)
+        offers = filter_excluded(parsed, excluded_terms)
         return SearchResult(req, self.provider, offers, None)
