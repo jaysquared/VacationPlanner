@@ -1,0 +1,22 @@
+source: https://www.hamburg.de/resource/blob/134372/5bc131bdd36a604f67b361d21f7df37e/ferienordnung-hamburg-2024-2030-data.pdf
+holidays:
+  - { id: herbst-2026,      name: "Herbstferien 2026",           start: 2026-10-19, end: 2026-10-30, targets: [BKK] }
+  - { id: weihnachten-2026, name: "Weihnachtsferien 2026/27",    start: 2026-12-21, end: 2027-01-01, targets: [MLE], nights: { min: 10, max: 14 } }
+  - { id: fruehjahr-2027,   name: "Frühjahrsferien 2027",        start: 2027-03-01, end: 2027-03-12, targets: [DXB] }
+  - { id: pfingsten-2027,   name: "Himmelfahrt/Pfingsten 2027",  start: 2027-05-07, end: 2027-05-14, targets: [PMI, LIS], nights: { min: 7, max: 9 } }
+  - { id: sommer-2027,      name: "Sommerferien 2027",           start: 2027-07-01, end: 2027-08-11, targets: [JFK], nights: { min: 14, max: 21 } }
+  - { id: herbst-2027,      name: "Herbstferien 2027",           start: 2027-10-11, end: 2027-10-22, targets: [] }
+  - { id: weihnachten-2027, name: "Weihnachtsferien 2027/28",    start: 2027-12-20, end: 2027-12-31, targets: [] }
+  - { id: fruehjahr-2028,   name: "Frühjahrsferien 2028",        start: 2028-03-06, end: 2028-03-17, targets: [] }
+  - { id: pfingsten-2028,   name: "Himmelfahrt/Pfingsten 2028",  start: 2028-05-22, end: 2028-05-26, targets: [] }
+  - { id: sommer-2028,      name: "Sommerferien 2028",           start: 2028-07-03, end: 2028-08-11, targets: [] }
+  - { id: herbst-2028,      name: "Herbstferien 2028",           start: 2028-10-02, end: 2028-10-13, targets: [] }
+  - { id: weihnachten-2028, name: "Weihnachtsferien 2028/29",    start: 2028-12-18, end: 2028-12-29, targets: [] }
+  - { id: fruehjahr-2029,   name: "Frühjahrsferien 2029",        start: 2029-03-05, end: 2029-03-16, targets: [] }
+  - { id: pfingsten-2029,   name: "Himmelfahrt/Pfingsten 2029",  start: 2029-05-11, end: 2029-05-18, targets: [] }
+  - { id: sommer-2029,      name: "Sommerferien 2029",           start: 2029-07-02, end: 2029-08-10, targets: [] }
+  - { id: herbst-2029,      name: "Herbstferien 2029",           start: 2029-10-01, end: 2029-10-12, targets: [] }
+  - { id: weihnachten-2029, name: "Weihnachtsferien 2029/30",    start: 2029-12-21, end: 2030-01-04, targets: [] }
+  - { id: fruehjahr-2030,   name: "Frühjahrsferien 2030",        start: 2030-03-04, end: 2030-03-15, targets: [] }
+  - { id: pfingsten-2030,   name: "Himmelfahrt/Pfingsten 2030",  start: 2030-05-20, end: 2030-05-24, targets: [] }
+  - { id: sommer-2030,      name: "Sommerferien 2030",           start: 2030-07-04, end: 2030-08-14, targets: [] }

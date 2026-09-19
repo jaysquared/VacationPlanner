@@ -27,54 +27,72 @@ so these can be added without restructuring.
 
 ## 2. Data sources
 
-Two providers behind one `FlightClient` protocol. Both read Google Flights,
-so their prices are comparable and share one price history.
+An ordered list of providers behind one `FlightClient` protocol. All read
+Google Flights, so their prices are comparable and share one price history.
+Each provider has an optional monthly budget; providers without a budget are
+unlimited (rate-limited by a pause instead). Default order:
 
-### 2.1 Primary: SerpApi (`engine=google_flights`)
+1. **SerpApi** (`engine=google_flights`), free plan ~250 searches/month.
+2. **SearchApi.io** (`engine=google_flights`), free plan 100 searches
+   (confirm with the account whether that is monthly or one-time and set the
+   budget accordingly).
+3. **`fast-flights`** (unofficial, keyless Google Flights client), unlimited,
+   5 s pause between calls, consent cookie `SOCS=CAI` so it works from EU IPs.
 
-Facts the design relies on (confirmed against the live API during
-implementation, with the response recorded as a test fixture):
+### 2.1 SerpApi (verified live 2026-09-19)
 
-- One request = one origin, one destination, one outbound date, one return
-  date, one cabin class, passenger counts, currency. Parameters used:
-  `departure_id`, `arrival_id`, `outbound_date`, `return_date`,
-  `travel_class` (1 economy, 2 premium economy, 3 business, 4 first),
-  `adults`, `children`, `currency=EUR`, `hl=en`, `gl=de`,
-  `exclude_airlines`, `stops`, `type=1` (round trip).
-- The first response lists outbound options (`best_flights`, `other_flights`)
-  each with a round-trip `price`, plus `price_insights` with `lowest_price`,
-  `price_level` (`low` / `typical` / `high`) and `typical_price_range`, plus
-  `search_metadata.google_flights_url`.
-- Return-leg details require a second request with a `departure_token`.
-  We never make that request; the round-trip price and the Google Flights link
-  are sufficient for deal detection and booking.
-- Whether `price` is per person or total for all passengers is verified in
-  implementation. Offers store the raw price and the passenger counts so the
-  per-person figure is derived, never guessed.
+Params: `departure_id`, `arrival_id`, `outbound_date`, `return_date`,
+`type=1`, `travel_class` (1 economy, 3 business), `adults`, `children`,
+`currency=EUR`, `hl=en`, `gl=de`, `stops` (1 nonstop, 2 one-stop-or-fewer,
+3 two-or-fewer), `exclude_airlines`, `api_key`.
+Response: `best_flights`/`other_flights` itineraries with `flights[]` legs
+(`departure_airport.time` as `YYYY-MM-DD HH:MM`, `flight_number`, `airline`),
+`total_duration`, `price`; `price_insights` (`price_level`,
+`typical_price_range` as `[low, high]`) is **sometimes absent**;
+`search_metadata.google_flights_url`. Errors: HTTP 401/403 with
+`{"error": ...}` for bad keys (never retried), 429 or "out of searches" for
+quota.
 
-Budget: free tier is 100 searches/month. The first paid plan is 5,000/month at
-roughly USD 900/year and is not planned. The planner takes the monthly budget
-from config and never exceeds the per-run share of it.
+### 2.2 SearchApi.io (verified live 2026-09-19)
 
-### 2.2 Backup: `fast-flights` (unofficial Google Flights, no key)
+URL `https://www.searchapi.io/api/v1/search`. Params: `engine=google_flights`,
+`departure_id`, `arrival_id`, `outbound_date`, `return_date`,
+`flight_type=round_trip`, `travel_class` (`economy` | `business`), `adults`,
+`children`, `currency=EUR`, `hl=en`, `gl=de`, `stops` (`nonstop` |
+`one_stop_or_fewer` | `two_stops_or_fewer` | `any`), `exclude_airlines`,
+`api_key`. Response: same itinerary shape as SerpApi except legs carry
+`departure_airport.date` and `.time` separately, `price_insights.typical_price_range`
+is `{low_price, high_price}`, and the Google link is
+`search_metadata.request_url`. Errors: HTTP 401 `{"error": "Invalid API key."}`;
+quota assumed 402/429 or an error mentioning credits.
 
-PyPI package `fast-flights` (3.1.0, August 2026). Supports seat class incl.
-business, adults/children, round trip, max stops, currency. It has no
-airline-exclusion parameter, so the client drops itineraries containing an
-excluded airline after fetching. It returns a price level (low/typical/high)
-and per-itinerary price, airline, stops, duration and times, but no typical
-price range and no deep link; the client builds the Google Flights URL from
-the query itself. Being unofficial it can break without notice; that is
-acceptable for a backup and is why it is not the primary.
+### 2.3 fast-flights
 
-### 2.3 Provider allocation
+As before (see 5.4): no airline-exclusion parameter, so the client filters
+after fetching and refuses to return results when the response lacks airline
+metadata while exclusions are configured. No price insights.
 
-The planner produces an ordered list of searches. The executor sends the
-first `serpapi_per_run` of them to SerpApi and the remainder, up to
-`max_searches_per_run`, to the backup. A SerpApi failure (error after
-retries, or quota exhausted) re-runs that search on the backup. Every offer
-records its `provider`. The backup client waits a configurable pause between
-requests and never runs in parallel.
+### 2.4 Price semantics (verified)
+
+Both APIs and fast-flights return the **total for all travellers**: for
+HAM–BKK Business, 2 adults + 1 child, 17–31 Oct 2026, all three reported the
+same Emirates itinerary at 16,824 EUR (5,608 EUR per person). `price_is_total`
+is therefore `true` for every provider.
+
+### 2.5 Provider allocation
+
+The planner computes, for each budgeted provider, its per-run share
+`max(1, monthly_budget // runs_per_month)` capped by the budget remaining this
+month (`monthly_budget − searches used this month`, counting ok and error
+rows). It walks the planned searches in slot order and assigns each to the
+first provider in the list with share left; unlimited providers absorb the
+rest, up to `max_searches_per_run`. If no provider can take a search, the
+plan ends there.
+
+The executor tries the planned provider, then each later provider in the
+list. A quota or auth failure marks that provider dead for the rest of the
+run. Every attempt is recorded as a search row (ok or error) so monthly usage
+counters stay accurate.
 
 Amadeus Self-Service was considered and rejected: it was decommissioned on
 2026-07-17.
@@ -178,13 +196,14 @@ bridge_days: { before: 0, after: 0 }
 max_stops: 1                    # 0 nonstop, 1 one stop, 2 two stops (Google param semantics mapped in client)
 excluded_airlines: [AI]
 providers:
-  primary: serpapi
-  backup: fast_flights            # or null to disable
-  backup_pause_seconds: 5
+  order:
+    - { name: serpapi, monthly_budget: 250 }
+    - { name: searchapi, monthly_budget: 100 }
+    - { name: fast_flights, pause_seconds: 5 }     # no budget = unlimited
+  price_is_total: { serpapi: true, searchapi: true, fast_flights: true }
 budget:
-  serpapi_per_month: 100
-  runs_per_month: 4               # weekly, matches the CI cron
-  max_searches_per_run: 60        # hard cap incl. backup
+  runs_per_month: 4               # Mondays: 4-5 runs/month; shares are capped by real usage
+  max_searches_per_run: 120       # hard cap across all providers
   max_pairs_per_route_per_run: 3
 deals:
   median_ratio: 0.85            # price <= 85% of historical median
@@ -197,8 +216,9 @@ email:
   mode: deals_only              # deals_only | always | never
 ```
 
-Recipients and SMTP credentials are env vars (`MAIL_TO`, `SMTP_*`), never
-config, so the repo contains no personal data even if it is public.
+API keys (`SERPAPI_KEY`, `SEARCHAPI_KEY`), recipients and SMTP credentials are
+env vars, never config, so the repo contains no personal data even if it is
+public. A listed provider whose key is missing is skipped with a warning.
 
 ## 4. Domain model
 
@@ -244,9 +264,12 @@ Input: config, today's date, storage (for freshness). Output: ordered list of
 3. Rank pairs per route: pairs with no data first, then oldest observation
    first. Take at most `max_pairs_per_route_per_run`.
 4. Concatenate routes in slot order and cut at `max_searches_per_run`.
-   The first `serpapi_per_month / runs_per_month` (rounded down, minimum 1)
-   are assigned to the primary provider, the rest to the backup. With no
-   backup configured the cut is at the primary share.
+   Assign each search to the first provider in `providers.order` with
+   per-run share left, where a budgeted provider's share is
+   `max(1, monthly_budget // runs_per_month)` capped by
+   `monthly_budget − searches recorded this calendar month` (a month with
+   five Mondays must not spend five shares). Unlimited providers absorb the
+   rest. If no provider can take a search the plan ends there.
 
 The `plan` CLI command prints this list and its count without spending
 anything.
@@ -263,10 +286,12 @@ implementations plus a fake for tests.
 - `providers/fast_flights.py`: builds the equivalent `fast-flights` query,
   filters out itineraries with excluded airlines, maps results to `Offer`
   with `typical_low/high` empty and a constructed Google Flights URL. Sleeps
-  `backup_pause_seconds` before each call. Raises `ProviderError` on parse
-  failure or empty response.
-- `providers/executor.py`: walks the plan, assigns providers per 2.3, handles
-  fallback, and writes each result through storage in its own transaction.
+  its entry's `pause_seconds` before each call. Raises `ProviderError` on
+  parse failure or empty response.
+- `providers/searchapi.py`: the same for SearchApi.io (2.2), reusing the
+  SerpApi airline-code helper; 401/403 raise `AuthError`.
+- `providers/executor.py`: walks the plan, tries the providers per 2.5,
+  and writes each result through storage in its own transaction.
 
 ### 5.5 `storage` — SQLite
 
@@ -282,8 +307,8 @@ migration scripts applied on startup.
   typical_high, google_url, flight_json)`
 - `deals(id, offer_id, slot_id, reasons_json, score, detected_at,
   notified_at)`
-- Views: `cheapest_per_search`, `route_history` (cheapest per search grouped
-  by slot, route, cabin, requested_at).
+- View: `cheapest_per_search`, plus the `route_observations` query method
+  (cheapest per search for one slot, route and cabin, newest first).
 
 One transaction per search so a crash leaves consistent data.
 
@@ -343,14 +368,16 @@ Entry point `vacation-planner` (typer):
 
 GitHub Actions workflow `scan.yml`:
 
-- Triggers: cron Monday 05:00 UTC (4 runs/month, matching `runs_per_month`),
+- Triggers: cron Monday 05:00 UTC (4-5 runs/month depending on the month;
+  `runs_per_month` sets each provider's per-run share and the planner caps
+  it by the searches actually recorded this month),
   `workflow_dispatch` with optional `limit`.
 - Steps: checkout, set up Python 3.12, install with `uv sync`,
   `vacation-planner run`, commit `data/planner.sqlite` and `docs/site/` with
   message `scan: <date> (<n> searches, <m> new deals)`, upload `data/raw/`
   as an artifact with 30-day retention, deploy Pages from `docs/site`.
 - `concurrency: scan` with `cancel-in-progress: false` so runs never overlap.
-- Secrets: `SERPAPI_KEY`, `SMTP_*`, `MAIL_FROM`, `MAIL_TO`.
+- Secrets: `SERPAPI_KEY`, `SEARCHAPI_KEY`, `SMTP_*`, `MAIL_FROM`, `MAIL_TO`.
 
 `data/raw/` is git-ignored. Locally `vacation-planner run` behaves the same
 with `.env`.
@@ -366,9 +393,11 @@ pipeline does not change either way.
 - Config errors: fail before any API call with file/key/problem.
 - API transient error: three retries, then the search is stored with
   `status=error` and the run continues.
-- Primary quota exhausted or failed: the search goes to the backup. If no
-  backup is configured or the backup also fails, the search is stored as
-  `skipped`/`error`, run status `partial`, report and notify still execute.
+- Provider quota exhausted, auth error, or failure: the search goes to the
+  next provider in `providers.order`; a quota/auth failure marks that
+  provider dead for the rest of the run. If every remaining provider fails
+  or is dead, the search is stored as `error`/`skipped`, run status
+  `partial`, report and notify still execute.
 - Parse error on a response: the raw JSON is kept, the search is marked
   `error`, the run continues. A test fixture is added when this happens.
 - Email failure: logged, run exits 0, deals stay un-notified and are picked
@@ -389,8 +418,10 @@ pytest, no live API in tests.
   and travel class, retry and quota paths with a stubbed HTTP layer.
 - `providers/fast_flights`: mapping from a recorded result object, excluded
   airline filtering, URL construction, pause behaviour with a fake sleep.
-- `providers/executor`: primary/backup split at the budget boundary,
-  fallback on primary failure, no backup configured, quota exhausted mid-run.
+- `providers/searchapi`: parsing of the recorded response (date+time legs,
+  dict price range, `request_url`), param mapping, auth/quota/retry paths.
+- `providers/executor`: ordered fallback across three providers, dead
+  providers skipped, quota mid-run, every attempt recorded.
 - `storage`: migrations apply cleanly on an empty DB and are idempotent;
   round-trip of run/search/offer/deal.
 - `deals`: each rule in isolation with fixture history, fallback to route

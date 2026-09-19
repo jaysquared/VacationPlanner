@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ slot.name }} · {{ origin }} → {{ destination.name }}{% endblock %}
+{% block body %}
+<p><a href="../index.html">← Overview</a></p>
+<h1>{{ origin }} → {{ destination.name }} ({{ destination.code }}) · {{ seat.value }}</h1>
+<p class="muted">{{ slot.name }}{% if median %} · median {{ money(median) }} over {{ observations|length }} observations{% endif %}</p>
+<div class="wrap"><table>
+<tr><th>Searched</th><th>Outbound</th><th>Return</th><th class="num">Nights</th><th class="num">Total</th><th class="num">Per person</th><th>Airlines</th><th class="num">Stops</th><th>Level</th><th>Provider</th><th></th></tr>
+{% for o in observations %}
+<tr>
+  <td>{{ o.search.requested_at.strftime('%Y-%m-%d') }}</td>
+  <td>{{ o.search.outbound_date }}</td><td>{{ o.search.return_date }}</td>
+  <td class="num">{{ (o.search.return_date - o.search.outbound_date).days }}</td>
+  <td class="num">{{ money(o.offer.price_total) }}</td>
+  <td class="num">{{ money(o.offer.per_person) }}</td>
+  <td>{{ o.offer.airlines|join(', ') }}</td>
+  <td class="num">{{ o.offer.stops }}</td>
+  <td class="level-{{ o.offer.price_level or 'none' }}">{{ o.offer.price_level or '–' }}</td>
+  <td>{{ o.search.provider.value }}</td>
+  <td><a href="{{ o.offer.google_url }}">Google Flights</a></td>
+</tr>
+{% endfor %}
+</table></div>
+{% endblock %}
