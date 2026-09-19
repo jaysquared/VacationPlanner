@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -38,9 +39,18 @@ def test_run_end_to_end_with_fake(config_dir, tmp_path):
     r = runner.invoke(app, common(config_dir, tmp_path) + ["run", "--fake", "--limit", "5"])
     assert r.exit_code == 0, r.output
     assert "searches: 5 ok" in r.output
+    assert re.search(r"deals: [1-9]\d* \(", r.output), r.output   # at least one deal
+    assert "under_max" in r.output                                   # fake prices are under the per-person max
     assert (out / "index.html").exists()
     db = Storage(tmp_path / "p.sqlite")
     assert len(db.searches_in_run(1)) == 5
     # second run: same prices -> no NEW_LOW, but UNDER_MAX deals still exist -> deals detected
     r2 = runner.invoke(app, common(config_dir, tmp_path) + ["run", "--fake", "--limit", "5"])
-    assert r2.exit_code == 0 and "deals:" in r2.output
+    assert r2.exit_code == 0, r2.output
+    assert re.search(r"deals: [1-9]\d* \(", r2.output), r2.output   # at least one deal
+    assert "under_max" in r2.output                                   # fake prices are under the per-person max
+
+
+def test_fake_refuses_default_db(config_dir):
+    r = runner.invoke(app, ["--config-dir", str(config_dir), "--today", "2026-09-21", "scan", "--fake"])
+    assert r.exit_code != 0 and "--db" in r.output

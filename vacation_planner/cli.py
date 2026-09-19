@@ -23,6 +23,8 @@ from . import notify as _notify
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 log = logging.getLogger("vacation_planner")
 
+DEFAULT_DB = Path("data/planner.sqlite")
+
 
 @dataclass
 class Ctx:
@@ -35,7 +37,7 @@ class Ctx:
 @app.callback()
 def main(ctx: typer.Context,
          config_dir: Path = typer.Option(Path("config"), "--config-dir"),
-         db: Path = typer.Option(Path("data/planner.sqlite"), "--db"),
+         db: Path = typer.Option(DEFAULT_DB, "--db"),
          today: Optional[str] = typer.Option(None, "--today", help="Override today's date (YYYY-MM-DD)"),
          verbose: bool = typer.Option(False, "--verbose", "-v")):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO, format="%(levelname)s %(name)s: %(message)s")
@@ -53,6 +55,13 @@ def main(ctx: typer.Context,
 def _storage(c: Ctx) -> Storage:
     c.db_path.parent.mkdir(parents=True, exist_ok=True)
     return Storage(c.db_path)
+
+
+def _guard_fake(c: Ctx, fake: bool) -> None:
+    if fake and c.db_path == DEFAULT_DB:
+        raise typer.BadParameter(
+            "--fake writes synthetic prices; pass an explicit --db path (not the default data/planner.sqlite)"
+        )
 
 
 def build_clients(config: Config, fake: bool) -> dict[Provider, FlightClient]:
@@ -131,6 +140,7 @@ def scan(ctx: typer.Context, limit: Optional[int] = typer.Option(None, "--limit"
          fake: bool = typer.Option(False, "--fake", help="Use the fake provider (no network)")):
     """Execute the planned searches and detect deals."""
     c: Ctx = ctx.obj
+    _guard_fake(c, fake)
     storage = _storage(c)
     summary, deals = do_scan(c.config, storage, c.today, c.now, limit, fake, c.config.root / "data" / "raw")
     _print_summary(summary, deals)
@@ -161,6 +171,7 @@ def run(ctx: typer.Context, limit: Optional[int] = typer.Option(None, "--limit")
         fake: bool = typer.Option(False, "--fake"), report_url: Optional[str] = typer.Option(None, "--report-url")):
     """scan + report + notify (what CI runs)."""
     c: Ctx = ctx.obj
+    _guard_fake(c, fake)
     storage = _storage(c)
     summary, deals = do_scan(c.config, storage, c.today, c.now, limit, fake, c.config.root / "data" / "raw")
     _print_summary(summary, deals)
