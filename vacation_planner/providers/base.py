@@ -11,7 +11,11 @@ class ProviderError(Exception):
 
 
 class QuotaExhausted(ProviderError):
-    """The provider's monthly quota is used up."""
+    """The provider's monthly quota is used up; it is unusable for the rest of this run."""
+
+
+class AuthError(QuotaExhausted):
+    """The provider rejected the credentials; unusable for this run, and never worth a retry."""
 
 
 class FlightClient(Protocol):
