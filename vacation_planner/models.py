@@ -27,6 +27,7 @@ class DealReason(str, Enum):
     GOOGLE_LOW = "google_low"
     UNDER_MAX = "under_max"
     NEW_LOW = "new_low"
+    CHEAPER_THAN_HOME = "cheaper_than_home"
 
 
 def seat_for(cabin: Cabin) -> SeatClass:

@@ -94,6 +94,20 @@ def test_prior_prices_exclude_current_and_other_slots(db: Storage):
     assert sorted(db.prior_route_prices("HAM", "BKK", SeatClass.BUSINESS, before_search_id=c)) == [6000, 7000]
 
 
+def test_best_price_for_uses_the_newest_observation_per_pair(db: Storage):
+    earlier = datetime(2026, 9, 14, 5, 0, tzinfo=timezone.utc)
+    run = db.start_run(earlier, 4)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(6000)]), earlier)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)   # newer, dearer
+    db.save_result(run, SearchResult(req(outbound_date=date(2026, 10, 18), return_date=date(2026, 11, 1)),
+                                     Provider.SERPAPI, [offer(6500)]), NOW)
+    db.record_search(run, req(origin="FRA"), Provider.SERPAPI, "error", NOW, error="boom")
+    assert db.best_price_for("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS) == 6500
+    assert db.best_price_for("herbst-2026", "FRA", "BKK", SeatClass.BUSINESS) is None
+    assert db.best_price_for("sommer-2027", "HAM", "BKK", SeatClass.BUSINESS) is None
+    assert db.best_price_for("herbst-2026", "HAM", "BKK", SeatClass.ECONOMY) is None
+
+
 def test_deals_pending_and_notified(db: Storage):
     run = db.start_run(NOW, 1)
     sid = db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(5000)]), NOW)

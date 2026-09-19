@@ -245,6 +245,20 @@ class Storage:
             (origin, destination, seat.value, before_search_id))
         return [r["price_total"] for r in rows]
 
+    def best_price_for(self, slot_id: str, origin: str, destination: str, seat: SeatClass) -> float | None:
+        """Cheapest current price on a route: the newest observation per date pair, minimised."""
+        r = self.conn.execute(
+            """SELECT MIN(c.price_total) AS p FROM searches s JOIN cheapest_per_search c ON c.search_id=s.id
+               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=?
+                 AND s.id = (
+                   SELECT s2.id FROM searches s2 JOIN cheapest_per_search c2 ON c2.search_id=s2.id
+                   WHERE s2.status='ok' AND s2.slot_id=s.slot_id AND s2.origin=s.origin
+                     AND s2.destination=s.destination AND s2.seat=s.seat
+                     AND s2.outbound_date=s.outbound_date AND s2.return_date=s.return_date
+                   ORDER BY s2.requested_at DESC, s2.id DESC LIMIT 1)""",
+            (slot_id, origin, destination, seat.value)).fetchone()
+        return r["p"]
+
     # ---- deals ----
     def insert_deal(self, offer_id: int, search_id: int, slot_id: str, reasons: list[DealReason],
                     score: float, now: datetime, notifiable: bool) -> int:

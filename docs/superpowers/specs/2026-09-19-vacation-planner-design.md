@@ -358,6 +358,19 @@ reasons, tie-broken by ratio to median. Notification dedup: a deal is marked
 notifiable only if no prior notified deal exists for (slot, route, cabin)
 or the price is ≤ `renotify_drop_ratio` × the last notified price.
 
+### 5.6a Alternate origins
+
+`settings.alternate_origins` = `{home, min_saving_ratio, min_saving_total}`.
+For a search whose origin is not `home`, storage supplies the best current
+price at `home` for the same (slot, destination, seat) — the cheapest of the
+newest observation per date pair (`Storage.best_price_for`). If such a price
+exists and the alternate fare is not both `<= (1 - min_saving_ratio) x home`
+and `<= home - min_saving_total`, the offer is not a deal at all and nothing
+is recorded, whatever the other rules say. If it clears both margins,
+`CHEAPER_THAN_HOME` is appended to the reasons it earned on its own; a fare
+with no other reason still is not a deal. With no `home` price on record yet
+the fare is evaluated normally.
+
 ### 5.7 `report` — HTML
 
 Jinja2 templates → `docs/site/index.html` plus one page per route
@@ -366,13 +379,15 @@ needed for v1.
 
 Index page:
 1. New deals since last run (empty state text if none).
-2. One section per upcoming slot: table of targets with best current price,
-   per-person price, airline(s), stops, outbound/return dates, ratio to
-   median, price level, Google Flights link, deal badge.
+2. One section per upcoming slot: one row per (destination, seat) with the
+   best current price at the home origin, per-person price, airline(s),
+   stops, outbound/return dates, ratio to median, price level, Google
+   Flights link, deal badge — plus, in its own column, the best price at
+   each alternate origin and how much it saves ("FRA 9,000 € (−25 %)").
 3. Footer: run time, searches executed, budget used this month.
 
-Route page: table of every observation (date searched, dates flown, price,
-airline, level) newest first.
+Route page: one per (slot, origin, destination, seat), with every observation
+(date searched, dates flown, price, airline, level) newest first.
 
 ### 5.8 `notify` — email
 

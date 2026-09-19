@@ -33,6 +33,8 @@ def test_loads_repo_config(config_dir: Path):
     assert cfg.settings.max_stops == 2
     assert cfg.settings.layovers.max_minutes == 180
     assert cfg.settings.layovers.forbidden_window == ("23:00", "05:00")
+    alt = cfg.settings.alternate_origins
+    assert (alt.home, alt.min_saving_ratio, alt.min_saving_total) == ("HAM", 0.20, 500)
     assert cfg.secrets.serpapi_key is None and cfg.secrets.searchapi_key is None
 
 

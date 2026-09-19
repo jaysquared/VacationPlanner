@@ -81,3 +81,23 @@ leg to the departure of the next. It is rejected when it is longer than
 22:30–01:00 wait and a 04:30–06:00 one, while 05:00–07:00 is fine. Set
 `forbidden_window: null` to check the duration only. Itineraries a provider
 reports without legs are never rejected by this rule.
+
+### Frankfurt has to be worth the trip
+
+Getting to Frankfurt costs a train ride and most of a day, so a fare from an
+origin other than `home` only counts as a deal if it beats the best known
+Hamburg fare for the same slot, destination and cabin by **both** margins:
+
+```yaml
+alternate_origins:
+  home: HAM
+  min_saving_ratio: 0.20          # a FRA fare must be >= 20 % cheaper than the best HAM fare
+  min_saving_total: 500           # ... and >= 500 EUR cheaper in absolute terms
+```
+
+If it does not, it is not reported at all, however low Google calls it. If there
+is no Hamburg price on record yet, the fare is judged on the normal rules alone.
+A deal that clears both margins carries the extra reason `cheaper_than_home`.
+In the report, Hamburg and Frankfurt share one row per destination: the
+alternate origin shows up as `FRA 9,000 € (−25 %)` next to the Hamburg price,
+and each origin keeps its own history page.

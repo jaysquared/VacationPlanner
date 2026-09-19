@@ -149,6 +149,22 @@ class DealSettings(BaseModel):
     lookahead_days: int
 
 
+class AlternateOriginSettings(BaseModel):
+    """How much cheaper a non-home origin has to be before it counts as a deal.
+
+    Flying from Frankfurt costs a train ride and a day, so a FRA fare is only
+    interesting if it beats the best Hamburg fare by both margins.
+    """
+
+    home: str = "HAM"
+    min_saving_ratio: float = 0.20
+    min_saving_total: float = 500
+
+    def beats_home(self, price: float, home_price: float) -> bool:
+        return (price <= (1 - self.min_saving_ratio) * home_price
+                and price <= home_price - self.min_saving_total)
+
+
 class ReportSettings(BaseModel):
     output_dir: str = "docs/site"
 
@@ -167,6 +183,7 @@ class Settings(BaseModel):
     providers: ProviderSettings
     budget: BudgetSettings
     deals: DealSettings
+    alternate_origins: AlternateOriginSettings = AlternateOriginSettings()
     report: ReportSettings = ReportSettings()
     email: EmailSettings = EmailSettings()
 

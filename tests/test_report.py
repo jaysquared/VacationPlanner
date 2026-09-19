@@ -68,6 +68,57 @@ def test_render_writes_index_and_route_pages(config_dir, tmp_path):
     assert all(p.exists() for p in written)
 
 
+def with_frankfurt(config_dir):
+    cfg, db, run = seeded(config_dir)          # HAM best is 7,000
+    fra = db.start_run(NOW, 1)
+    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(5250)]), NOW)
+    db.save_result(fra, SearchResult(req(origin="FRA", out=date(2026, 12, 20), ret=date(2027, 1, 1)),
+                                     Provider.SERPAPI, [offer(6000)]), NOW)
+    return cfg, db, run
+
+
+def test_alternate_origins_share_one_row_per_destination(config_dir):
+    cfg, db, run = with_frankfurt(config_dir)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    routes = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")
+    assert len(routes) == 1                                   # HAM and FRA share the (BKK, business) row
+    r = routes[0]
+    assert r.best.search.origin == "HAM" and r.best.offer.price_total == 7000
+    assert [(origin, obs.offer.price_total, round(saving, 4)) for origin, obs, saving in r.alternates] \
+        == [("FRA", 5250, 0.25)]
+
+
+def test_render_shows_the_frankfurt_price_and_its_saving(config_dir, tmp_path):
+    cfg, db, run = with_frankfurt(config_dir)
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    index = (tmp_path / "index.html").read_text()
+    assert "FRA 5,250 € (−25 %)" in index
+    assert index.count("routes/weihnachten-2026-HAM-BKK-business.html") == 1   # no duplicate HAM row
+    assert "routes/weihnachten-2026-FRA-BKK-business.html" in index
+    assert (tmp_path / "routes" / "weihnachten-2026-FRA-BKK-business.html").exists()
+
+
+def test_a_dearer_alternate_origin_is_shown_with_a_plus(config_dir, tmp_path):
+    cfg, db, run = seeded(config_dir)          # HAM best is 7,000
+    fra = db.start_run(NOW, 1)
+    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7700)]), NOW)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    routes = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")
+    assert routes[0].best.search.origin == "HAM"
+    assert round(routes[0].alternates[0][2], 2) == -0.10
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    assert "FRA 7,700 € (+10 %)" in (tmp_path / "index.html").read_text()
+
+
+def test_an_equally_priced_alternate_origin_shows_no_percentage(config_dir, tmp_path):
+    cfg, db, run = seeded(config_dir)          # HAM best is 7,000
+    fra = db.start_run(NOW, 1)
+    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7000)]), NOW)
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    index = (tmp_path / "index.html").read_text()
+    assert "FRA 7,000 €<" in index and "−0 %" not in index
+
+
 def test_render_with_empty_db(config_dir, tmp_path):
     cfg = load_config(config_dir, env={})
     render(Storage(":memory:"), cfg, tmp_path, NOW)

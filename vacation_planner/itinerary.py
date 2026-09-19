@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, time, timedelta
 from typing import Sequence
 
+from .config import LayoverSettings
 from .models import Leg
 
 TIME_FORMAT = "%Y-%m-%d %H:%M"
@@ -64,10 +65,10 @@ def _touches_window(starts_at: datetime, ends_at: datetime, window: tuple[str, s
     return False
 
 
-def passes_layover_rule(legs: Sequence[Leg], settings) -> bool:
+def passes_layover_rule(legs: Sequence[Leg], settings: LayoverSettings) -> bool:
     """True when every stop is short enough and none of them touches the night window.
 
-    `settings` is a `config.LayoverSettings`. A nonstop itinerary (or one whose legs
+    A nonstop itinerary (or one whose legs
     the provider did not report) has no layovers and always passes.
     """
     for layover in layovers(legs):

@@ -22,6 +22,10 @@ deals:
   min_history_points: 3
   renotify_drop_ratio: 0.95
   lookahead_days: 330
+alternate_origins:
+  home: HAM
+  min_saving_ratio: 0.20          # a FRA fare must be >= 20 % cheaper than the best HAM fare
+  min_saving_total: 500           # ... and >= 500 EUR cheaper in absolute terms
 report:
   output_dir: docs/site
 email:

@@ -34,6 +34,46 @@ def offer(price, level=None):
     return Offer(Provider.SERPAPI, price, "EUR", price / 3, ["LH"], 1, 800, "", "", level, None, None, "https://g", {})
 
 
+def alternate_origin_run(config_dir, ham: float | None, fra: float):
+    """Seed one HAM observation (unless None) and detect on a later FRA search."""
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    if ham is not None:
+        home = db.start_run(NOW, 1)
+        db.save_result(home, SearchResult(req(), Provider.SERPAPI, [offer(ham)]), NOW)
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(fra, "low")]), NOW)
+    return detect_for_run(db, run, cfg, NOW)
+
+
+def test_frankfurt_must_beat_hamburg_by_the_margin(config_dir):
+    deals = alternate_origin_run(config_dir, ham=12000, fra=9000)   # 25 %, 3,000 EUR
+    assert len(deals) == 1 and deals[0].search.origin == "FRA"
+    assert deals[0].reasons == [DealReason.GOOGLE_LOW, DealReason.CHEAPER_THAN_HOME]
+
+
+def test_frankfurt_too_close_to_hamburg_is_no_deal_at_all(config_dir):
+    assert alternate_origin_run(config_dir, ham=12000, fra=11000) == []   # 8 %, google low ignored
+
+
+def test_frankfurt_needs_both_the_ratio_and_the_absolute_saving(config_dir):
+    assert len(alternate_origin_run(config_dir, ham=12000, fra=9600)) == 1   # exactly 20 %, 2,400 EUR
+    assert alternate_origin_run(config_dir, ham=2000, fra=1600) == []        # 20 % but only 400 EUR
+
+
+def test_frankfurt_without_hamburg_history_is_evaluated_normally(config_dir):
+    deals = alternate_origin_run(config_dir, ham=None, fra=9000)
+    assert len(deals) == 1 and deals[0].reasons == [DealReason.GOOGLE_LOW]
+
+
+def test_the_home_origin_is_never_margin_checked(config_dir):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(11000, "low")]), NOW)
+    assert [d.reasons for d in detect_for_run(db, run, cfg, NOW)] == [[DealReason.GOOGLE_LOW]]
+
+
 def test_detect_for_run_records_deals_and_renotify_rule(config_dir):
     cfg = load_config(config_dir, env={})
     db = Storage(":memory:")
