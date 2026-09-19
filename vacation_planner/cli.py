@@ -20,7 +20,7 @@ from .report import render
 from .storage import Storage
 from . import notify as _notify
 
-app = typer.Typer(no_args_is_help=True, add_completion=False)
+app = typer.Typer(no_args_is_help=True, add_completion=False, rich_markup_mode=None)
 log = logging.getLogger("vacation_planner")
 
 DEFAULT_DB = Path("data/planner.sqlite")
