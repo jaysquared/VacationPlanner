@@ -28,6 +28,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync --frozen
+      - run: uv run pytest -q
       - name: Run planner
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
@@ -38,6 +39,7 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: |
+          set -o pipefail   # without it `... | tee run.log` hides a failing run
           LIMIT="${{ github.event.inputs.limit }}"
           ARGS=""
           if [ -n "$LIMIT" ]; then ARGS="--limit $LIMIT"; fi
