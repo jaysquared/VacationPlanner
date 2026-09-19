@@ -4,17 +4,15 @@ bridge_days: { before: 0, after: 0 }
 max_stops: 1
 excluded_airlines: [AI]
 providers:
-  primary: serpapi
-  backup: fast_flights
-  backup_pause_seconds: 5
-  # fast_flights verified live (16,824 EUR = 3 travellers); serpapi UNVERIFIED until the first real search
-  price_is_total:
-    serpapi: true
-    fast_flights: true
+  order:
+    - { name: serpapi, monthly_budget: 250 }
+    - { name: searchapi, monthly_budget: 100 }
+    - { name: fast_flights, pause_seconds: 5 }     # no budget = unlimited
+  # All three verified live 2026-09-19: the price is the total for all travellers.
+  price_is_total: { serpapi: true, searchapi: true, fast_flights: true }
 budget:
-  serpapi_per_month: 100
-  runs_per_month: 4               # Mondays: 4-5 runs/month; the planner also caps by actual monthly usage
-  max_searches_per_run: 60
+  runs_per_month: 4               # Mondays: 4-5 runs/month; shares are capped by real usage
+  max_searches_per_run: 120       # hard cap across all providers
   max_pairs_per_route_per_run: 3
 deals:
   median_ratio: 0.85

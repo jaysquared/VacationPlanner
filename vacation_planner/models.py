@@ -17,6 +17,7 @@ class SeatClass(str, Enum):
 
 class Provider(str, Enum):
     SERPAPI = "serpapi"
+    SEARCHAPI = "searchapi"
     FAST_FLIGHTS = "fast_flights"
     FAKE = "fake"
 

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from vacation_planner.config import ConfigError, ProviderSettings, load_config
+from vacation_planner.config import ConfigError, ProviderEntry, ProviderSettings, load_config
 from vacation_planner.models import Cabin, Nights, Provider
 
 
@@ -16,16 +16,21 @@ def test_loads_repo_config(config_dir: Path):
     assert cfg.destination("PMI").cabin is Cabin.ANY
     herbst = next(s for s in cfg.slots if s.id == "herbst-2026")
     assert herbst.start == date(2026, 10, 19) and herbst.targets == ("BKK",)
-    assert cfg.settings.providers.primary is Provider.SERPAPI
-    assert cfg.settings.budget.serpapi_per_month == 100
+    order = cfg.settings.providers.order
+    assert [e.name for e in order] == [Provider.SERPAPI, Provider.SEARCHAPI, Provider.FAST_FLIGHTS]
+    assert [e.monthly_budget for e in order] == [250, 100, None]
+    assert cfg.settings.providers.entry(Provider.FAST_FLIGHTS).pause_seconds == 5
+    assert [e.name for e in cfg.settings.providers.budgeted()] == [Provider.SERPAPI, Provider.SEARCHAPI]
+    assert cfg.settings.budget.max_searches_per_run == 120
     assert cfg.settings.nights == Nights(7, 14)
-    assert cfg.secrets.serpapi_key is None
+    assert cfg.secrets.serpapi_key is None and cfg.secrets.searchapi_key is None
 
 
 def test_secrets_from_env(config_dir: Path):
-    env = {"SERPAPI_KEY": "k", "MAIL_TO": "a@x.de, b@x.de", "SMTP_PORT": "2525"}
+    env = {"SERPAPI_KEY": "k", "SEARCHAPI_KEY": "s", "MAIL_TO": "a@x.de, b@x.de", "SMTP_PORT": "2525"}
     cfg = load_config(config_dir, env=env)
     assert cfg.secrets.serpapi_key == "k"
+    assert cfg.secrets.searchapi_key == "s"
     assert cfg.secrets.mail_to == ["a@x.de", "b@x.de"]
     assert cfg.secrets.smtp_port == 2525
 
@@ -53,16 +58,45 @@ def test_bad_yaml_value_names_file_and_key(config_dir: Path):
 
 def test_price_is_total_is_per_provider(config_dir: Path):
     cfg = load_config(config_dir, env={})
-    assert cfg.settings.providers.price_is_total == {Provider.SERPAPI: True, Provider.FAST_FLIGHTS: True}
+    assert cfg.settings.providers.price_is_total == {
+        Provider.SERPAPI: True, Provider.SEARCHAPI: True, Provider.FAST_FLIGHTS: True}
 
 
 def test_price_is_total_accepts_a_bare_bool(config_dir: Path):
     st = config_dir / "settings.yaml"
-    st.write_text(re.sub(r"  price_is_total:\n(?:    .*\n)+", "  price_is_total: false\n", st.read_text()))
+    st.write_text(re.sub(r"  price_is_total:.*\n", "  price_is_total: false\n", st.read_text()))
     cfg = load_config(config_dir, env={})
-    assert cfg.settings.providers.price_is_total == {Provider.SERPAPI: False, Provider.FAST_FLIGHTS: False}
+    assert cfg.settings.providers.price_is_total == {
+        Provider.SERPAPI: False, Provider.SEARCHAPI: False, Provider.FAST_FLIGHTS: False}
 
 
-def test_price_is_total_defaults_to_total_for_both_providers():
-    ps = ProviderSettings(primary=Provider.SERPAPI, backup=Provider.FAST_FLIGHTS)
-    assert ps.price_is_total == {Provider.SERPAPI: True, Provider.FAST_FLIGHTS: True}
+def test_price_is_total_defaults_to_total_for_listed_providers():
+    ps = ProviderSettings(order=[ProviderEntry(name=Provider.SERPAPI),
+                                 ProviderEntry(name=Provider.SEARCHAPI, monthly_budget=100),
+                                 ProviderEntry(name=Provider.FAST_FLIGHTS, pause_seconds=5)],
+                          price_is_total={Provider.SEARCHAPI: False})
+    assert ps.price_is_total == {Provider.SERPAPI: True, Provider.SEARCHAPI: False, Provider.FAST_FLIGHTS: True}
+    assert ps.entry(Provider.FAST_FLIGHTS).pause_seconds == 5
+    assert [e.name for e in ps.budgeted()] == [Provider.SEARCHAPI]
+
+
+def test_missing_price_is_total_key_defaults_to_true(config_dir: Path):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("searchapi: true, ", ""))
+    cfg = load_config(config_dir, env={})
+    assert cfg.settings.providers.price_is_total[Provider.SEARCHAPI] is True
+
+
+def test_duplicate_provider_in_order_is_rejected(config_dir: Path):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("{ name: searchapi, monthly_budget: 100 }",
+                                         "{ name: serpapi, monthly_budget: 100 }"))
+    with pytest.raises(ConfigError, match="settings.yaml.*providers.order.*serpapi"):
+        load_config(config_dir, env={})
+
+
+def test_empty_provider_order_is_rejected(config_dir: Path):
+    st = config_dir / "settings.yaml"
+    st.write_text(re.sub(r"  order:\n(?:    - .*\n)+", "  order: []\n", st.read_text()))
+    with pytest.raises(ConfigError, match="settings.yaml.*providers.order"):
+        load_config(config_dir, env={})

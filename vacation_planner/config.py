@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Literal, Mapping
 
 import yaml
-from pydantic import BaseModel, ValidationError, field_validator
+from pydantic import BaseModel, ValidationError, ValidationInfo, field_validator, model_validator
 
 from .models import Cabin, Child, Destination, Nights, Provider, Slot, Travellers
 
@@ -61,23 +61,55 @@ class BridgeDays(BaseModel):
     after: int = 0
 
 
+class ProviderEntry(BaseModel):
+    name: Provider
+    monthly_budget: int | None = None   # None = unlimited, rate-limited by pause_seconds instead
+    pause_seconds: float = 0.0
+
+
 class ProviderSettings(BaseModel):
-    primary: Provider
-    backup: Provider | None = None
-    backup_pause_seconds: float = 5.0
-    # Per provider: the two are verified independently, so one flag for both would be a guess.
-    price_is_total: dict[Provider, bool] = {Provider.SERPAPI: True, Provider.FAST_FLIGHTS: True}
+    """The providers to use, best first. Each search goes to the first one with budget left."""
+
+    order: list[ProviderEntry]
+    # Per provider: each is verified independently, so one flag for all of them would be a guess.
+    price_is_total: dict[Provider, bool] = {}
+
+    @field_validator("order")
+    @classmethod
+    def _non_empty_and_unique(cls, v: list[ProviderEntry]) -> list[ProviderEntry]:
+        if not v:
+            raise ValueError("list at least one provider")
+        seen: set[Provider] = set()
+        for e in v:
+            if e.name in seen:
+                raise ValueError(f"duplicate provider {e.name.value}")
+            seen.add(e.name)
+        return v
 
     @field_validator("price_is_total", mode="before")
     @classmethod
-    def _expand_bare_bool(cls, v: object) -> object:
-        if isinstance(v, bool):   # older config shape: one flag for both providers
-            return {Provider.SERPAPI: v, Provider.FAST_FLIGHTS: v}
+    def _expand_bare_bool(cls, v: object, info: ValidationInfo) -> object:
+        if isinstance(v, bool):   # older config shape: one flag for every provider
+            return {e.name: v for e in (info.data.get("order") or [])}
         return v
+
+    @model_validator(mode="after")
+    def _default_listed_providers_to_total(self) -> "ProviderSettings":
+        for e in self.order:
+            self.price_is_total.setdefault(e.name, True)
+        return self
+
+    def entry(self, p: Provider) -> ProviderEntry:
+        for e in self.order:
+            if e.name is p:
+                return e
+        raise KeyError(p)
+
+    def budgeted(self) -> list[ProviderEntry]:
+        return [e for e in self.order if e.monthly_budget is not None]
 
 
 class BudgetSettings(BaseModel):
-    serpapi_per_month: int
     runs_per_month: int
     max_searches_per_run: int
     max_pairs_per_route_per_run: int
@@ -123,6 +155,7 @@ class Settings(BaseModel):
 @dataclass
 class Secrets:
     serpapi_key: str | None
+    searchapi_key: str | None
     smtp_host: str | None
     smtp_port: int
     smtp_user: str | None
@@ -162,6 +195,7 @@ def _secrets(env: Mapping[str, str]) -> Secrets:
     to = [x.strip() for x in env.get("MAIL_TO", "").split(",") if x.strip()]
     return Secrets(
         serpapi_key=env.get("SERPAPI_KEY") or None,
+        searchapi_key=env.get("SEARCHAPI_KEY") or None,
         smtp_host=env.get("SMTP_HOST") or None,
         smtp_port=int(env.get("SMTP_PORT") or 587),
         smtp_user=env.get("SMTP_USER") or None,
