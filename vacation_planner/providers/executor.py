@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Callable, Mapping
 
 from ..config import ProviderSettings
-from ..models import PlannedSearch, Provider, SearchRequest, SearchResult
+from ..models import PlannedSearch, Provider, SearchResult
 from ..storage import Storage
 from .base import FlightClient, ProviderError, QuotaExhausted
 
@@ -26,59 +26,50 @@ def execute(planned: list[PlannedSearch], clients: Mapping[Provider, FlightClien
             providers: ProviderSettings, now: Callable[[], datetime], raw_dir: Path | None = None) -> ExecutionSummary:
     run_id = storage.start_run(now(), len(planned))
     summary = ExecutionSummary(run_id=run_id, planned=len(planned))
-    primary, backup = providers.primary, providers.backup
-    primary_dead = False
-
-    def attempt(provider: Provider, req: SearchRequest) -> SearchResult:
-        return clients[provider].search(req, raw_dir)
+    order = [e.name for e in providers.order]
+    dead: set[Provider] = set()   # quota or auth failure: unusable for the rest of this run
 
     for ps in planned:
         req = ps.request
-        provider = ps.provider
-        if provider == primary and primary_dead:
-            if backup is None:
-                storage.record_search(run_id, req, primary, "skipped", now(), error="primary quota exhausted")
-                summary.skipped += 1
+        # The planned provider first, then everything below it in the configured order:
+        # falling back *up* the list would spend a scarcer budget than the plan allowed.
+        chain = order[order.index(ps.provider):] if ps.provider in order else [ps.provider]
+        attempted = False
+        result: SearchResult | None = None
+
+        for provider in chain:
+            if provider in dead or provider not in clients:
                 continue
-            provider = backup
-            summary.fallbacks += 1
-
-        error: str | None = None
-        try:
-            storage.save_result(run_id, attempt(provider, req), now())
-            summary.ok += 1
-            continue
-        except QuotaExhausted as e:
-            error = str(e)
-            if provider == primary:
-                primary_dead = True
-        except ProviderError as e:
-            error = str(e)
-        except Exception as e:
-            # A client bug (layout change, bad cast) must never take the whole run down:
-            # record this search as an error and keep going. Spec section 7.
-            storage.record_search(run_id, req, provider, "error", now(),
-                                  error=f"unexpected {type(e).__name__}: {e}")
-            summary.errors += 1
-            continue
-
-        if provider == primary and backup is not None:
-            # Record the failed primary attempt on its own: the monthly budget counter reads
-            # searches, and a fallback must not hide the credit the primary already spent.
-            storage.record_search(run_id, req, primary, "error", now(), error=error)
-            summary.fallbacks += 1
+            attempted = True
             try:
-                storage.save_result(run_id, attempt(backup, req), now())
-                summary.ok += 1
+                result = clients[provider].search(req, raw_dir)
+            except QuotaExhausted as e:
+                dead.add(provider)
+                storage.record_search(run_id, req, provider, "error", now(), error=str(e))
                 continue
             except ProviderError as e:
-                error = f"{error}; backup: {e}"
-            except Exception as e:   # a backup client bug must not take the run down either
-                error = f"{error}; backup: unexpected {type(e).__name__}: {e}"
-            provider = backup
+                storage.record_search(run_id, req, provider, "error", now(), error=str(e))
+                continue
+            except Exception as e:
+                # A client bug (layout change, bad cast) must never take the whole run down:
+                # record this attempt as an error and try the next provider. Spec section 7.
+                storage.record_search(run_id, req, provider, "error", now(),
+                                      error=f"unexpected {type(e).__name__}: {e}")
+                continue
+            # Every attempt above is stored on its own, so the monthly counters stay accurate.
+            storage.save_result(run_id, result, now())
+            summary.ok += 1
+            if provider is not ps.provider:
+                summary.fallbacks += 1
+            break
 
-        storage.record_search(run_id, req, provider, "error", now(), error=error)
-        summary.errors += 1
+        if result is not None:
+            continue
+        if not attempted:
+            storage.record_search(run_id, req, ps.provider, "skipped", now(), error="no provider available")
+            summary.skipped += 1
+        else:
+            summary.errors += 1   # the error rows are already stored, one per attempt
 
     if not planned:
         summary.status = "empty"
