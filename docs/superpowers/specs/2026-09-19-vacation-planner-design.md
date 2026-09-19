@@ -25,11 +25,15 @@ Out of scope for this version: hotels, a web UI, multi-city trips, one-way
 trips, price alerts from other sources. The module boundaries below are chosen
 so these can be added without restructuring.
 
-## 2. Data source
+## 2. Data sources
 
-SerpApi, `engine=google_flights`. Facts the design relies on (to be confirmed
-against the live API during implementation, with the response recorded as a
-test fixture):
+Two providers behind one `FlightClient` protocol. Both read Google Flights,
+so their prices are comparable and share one price history.
+
+### 2.1 Primary: SerpApi (`engine=google_flights`)
+
+Facts the design relies on (confirmed against the live API during
+implementation, with the response recorded as a test fixture):
 
 - One request = one origin, one destination, one outbound date, one return
   date, one cabin class, passenger counts, currency. Parameters used:
@@ -48,13 +52,32 @@ test fixture):
   implementation. Offers store the raw price and the passenger counts so the
   per-person figure is derived, never guessed.
 
-Budget: free tier is 100 searches/month; the first paid plan is 5,000/month
-at roughly USD 900/year, which is not planned. The project starts on the free
-tier with a small number of targets. The planner takes a monthly budget from
-config and never exceeds the per-run share of it. Because the per-run share
-is what limits coverage, the default schedule is twice weekly (about 12
-searches per run) rather than daily (3 per run). The `FlightClient` protocol
-keeps a later switch to another provider contained in one module.
+Budget: free tier is 100 searches/month. The first paid plan is 5,000/month at
+roughly USD 900/year and is not planned. The planner takes the monthly budget
+from config and never exceeds the per-run share of it.
+
+### 2.2 Backup: `fast-flights` (unofficial Google Flights, no key)
+
+PyPI package `fast-flights` (3.1.0, August 2026). Supports seat class incl.
+business, adults/children, round trip, max stops, currency. It has no
+airline-exclusion parameter, so the client drops itineraries containing an
+excluded airline after fetching. It returns a price level (low/typical/high)
+and per-itinerary price, airline, stops, duration and times, but no typical
+price range and no deep link; the client builds the Google Flights URL from
+the query itself. Being unofficial it can break without notice; that is
+acceptable for a backup and is why it is not the primary.
+
+### 2.3 Provider allocation
+
+The planner produces an ordered list of searches. The executor sends the
+first `serpapi_per_run` of them to SerpApi and the remainder, up to
+`max_searches_per_run`, to the backup. A SerpApi failure (error after
+retries, or quota exhausted) re-runs that search on the backup. Every offer
+records its `provider`. The backup client waits a configurable pause between
+requests and never runs in parallel.
+
+Amadeus Self-Service was considered and rejected: it was decommissioned on
+2026-07-17.
 
 ## 3. Configuration
 
@@ -133,7 +156,7 @@ holidays:
 ```
 
 Seed data covers 2026/27 through 2029/30 from the PDF, with targets only on
-the 2026/27 slots and at most two per slot to stay inside the free tier. The Halbjahrespause
+the 2026/27 slots and at most two per slot to start small. The Halbjahrespause
 (single Friday) is deliberately not seeded: with the enclosing weekend it is
 three days, always below the minimum trip length.
 
@@ -154,9 +177,14 @@ nights: { min: 7, max: 14 }     # default trip length, per-slot override allowed
 bridge_days: { before: 0, after: 0 }
 max_stops: 1                    # 0 nonstop, 1 one stop, 2 two stops (Google param semantics mapped in client)
 excluded_airlines: [AI]
+providers:
+  primary: serpapi
+  backup: fast_flights            # or null to disable
+  backup_pause_seconds: 5
 budget:
-  searches_per_month: 100
-  runs_per_month: 8               # twice weekly, matches the CI cron
+  serpapi_per_month: 100
+  runs_per_month: 4               # weekly, matches the CI cron
+  max_searches_per_run: 60        # hard cap incl. backup
   max_pairs_per_route_per_run: 3
 deals:
   median_ratio: 0.85            # price <= 85% of historical median
@@ -215,20 +243,30 @@ Input: config, today's date, storage (for freshness). Output: ordered list of
    pairs inside the free window that satisfy the slot's night range.
 3. Rank pairs per route: pairs with no data first, then oldest observation
    first. Take at most `max_pairs_per_route_per_run`.
-4. Concatenate routes in slot order and cut at
-   `searches_per_month / runs_per_month` (rounded down, minimum 1).
+4. Concatenate routes in slot order and cut at `max_searches_per_run`.
+   The first `serpapi_per_month / runs_per_month` (rounded down, minimum 1)
+   are assigned to the primary provider, the rest to the backup. With no
+   backup configured the cut is at the primary share.
 
 The `plan` CLI command prints this list and its count without spending
 anything.
 
-### 5.4 `serpapi_client` — fetch
+### 5.4 `providers` — fetch
 
-`search(request) -> SearchResult`. Maps the request to SerpApi params, calls
-the API, saves the raw JSON to the run's raw directory, parses into `Offer`
-objects (both `best_flights` and `other_flights`). Retries transient errors
-three times with exponential backoff. Raises `QuotaExhausted` on the API's
-quota error so the scan stops cleanly. Interface is a `FlightClient` protocol
-so tests use a fake.
+`FlightClient` protocol: `search(request) -> SearchResult`. Two
+implementations plus a fake for tests.
+
+- `providers/serpapi.py`: maps the request to SerpApi params, calls the API,
+  saves the raw JSON to the run's raw directory, parses `best_flights` and
+  `other_flights` into `Offer` objects. Retries transient errors three times
+  with exponential backoff. Raises `QuotaExhausted` on the API's quota error.
+- `providers/fast_flights.py`: builds the equivalent `fast-flights` query,
+  filters out itineraries with excluded airlines, maps results to `Offer`
+  with `typical_low/high` empty and a constructed Google Flights URL. Sleeps
+  `backup_pause_seconds` before each call. Raises `ProviderError` on parse
+  failure or empty response.
+- `providers/executor.py`: walks the plan, assigns providers per 2.3, handles
+  fallback, and writes each result through storage in its own transaction.
 
 ### 5.5 `storage` — SQLite
 
@@ -237,8 +275,9 @@ migration scripts applied on startup.
 
 - `runs(id, started_at, finished_at, planned, executed, status)`
 - `searches(id, run_id, slot_id, origin, destination, outbound_date,
-  return_date, cabin, adults, children, requested_at, status, error)`
-- `offers(id, search_id, price_total, currency, per_person, airlines_json,
+  return_date, cabin, adults, children, provider, requested_at, status,
+  error)`
+- `offers(id, search_id, provider, price_total, currency, per_person, airlines_json,
   stops, duration_minutes, departs_at, arrives_at, price_level, typical_low,
   typical_high, google_url, flight_json)`
 - `deals(id, offer_id, slot_id, reasons_json, score, detected_at,
@@ -304,8 +343,8 @@ Entry point `vacation-planner` (typer):
 
 GitHub Actions workflow `scan.yml`:
 
-- Triggers: cron Monday and Thursday 05:00 UTC (8 runs/month, matching
-  `runs_per_month`), `workflow_dispatch` with optional `limit`.
+- Triggers: cron Monday 05:00 UTC (4 runs/month, matching `runs_per_month`),
+  `workflow_dispatch` with optional `limit`.
 - Steps: checkout, set up Python 3.12, install with `uv sync`,
   `vacation-planner run`, commit `data/planner.sqlite` and `docs/site/` with
   message `scan: <date> (<n> searches, <m> new deals)`, upload `data/raw/`
@@ -327,8 +366,9 @@ pipeline does not change either way.
 - Config errors: fail before any API call with file/key/problem.
 - API transient error: three retries, then the search is stored with
   `status=error` and the run continues.
-- Quota exhausted: remaining planned searches stored as `skipped`, run
-  status `partial`, report and notify still execute.
+- Primary quota exhausted or failed: the search goes to the backup. If no
+  backup is configured or the backup also fails, the search is stored as
+  `skipped`/`error`, run status `partial`, report and notify still execute.
 - Parse error on a response: the raw JSON is kept, the search is marked
   `error`, the run continues. A test fixture is added when this happens.
 - Email failure: logged, run exits 0, deals stay un-notified and are picked
@@ -344,9 +384,13 @@ pytest, no live API in tests.
 - `planner`: pair enumeration for short and six-week windows, per-route cap,
   freshness ordering with a fake storage, budget cut, lookahead filter, slots
   without targets ignored. Uses an injected `today`.
-- `serpapi_client`: parsing of a recorded fixture (best + other flights,
+- `providers/serpapi`: parsing of a recorded fixture (best + other flights,
   price insights, missing insights), param mapping incl. excluded airlines
   and travel class, retry and quota paths with a stubbed HTTP layer.
+- `providers/fast_flights`: mapping from a recorded result object, excluded
+  airline filtering, URL construction, pause behaviour with a fake sleep.
+- `providers/executor`: primary/backup split at the budget boundary,
+  fallback on primary failure, no backup configured, quota exhausted mid-run.
 - `storage`: migrations apply cleanly on an empty DB and are idempotent;
   round-trip of run/search/offer/deal.
 - `deals`: each rule in isolation with fixture history, fallback to route
@@ -364,12 +408,13 @@ config/            travellers.yaml destinations.yaml holidays.yaml settings.yaml
 data/              planner.sqlite (committed), raw/ (ignored)
 docs/site/         generated report (committed, served by Pages)
 docs/superpowers/  specs and plans
-vacation_planner/  config.py calendar.py planner.py serpapi_client.py
-                   storage.py deals.py report.py notify.py cli.py
-                   templates/ migrations/
+vacation_planner/  config.py calendar.py planner.py storage.py deals.py
+                   report.py notify.py cli.py templates/ migrations/
+                   providers/ (base.py serpapi.py fast_flights.py executor.py)
 tests/             mirrors the package, fixtures/ holds recorded responses
 .github/workflows/scan.yml
-pyproject.toml     (uv, typer, pydantic, pyyaml, jinja2, httpx, python-dotenv)
+pyproject.toml     (uv, typer, pydantic, pyyaml, jinja2, httpx, python-dotenv,
+                    fast-flights)
 ```
 
 ## 10. Future extensions (not in this spec)
