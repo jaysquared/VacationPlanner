@@ -48,7 +48,8 @@ def compose(deals: list[NewDeal], config: Config, report_url: str | None) -> tup
 
 
 def send_pending(storage: Storage, config: Config, now: datetime, report_url: str | None = None,
-                 smtp_factory: Callable[[str, int], smtplib.SMTP] = smtplib.SMTP) -> int:
+                 smtp_factory: Callable[[str, int], smtplib.SMTP] = smtplib.SMTP,
+                 smtp_ssl_factory: Callable[[str, int], smtplib.SMTP] = smtplib.SMTP_SSL) -> int:
     mode = config.settings.email.mode
     if mode == "never":
         return 0
@@ -67,9 +68,12 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
     msg["Subject"], msg["From"], msg["To"] = subject, sec.mail_from, ", ".join(sec.mail_to)
     msg.set_content(text)
     msg.add_alternative(html, subtype="html")
+    implicit_tls = sec.smtp_port == 465   # 465 is TLS from the first byte; 587 upgrades with STARTTLS
+    factory = smtp_ssl_factory if implicit_tls else smtp_factory
     try:
-        with smtp_factory(sec.smtp_host, sec.smtp_port) as smtp:
-            smtp.starttls()
+        with factory(sec.smtp_host, sec.smtp_port) as smtp:
+            if not implicit_tls:
+                smtp.starttls()
             if sec.smtp_user:
                 smtp.login(sec.smtp_user, sec.smtp_password or "")
             smtp.send_message(msg)

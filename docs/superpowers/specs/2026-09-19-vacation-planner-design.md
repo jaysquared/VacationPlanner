@@ -285,8 +285,8 @@ migration scripts applied on startup.
   typical_high, google_url, flight_json)`
 - `deals(id, offer_id, slot_id, reasons_json, score, detected_at,
   notified_at)`
-- Views: `cheapest_per_search`, `route_history` (cheapest per search grouped
-  by slot, route, cabin, requested_at).
+- View: `cheapest_per_search`, plus the `route_observations` query method
+  (cheapest per search for one slot, route and cabin, newest first).
 
 One transaction per search so a crash leaves consistent data.
 

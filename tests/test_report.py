@@ -71,3 +71,12 @@ def test_render_with_empty_db(config_dir, tmp_path):
     cfg = load_config(config_dir, env={})
     render(Storage(":memory:"), cfg, tmp_path, NOW)
     assert "No deals" in (tmp_path / "index.html").read_text()
+
+
+def test_route_median_honours_min_history_points(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("min_history_points: 3", "min_history_points: 6"))
+    cfg, db, run = seeded(config_dir)            # 5 observations on the BKK route
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    herbst = next(routes for slot, window, routes in data.slots if slot.id == "herbst-2026")
+    assert herbst[0].median is None and herbst[0].ratio is None

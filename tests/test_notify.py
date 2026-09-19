@@ -84,3 +84,34 @@ def test_mode_never_and_always(config_dir):
     cfg = load_config(config_dir, env=ENV)
     assert send_pending(Storage(":memory:"), cfg, NOW, smtp_factory=FakeSMTP) == 0
     assert "No new deals" in FakeSMTP.instances[0].sent[0]["Subject"]
+
+
+class FakeSMTPSSL(FakeSMTP):
+    instances = []
+
+    def __init__(self, host, port):
+        super().__init__(host, port)
+        FakeSMTPSSL.instances.append(self)
+
+    def starttls(self):
+        raise AssertionError("starttls() must not be called on an implicit-TLS (465) connection")
+
+
+def test_port_465_uses_implicit_tls(config_dir):
+    cfg, db = with_deal(config_dir, env=dict(ENV, SMTP_PORT="465"))
+    FakeSMTP.instances.clear()
+    FakeSMTPSSL.instances.clear()
+    n = send_pending(db, cfg, NOW, smtp_factory=FakeSMTP, smtp_ssl_factory=FakeSMTPSSL)
+    assert n == 1 and db.pending_deals() == []
+    assert FakeSMTP.instances == [FakeSMTPSSL.instances[0]]   # only the SSL factory was used
+    smtp = FakeSMTPSSL.instances[0]
+    assert (smtp.host, smtp.port, smtp.tls, smtp.logged_in) == ("smtp.test", 465, False, ("u", "p"))
+    assert smtp.sent
+
+
+def test_port_587_still_starts_tls(config_dir):
+    cfg, db = with_deal(config_dir)
+    FakeSMTPSSL.instances.clear()
+    FakeSMTP.instances.clear()
+    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP, smtp_ssl_factory=FakeSMTPSSL) == 1
+    assert FakeSMTPSSL.instances == [] and FakeSMTP.instances[0].tls is True

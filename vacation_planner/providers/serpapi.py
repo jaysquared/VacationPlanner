@@ -48,8 +48,10 @@ def parse_response(data: dict, req: SearchRequest, price_is_total: bool) -> list
 
 
 def _is_quota(status: int, body: dict | None) -> bool:
+    # Only the monthly quota, not every message mentioning a "limit": a rate limit is
+    # transient and must stay retryable instead of killing the primary for the whole run.
     msg = ((body or {}).get("error") or "").lower()
-    return status == 429 or "out of searches" in msg or "limit" in msg
+    return status == 429 or "out of searches" in msg or "run out of" in msg
 
 
 class SerpApiClient:

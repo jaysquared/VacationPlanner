@@ -53,10 +53,11 @@ def money(v: float) -> str:
     return f"{v:,.0f} €"
 
 
-def _route_median(storage: Storage, slot_id: str, origin: str, dest: str, seat: SeatClass) -> tuple[list[Observation], float | None]:
+def _route_median(storage: Storage, slot_id: str, origin: str, dest: str, seat: SeatClass,
+                  min_points: int) -> tuple[list[Observation], float | None]:
     obs = storage.route_observations(slot_id, origin, dest, seat)
     prices = [o.offer.price_total for o in obs]
-    return obs, (float(_median(prices)) if len(prices) >= 3 else None)
+    return obs, (float(_median(prices)) if len(prices) >= min_points else None)
 
 
 def build_report(storage: Storage, config: Config, now: datetime, last_run_id: int | None) -> ReportData:
@@ -80,7 +81,7 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
         routes = []
         for (origin, dest, seat), obs in by_route.items():
             best = min(obs, key=lambda o: o.offer.price_total)
-            _, med = _route_median(storage, slot.id, origin, dest, seat)
+            _, med = _route_median(storage, slot.id, origin, dest, seat, config.settings.deals.min_history_points)
             destination = config.destinations.get(dest) or Destination(dest, dest, Cabin.ANY)  # removed from catalogue but still in history
             routes.append(RouteSummary(
                 slot=slot, destination=destination, seat=seat, best=best, median=med,
@@ -115,7 +116,8 @@ def render(storage: Storage, config: Config, out_dir: Path, now: datetime, last_
     tpl = env.get_template("route.html")
     for slot, _window, routes in data.slots:
         for r in routes:
-            obs, med = _route_median(storage, slot.id, r.best.search.origin, r.destination.code, r.seat)
+            obs, med = _route_median(storage, slot.id, r.best.search.origin, r.destination.code, r.seat,
+                                     config.settings.deals.min_history_points)
             p = out_dir / r.page
             p.write_text(tpl.render(data=data, slot=slot, origin=r.best.search.origin, destination=r.destination,
                                     seat=r.seat, observations=obs, median=med))

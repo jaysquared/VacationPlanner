@@ -95,3 +95,19 @@ def test_client_reads_its_own_price_flag(config_dir, httpx_mock):
     httpx_mock.add_response(json=json.loads(FIX.read_text()))
     o = c.search(REQ).offers[0]
     assert (o.per_person, o.price_total) == (5940, 5940 * 3)   # per-person price, 3 travellers
+
+
+def test_rate_limit_wording_is_a_transient_error_not_quota(client, httpx_mock):
+    """A bare "limit" in the message is not the monthly quota: retry it, do not kill the primary."""
+    for _ in range(3):
+        httpx_mock.add_response(status_code=400, json={"error": "Rate limit exceeded for this endpoint."})
+    with pytest.raises(ProviderError) as e:
+        client.search(REQ)
+    assert not isinstance(e.value, QuotaExhausted)
+    assert client._sleeps == [2, 4]
+
+
+def test_quota_wording_without_429_is_quota(client, httpx_mock):
+    httpx_mock.add_response(status_code=200, json={"error": "You have run out of searches this month."})
+    with pytest.raises(QuotaExhausted):
+        client.search(REQ)
