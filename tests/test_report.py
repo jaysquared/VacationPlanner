@@ -57,6 +57,11 @@ def test_render_writes_index_and_route_pages(config_dir, tmp_path):
     index = (tmp_path / "index.html").read_text()
     assert "Herbstferien 2026" in index and "7,000 €" in index and "2,333 €" in index
     assert "routes/herbst-2026-HAM-BKK-business.html" in index
+    assert "No targets configured." in index          # herbst-2027 has targets: []
+    assert "Not searched yet." in index                # weihnachten-2026 has targets but no data
+    assert "google low" in index and "below median" in index and "new low" in index   # reason badges
+    assert 'class="level-low"' in index
+    assert "<script" not in index
     route = (tmp_path / "routes" / "herbst-2026-HAM-BKK-business.html").read_text()
     assert route.count("<tr") >= 6  # header + 5 observations
     assert all(p.exists() for p in written)
