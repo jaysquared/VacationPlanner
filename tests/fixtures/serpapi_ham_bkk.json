@@ -1,0 +1,45 @@
+{
+  "search_metadata": {"status": "Success", "google_flights_url": "https://www.google.com/travel/flights?hl=en&gl=de&curr=EUR&tfs=FIXTURE"},
+  "search_parameters": {"engine": "google_flights", "departure_id": "HAM", "arrival_id": "BKK"},
+  "best_flights": [
+    {
+      "flights": [
+        {"departure_airport": {"name": "Hamburg Airport", "id": "HAM", "time": "2026-10-17 10:35"},
+         "arrival_airport": {"name": "Frankfurt Airport", "id": "FRA", "time": "2026-10-17 11:45"},
+         "duration": 70, "airline": "Lufthansa", "travel_class": "Business", "flight_number": "LH 11"},
+        {"departure_airport": {"name": "Frankfurt Airport", "id": "FRA", "time": "2026-10-17 13:55"},
+         "arrival_airport": {"name": "Suvarnabhumi Airport", "id": "BKK", "time": "2026-10-18 06:10"},
+         "duration": 675, "airline": "Thai", "travel_class": "Business", "flight_number": "TG 921"}
+      ],
+      "layovers": [{"duration": 130, "name": "Frankfurt Airport", "id": "FRA"}],
+      "total_duration": 875, "price": 5940, "type": "Round trip", "departure_token": "tok1"
+    }
+  ],
+  "other_flights": [
+    {
+      "flights": [
+        {"departure_airport": {"name": "Hamburg Airport", "id": "HAM", "time": "2026-10-17 06:00"},
+         "arrival_airport": {"name": "Indira Gandhi International Airport", "id": "DEL", "time": "2026-10-17 18:30"},
+         "duration": 570, "airline": "Air India", "travel_class": "Business", "flight_number": "AI 120"},
+        {"departure_airport": {"name": "Indira Gandhi International Airport", "id": "DEL", "time": "2026-10-17 21:00"},
+         "arrival_airport": {"name": "Suvarnabhumi Airport", "id": "BKK", "time": "2026-10-18 03:00"},
+         "duration": 270, "airline": "Air India", "travel_class": "Business", "flight_number": "AI 332"}
+      ],
+      "layovers": [{"duration": 150, "name": "Indira Gandhi International Airport", "id": "DEL"}],
+      "total_duration": 990, "price": 4100, "type": "Round trip", "departure_token": "tok2"
+    },
+    {
+      "flights": [
+        {"departure_airport": {"name": "Hamburg Airport", "id": "HAM", "time": "2026-10-17 14:20"},
+         "arrival_airport": {"name": "Dubai International Airport", "id": "DXB", "time": "2026-10-17 23:05"},
+         "duration": 405, "airline": "Emirates", "travel_class": "Business", "flight_number": "EK 60"},
+        {"departure_airport": {"name": "Dubai International Airport", "id": "DXB", "time": "2026-10-18 03:30"},
+         "arrival_airport": {"name": "Suvarnabhumi Airport", "id": "BKK", "time": "2026-10-18 12:50"},
+         "duration": 380, "airline": "Emirates", "travel_class": "Business", "flight_number": "EK 384"}
+      ],
+      "layovers": [{"duration": 265, "name": "Dubai International Airport", "id": "DXB"}],
+      "total_duration": 1050, "price": 6420, "type": "Round trip", "departure_token": "tok3"
+    }
+  ],
+  "price_insights": {"lowest_price": 5940, "price_level": "low", "typical_price_range": [7200, 9800]}
+}
