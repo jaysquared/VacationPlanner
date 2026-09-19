@@ -76,3 +76,23 @@ def test_plan_without_backup_cuts_at_serpapi_share(config_dir):
     cfg = load_config_dir(config_dir)
     ps = plan(cfg, Storage(":memory:"), TODAY)
     assert len(ps) <= 25 and all(p.provider is Provider.SERPAPI for p in ps)
+
+
+def test_plan_assigns_backup_beyond_primary_share(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("serpapi_per_month: 100", "serpapi_per_month: 8"))
+    cfg = load_config_dir(config_dir)
+    ps = plan(cfg, Storage(":memory:"), TODAY)
+    assert len(ps) == 18
+    assert all(p.provider is Provider.SERPAPI for p in ps[:2])
+    assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[2:])
+
+
+def test_plan_never_searches_past_outbound_dates(config_dir):
+    cfg = load_config_dir(config_dir)
+    db = Storage(":memory:")
+    today = date(2026, 10, 17)  # herbst-2026 free window starts here; slot.start (19 Oct) is still eligible
+    ps = plan(cfg, db, today)
+    herbst = [p.request for p in ps if p.request.slot_id == "herbst-2026"]
+    assert herbst
+    assert all(p.outbound_date > today for p in herbst)

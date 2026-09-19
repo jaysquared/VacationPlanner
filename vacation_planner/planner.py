@@ -29,11 +29,11 @@ def _slot_nights(slot: Slot, cfg: Config) -> Nights:
     return slot.nights or Nights(cfg.settings.nights.min, cfg.settings.nights.max)
 
 
-def _route_requests(cfg: Config, storage: Storage, slot: Slot, origin: str, dest_code: str) -> list[SearchRequest]:
+def _route_requests(cfg: Config, storage: Storage, slot: Slot, origin: str, dest_code: str, today: date) -> list[SearchRequest]:
     dest = cfg.destination(dest_code)
     bd = cfg.settings.bridge_days
     window = free_window(slot, bd.before, bd.after)
-    pairs = candidate_pairs(window, _slot_nights(slot, cfg))
+    pairs = [(out, ret) for out, ret in candidate_pairs(window, _slot_nights(slot, cfg)) if out > today]
     reqs = []
     for out, ret in pairs:
         adults, children, _infants = pax_for(cfg.travellers, out)
@@ -52,7 +52,7 @@ def plan(config: Config, storage: Storage, today: date) -> list[PlannedSearch]:
             continue
         for origin in s.origins:
             for dest_code in slot.targets:
-                requests.extend(_route_requests(config, storage, slot, origin, dest_code))
+                requests.extend(_route_requests(config, storage, slot, origin, dest_code, today))
 
     primary_n = serpapi_share(s.budget)
     backup = s.providers.backup
