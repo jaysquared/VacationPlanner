@@ -49,3 +49,17 @@ Both APIs were verified live on 2026-09-19 with the same search (HAM→BKK Busin
 - `config/holidays.yaml` — the slots and, per slot, which destinations to search (`targets`). Only listed targets are ever searched.
 - `config/destinations.yaml` — the catalogue; `cabin: business` for long haul, `cabin: any` for Europe.
 - `config/settings.yaml` — origins, trip length, budget, providers, deal thresholds.
+
+### Origins per destination
+
+`settings.yaml` lists the default `origins` (`[HAM]`). A destination may name its
+own, and then only those are searched for it:
+
+```yaml
+destinations:
+  - { code: TFS, name: Tenerife South, cabin: any }                                  # HAM only
+  - { code: HKT, name: Phuket, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+```
+
+Each (origin, destination) pair is a route of its own, so
+`budget.max_pairs_per_route_per_run` applies per origin.

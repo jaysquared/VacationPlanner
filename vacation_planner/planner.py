@@ -65,8 +65,10 @@ def plan(config: Config, storage: Storage, today: date) -> list[PlannedSearch]:
     for slot in config.slots:
         if not slot.targets or slot.start <= today or slot.start > horizon:
             continue
-        for origin in s.origins:
-            for dest_code in slot.targets:
+        for dest_code in slot.targets:
+            # A destination may name its own origins (long haul is searched from HAM and FRA);
+            # the searches for one destination stay adjacent so both origins share a budget slice.
+            for origin in config.destination(dest_code).origins or s.origins:
                 requests.extend(_route_requests(config, storage, slot, origin, dest_code, today))
 
     shares = provider_shares(config, storage, today)

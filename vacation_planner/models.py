@@ -55,6 +55,8 @@ class Destination:
     name: str
     cabin: Cabin
     max_price_per_person: float | None = None
+    #: Origins to search for this destination; None falls back to `settings.origins`.
+    origins: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)

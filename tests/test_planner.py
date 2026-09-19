@@ -1,4 +1,5 @@
 import re
+from collections import Counter
 from datetime import date, datetime, timezone
 
 from vacation_planner.calendar import Window
@@ -59,10 +60,12 @@ def test_plan_orders_by_slot_and_assigns_providers(config_dir):
     assert first.return_date <= date(2027, 1, 3)
     slots = [p.request.slot_id for p in ps]
     assert "pfingsten-2027" in slots and "herbst-2026" not in slots  # herbst-2026 has no targets
-    # per-route cap 3
-    assert sum(1 for p in ps if p.request.destination == "HKT") == 3
-    # 20 routes x 3 pairs, all inside the SerpApi per-run share of 62
-    assert len(ps) == 60 and all(p.provider is Provider.SERPAPI for p in ps)
+    # per-route cap 3, counted per (origin, destination)
+    assert sum(1 for p in ps if p.request.destination == "HKT" and p.request.origin == "HAM") == 3
+    # 17 long-haul targets from 2 origins + 3 short-haul from 1, 3 pairs each
+    assert len(ps) == 17 * 2 * 3 + 3 * 3 == 111
+    counts = Counter(p.provider for p in ps)
+    assert counts == {Provider.SERPAPI: 62, Provider.SEARCHAPI: 25, Provider.FAST_FLIGHTS: 24}
     # TFS in pfingsten is economy (cabin any)
     tfs = next(p for p in ps if p.request.destination == "TFS")
     assert tfs.request.seat is SeatClass.ECONOMY and 7 <= tfs.request.nights <= 9
@@ -74,7 +77,7 @@ def test_plan_walks_down_the_provider_order_as_shares_run_out(config_dir):
                                 .replace("monthly_budget: 100", "monthly_budget: 4"))
     cfg = load_config_dir(config_dir)
     ps = plan(cfg, Storage(":memory:"), TODAY)
-    assert len(ps) == 60
+    assert len(ps) == 111
     assert [p.provider for p in ps[:3]] == [Provider.SERPAPI, Provider.SERPAPI, Provider.SEARCHAPI]
     assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[3:])
 
@@ -86,7 +89,7 @@ def test_plan_skips_a_provider_whose_month_is_spent(config_dir):
     db = Storage(":memory:")
     seed(db, Provider.SERPAPI, 250)
     ps = plan(cfg, db, TODAY)
-    assert len(ps) == 120   # 20 routes x 6 pairs, exactly the max_searches_per_run cap
+    assert len(ps) == 120   # 37 routes x 6 pairs, cut at the max_searches_per_run cap
     assert all(p.provider is Provider.SEARCHAPI for p in ps[:25])
     assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[25:])
 
@@ -147,6 +150,27 @@ def test_plan_never_searches_past_outbound_dates(config_dir):
     weihnachten = [p.request for p in ps if p.request.slot_id == "weihnachten-2026"]
     assert weihnachten
     assert all(p.outbound_date > today for p in weihnachten)
+
+
+def test_plan_uses_the_destinations_own_origins(config_dir):
+    cfg = load_config_dir(config_dir)
+    ps = plan(cfg, Storage(":memory:"), TODAY)
+    hkt = [p.request for p in ps if p.request.destination == "HKT"]
+    assert sorted({r.origin for r in hkt}) == ["FRA", "HAM"]
+    assert Counter(r.origin for r in hkt) == {"HAM": 3, "FRA": 3}   # the per-route cap is per origin
+    tfs = [p.request for p in ps if p.request.destination == "TFS"]
+    assert {r.origin for r in tfs} == {"HAM"} and len(tfs) == 3     # short haul: settings.origins
+
+
+def test_plan_falls_back_to_settings_origins(config_dir):
+    dst = config_dir / "destinations.yaml"
+    dst.write_text(dst.read_text().replace(", origins: [HAM, FRA]", ""))
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("origins: [HAM]", "origins: [HAM, CPH]"))
+    cfg = load_config_dir(config_dir)
+    ps = plan(cfg, Storage(":memory:"), TODAY)
+    assert {p.request.origin for p in ps} == {"HAM", "CPH"}
+    assert len(ps) == 20 * 2 * 3
 
 
 SEED_AT = datetime(2026, 9, 10, tzinfo=timezone.utc)

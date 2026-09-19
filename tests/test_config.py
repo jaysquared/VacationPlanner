@@ -14,6 +14,8 @@ def test_loads_repo_config(config_dir: Path):
     assert cfg.travellers.children[0].birthdate == date(2019, 4, 21)
     assert cfg.destination("BKK").cabin is Cabin.BUSINESS
     assert cfg.destination("PMI").cabin is Cabin.ANY
+    assert cfg.destination("HKT").origins == ("HAM", "FRA")   # long haul: Hamburg or Frankfurt
+    assert cfg.destination("TFS").origins is None             # short haul: settings.origins
     weihnachten = next(s for s in cfg.slots if s.id == "weihnachten-2026")
     assert weihnachten.start == date(2026, 12, 21) and weihnachten.nights == Nights(10, 14)
     assert weihnachten.targets[0] == "HKT" and len(weihnachten.targets) == 17
@@ -29,6 +31,19 @@ def test_loads_repo_config(config_dir: Path):
     assert cfg.settings.budget.max_searches_per_run == 120
     assert cfg.settings.nights == Nights(7, 14)
     assert cfg.secrets.serpapi_key is None and cfg.secrets.searchapi_key is None
+
+
+def test_origins_default_to_none_and_are_read_per_destination(config_dir: Path):
+    dst = config_dir / "destinations.yaml"
+    dst.write_text("destinations:\n"
+                   "  - { code: AAA, name: A, cabin: any }\n"
+                   "  - { code: BBB, name: B, cabin: business, origins: [HAM, FRA, CPH] }\n")
+    hol = config_dir / "holidays.yaml"
+    hol.write_text("holidays:\n"
+                   "  - { id: s1, name: S1, start: 2027-01-01, end: 2027-01-10, targets: [AAA, BBB] }\n")
+    cfg = load_config(config_dir, env={})
+    assert cfg.destination("AAA").origins is None
+    assert cfg.destination("BBB").origins == ("HAM", "FRA", "CPH")
 
 
 def test_secrets_from_env(config_dir: Path):

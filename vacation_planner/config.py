@@ -31,6 +31,7 @@ class _Destination(BaseModel):
     name: str
     cabin: Cabin
     max_price_per_person: float | None = None
+    origins: list[str] | None = None
 
 
 class _Destinations(BaseModel):
@@ -221,7 +222,9 @@ def load_config(config_dir: Path, env: Mapping[str, str] | None = None) -> Confi
     for d in dests.destinations:
         if d.code in destinations:
             raise ConfigError(f"destinations.yaml: duplicate code {d.code}")
-        destinations[d.code] = Destination(d.code, d.name, d.cabin, d.max_price_per_person)
+        destinations[d.code] = Destination(
+            d.code, d.name, d.cabin, d.max_price_per_person,
+            tuple(d.origins) if d.origins is not None else None)
 
     slots: list[Slot] = []
     seen: set[str] = set()

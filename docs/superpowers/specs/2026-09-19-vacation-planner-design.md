@@ -129,7 +129,16 @@ destinations:
   - code: PMI
     name: Palma de Mallorca
     cabin: any
+  - code: HKT
+    name: Phuket
+    cabin: business
+    max_price_per_person: 2000
+    origins: [HAM, FRA]      # optional; defaults to settings.origins
 ```
+
+`origins` overrides `settings.origins` for that destination only. Each
+(origin, destination) pair is a separate route, so the per-route pair cap
+applies per origin.
 
 Starter set (user prunes/extends): Europe `LIS PMI ATH FNC TFS LCA`; long haul
 `BKK HKT DXB MLE CPT MRU JFK MIA CUN NRT SIN DPS`.
@@ -228,7 +237,7 @@ Plain dataclasses / pydantic models shared by all stages:
   Derived: `free_window` = (start extended back to the preceding Saturday if
   start is a Monday, end extended forward to the following Sunday if end is a
   Friday), then widened by bridge days.
-- `Destination` — code, name, cabin, max price.
+- `Destination` — code, name, cabin, max price, optional origins.
 - `SearchRequest` — origin, destination, outbound_date, return_date, cabin,
   adults, children, slot_id. Hashable; equality is the dedup key.
 - `Offer` — search reference, price_total, currency, per_person, airlines,
@@ -259,8 +268,10 @@ Input: config, today's date, storage (for freshness). Output: ordered list of
 
 1. Select slots that have targets and whose start is after today and within
    `lookahead_days`. Order by start date ascending.
-2. For each (slot, origin, target) route, enumerate all (outbound, return)
-   pairs inside the free window that satisfy the slot's night range.
+2. For each (slot, target) pick the origins: the destination's own `origins`
+   if it has them, otherwise `settings.origins`. For each (slot, origin,
+   target) route, enumerate all (outbound, return) pairs inside the free
+   window that satisfy the slot's night range.
 3. Rank pairs per route: pairs with no data first, then oldest observation
    first. Take at most `max_pairs_per_route_per_run`.
 4. Concatenate routes in slot order and cut at `max_searches_per_run`.
