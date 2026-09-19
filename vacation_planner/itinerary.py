@@ -69,9 +69,15 @@ def passes_layover_rule(legs: Sequence[Leg], settings: LayoverSettings) -> bool:
     """True when every stop is short enough and none of them touches the night window.
 
     A nonstop itinerary (or one whose legs
-    the provider did not report) has no layovers and always passes.
+    the provider did not report) has no layovers and always passes; an itinerary whose
+    legs are out of order (a departure before the previous arrival) never does.
+
+    Only the legs the provider reports are checked -- for a round trip that is the
+    outbound itinerary; see the note in spec 5.4a.
     """
     for layover in layovers(legs):
+        if layover.minutes < 0:
+            return False   # the next leg departs before this one lands: not a bookable itinerary
         if layover.minutes > settings.max_minutes:
             return False
         if settings.forbidden_window and _touches_window(

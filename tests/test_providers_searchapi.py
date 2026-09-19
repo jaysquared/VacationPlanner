@@ -204,6 +204,16 @@ def test_malformed_payload_raises_provider_error_and_keeps_raw(client, httpx_moc
     assert list(tmp_path.glob("searchapi_*.json"))   # raw response kept for the fixture
 
 
+def test_an_unparseable_leg_time_is_a_parse_error(client, httpx_mock, tmp_path):
+    """The layover check runs inside the parse guard, so a bad time is a ProviderError."""
+    data = fixture()
+    data["best_flights"][0]["flights"][0]["arrival_airport"]["time"] = "25:99"
+    httpx_mock.add_response(json=data)
+    with pytest.raises(ProviderError, match="searchapi: parse failed: ValueError"):
+        client.search(REQ, raw_dir=tmp_path)
+    assert list(tmp_path.glob("searchapi_*.json"))   # raw response kept for the fixture
+
+
 def test_client_reads_its_own_price_flag(config_dir, httpx_mock):
     st = config_dir / "settings.yaml"
     st.write_text(st.read_text().replace("searchapi: true", "searchapi: false"))

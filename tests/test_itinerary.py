@@ -56,6 +56,14 @@ def test_without_a_window_only_the_duration_counts():
     assert passes_layover_rule(stop("2026-12-19 22:30", "2026-12-20 02:00"), NO_WINDOW) is False
 
 
+def test_legs_out_of_order_never_pass():
+    """A departure before the previous arrival is not a bookable itinerary."""
+    legs = stop("2026-12-19 14:00", "2026-12-19 12:00")
+    assert layovers(legs)[0].minutes == -120
+    assert passes_layover_rule(legs, RULE) is False
+    assert passes_layover_rule(legs, NO_WINDOW) is False
+
+
 def test_every_stop_must_pass():
     legs = [Leg("HAM", "FRA", "2026-12-19 08:00", "2026-12-19 09:00"),
             Leg("FRA", "DXB", "2026-12-19 10:00", "2026-12-19 20:00"),    # 60 min, fine

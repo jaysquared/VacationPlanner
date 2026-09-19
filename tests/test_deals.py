@@ -35,7 +35,10 @@ def offer(price, level=None):
 
 
 def alternate_origin_run(config_dir, ham: float | None, fra: float):
-    """Seed one HAM observation (unless None) and detect on a later FRA search."""
+    """Seed one HAM observation (unless None) and detect on a later FRA search.
+
+    Returns (detected deals, storage, run id) so callers can also check what was stored.
+    """
     cfg = load_config(config_dir, env={})
     db = Storage(":memory:")
     if ham is not None:
@@ -43,26 +46,28 @@ def alternate_origin_run(config_dir, ham: float | None, fra: float):
         db.save_result(home, SearchResult(req(), Provider.SERPAPI, [offer(ham)]), NOW)
     run = db.start_run(NOW, 1)
     db.save_result(run, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(fra, "low")]), NOW)
-    return detect_for_run(db, run, cfg, NOW)
+    return detect_for_run(db, run, cfg, NOW), db, run
 
 
 def test_frankfurt_must_beat_hamburg_by_the_margin(config_dir):
-    deals = alternate_origin_run(config_dir, ham=12000, fra=9000)   # 25 %, 3,000 EUR
+    deals, _db, _run = alternate_origin_run(config_dir, ham=12000, fra=9000)   # 25 %, 3,000 EUR
     assert len(deals) == 1 and deals[0].search.origin == "FRA"
     assert deals[0].reasons == [DealReason.GOOGLE_LOW, DealReason.CHEAPER_THAN_HOME]
 
 
 def test_frankfurt_too_close_to_hamburg_is_no_deal_at_all(config_dir):
-    assert alternate_origin_run(config_dir, ham=12000, fra=11000) == []   # 8 %, google low ignored
+    deals, db, run = alternate_origin_run(config_dir, ham=12000, fra=11000)   # 8 %, google low ignored
+    assert deals == []
+    assert db.deals_in_run(run) == []   # nothing recorded, not merely nothing returned
 
 
 def test_frankfurt_needs_both_the_ratio_and_the_absolute_saving(config_dir):
-    assert len(alternate_origin_run(config_dir, ham=12000, fra=9600)) == 1   # exactly 20 %, 2,400 EUR
-    assert alternate_origin_run(config_dir, ham=2000, fra=1600) == []        # 20 % but only 400 EUR
+    assert len(alternate_origin_run(config_dir, ham=12000, fra=9600)[0]) == 1   # exactly 20 %, 2,400 EUR
+    assert alternate_origin_run(config_dir, ham=2000, fra=1600)[0] == []        # 20 % but only 400 EUR
 
 
 def test_frankfurt_without_hamburg_history_is_evaluated_normally(config_dir):
-    deals = alternate_origin_run(config_dir, ham=None, fra=9000)
+    deals, _db, _run = alternate_origin_run(config_dir, ham=None, fra=9000)
     assert len(deals) == 1 and deals[0].reasons == [DealReason.GOOGLE_LOW]
 
 

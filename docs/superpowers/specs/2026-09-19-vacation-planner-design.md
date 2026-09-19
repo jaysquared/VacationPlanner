@@ -202,7 +202,10 @@ Official dates, for reference:
 origins: [HAM]                  # list so FRA/CPH can be added later
 nights: { min: 7, max: 14 }     # default trip length, per-slot override allowed
 bridge_days: { before: 0, after: 0 }
-max_stops: 1                    # 0 nonstop, 1 one stop, 2 two stops (Google param semantics mapped in client)
+max_stops: 2                    # 0 nonstop, 1 one stop, 2 two stops (Google param semantics mapped in client)
+layovers:
+  max_minutes: 180                        # each individual stop
+  forbidden_window: ["23:00", "05:00"]    # local time; a stop touching this window is rejected
 excluded_airlines: [AI]
 providers:
   order:
@@ -219,6 +222,10 @@ deals:
   min_history_points: 3         # below this, fall back to route-level median across slots
   renotify_drop_ratio: 0.95     # re-report only if price falls to <= 95% of last reported
   lookahead_days: 330           # ignore slots starting later than this
+alternate_origins:
+  home: HAM
+  min_saving_ratio: 0.20        # a FRA fare must be >= 20 % cheaper than the best HAM fare
+  min_saving_total: 500         # ... and >= 500 EUR cheaper in absolute terms
 report:
   output_dir: docs/site
 email:
@@ -316,9 +323,19 @@ starts_at, ends_at, minutes)`; `itinerary.passes_layover_rule(legs,
 settings)` is false as soon as one layover is longer than `max_minutes` or
 its half-open interval `[starts_at, ends_at)` overlaps the window on any day
 it spans (the window wraps midnight when its start is later than its end).
-Every client applies it through `providers.base.filter_layovers` directly
-after the excluded-airline filter; an offer whose legs the provider did not
-report is kept.
+A layover whose minutes are negative (the next leg departs before the previous
+one lands) never passes. Every client applies the rule through
+`providers.base.filter_layovers` directly after the excluded-airline filter and
+inside the parse guard, so an unparseable leg time surfaces as
+`ProviderError("<provider>: parse failed: ...")`; an offer whose legs the
+provider did not report is kept.
+
+Scope: the rule is evaluated on the outbound legs the providers report;
+return-leg stops are not visible without a second paid request and are not
+checked. Verify the return itinerary on the Google Flights link before booking.
+(All three providers price an outbound option for the whole round trip and hide
+the matching return itineraries behind a second `departure_token` call, which
+would double the cost per search.)
 
 ### 5.5 `storage` — SQLite
 

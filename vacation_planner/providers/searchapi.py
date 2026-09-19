@@ -132,8 +132,9 @@ class SearchApiClient:
             raw_path = str(f)
         try:
             parsed = parse_response(data, req, self.settings.providers.price_is_total[Provider.SEARCHAPI])
+            offers = filter_excluded(parsed, self.settings.excluded_airlines)
+            # Inside the try: an unparseable leg time is a layout change like any other.
+            offers = filter_layovers(offers, self.settings.layovers)
         except Exception as e:   # layout change: the raw JSON above is kept for a fixture
             raise ProviderError(self._safe(f"searchapi: parse failed: {type(e).__name__}: {e}")) from e
-        offers = filter_excluded(parsed, self.settings.excluded_airlines)
-        offers = filter_layovers(offers, self.settings.layovers)
         return SearchResult(req, self.provider, offers, raw_path)

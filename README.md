@@ -80,7 +80,15 @@ leg to the departure of the next. It is rejected when it is longer than
 `max_minutes` or overlaps the window on any day it spans — so 23:00–05:00 kills a
 22:30–01:00 wait and a 04:30–06:00 one, while 05:00–07:00 is fine. Set
 `forbidden_window: null` to check the duration only. Itineraries a provider
-reports without legs are never rejected by this rule.
+reports without legs are never rejected by this rule, and an itinerary whose legs
+are out of order (a departure before the previous arrival) always is.
+
+**Outbound only.** All three providers return outbound options priced for the whole
+round trip; the matching return itineraries sit behind a second `departure_token`
+request that this scanner never makes. So: the rule is evaluated on the outbound
+legs the providers report; return-leg stops are not visible without a second paid
+request and are not checked. Verify the return itinerary on the Google Flights link
+before booking.
 
 ### Frankfurt has to be worth the trip
 

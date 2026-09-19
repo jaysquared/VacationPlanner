@@ -133,10 +133,11 @@ class FastFlightsClient:
         excluded_terms = excluded | {code_to_name[c] for c in excluded if c in code_to_name}
         try:
             parsed = parse_results(results, req, q.url(), self.settings.providers.price_is_total[Provider.FAST_FLIGHTS])
+            offers = filter_excluded(parsed, excluded_terms)
+            # Inside the try: an unparseable leg time is a layout change like any other.
+            offers = filter_layovers(offers, self.settings.layovers)
         except ProviderError:
             raise
         except Exception as e:   # layout change in the scraped page
             raise ProviderError(f"fast_flights: parse failed: {type(e).__name__}: {e}") from e
-        offers = filter_excluded(parsed, excluded_terms)
-        offers = filter_layovers(offers, self.settings.layovers)
         return SearchResult(req, self.provider, offers, None)
