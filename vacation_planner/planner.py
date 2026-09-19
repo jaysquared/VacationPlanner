@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta, timezone
 
 from .calendar import Window, free_window, pax_for
-from .config import BudgetSettings, Config
+from .config import Config
 from .models import Nights, PlannedSearch, Provider, SearchRequest, Slot, seat_for
 from .storage import Storage
 
@@ -21,8 +21,23 @@ def candidate_pairs(window: Window, nights: Nights) -> list[tuple[date, date]]:
     return pairs
 
 
-def serpapi_share(budget: BudgetSettings) -> int:
-    return max(1, budget.serpapi_per_month // budget.runs_per_month)
+def provider_shares(config: Config, storage: Storage, today: date) -> list[tuple[Provider, int | None]]:
+    """Per-run search allowance per provider, in configured order. None means unlimited.
+
+    The cron fires on Mondays, so a month can have five runs: the per-run share alone
+    (monthly_budget / runs_per_month) would overshoot a free tier. Cap it by what this
+    calendar month has actually spent (ok and error rows both cost a credit).
+    """
+    runs = config.settings.budget.runs_per_month
+    month_start = datetime(today.year, today.month, 1, tzinfo=timezone.utc)
+    shares: list[tuple[Provider, int | None]] = []
+    for e in config.settings.providers.order:
+        if e.monthly_budget is None:
+            shares.append((e.name, None))
+            continue
+        used = storage.searches_by_provider_since(e.name, month_start)
+        shares.append((e.name, max(0, min(max(1, e.monthly_budget // runs), e.monthly_budget - used))))
+    return shares
 
 
 def _slot_nights(slot: Slot, cfg: Config) -> Nights:
@@ -54,16 +69,17 @@ def plan(config: Config, storage: Storage, today: date) -> list[PlannedSearch]:
             for dest_code in slot.targets:
                 requests.extend(_route_requests(config, storage, slot, origin, dest_code, today))
 
-    # The cron fires on Mondays, so a month can have five runs: the per-run share alone
-    # (serpapi_per_month / runs_per_month) would overshoot the free tier. Cap by what this
-    # calendar month has actually spent.
-    month_start = datetime(today.year, today.month, 1, tzinfo=timezone.utc)
-    used = storage.searches_by_provider_since(Provider.SERPAPI, month_start)
-    primary_n = max(0, min(serpapi_share(s.budget), s.budget.serpapi_per_month - used))
-    backup = s.providers.backup
-    limit = s.budget.max_searches_per_run if backup else primary_n
-    out = []
-    for i, req in enumerate(requests[:limit]):
-        provider = s.providers.primary if i < primary_n else backup
-        out.append(PlannedSearch(req, provider))
+    shares = provider_shares(config, storage, today)
+    out: list[PlannedSearch] = []
+    for req in requests[: s.budget.max_searches_per_run]:
+        for i, (provider, left) in enumerate(shares):
+            if left is None:
+                out.append(PlannedSearch(req, provider))
+                break
+            if left > 0:
+                shares[i] = (provider, left - 1)
+                out.append(PlannedSearch(req, provider))
+                break
+        else:
+            break   # every provider is out of budget: the plan ends here
     return out

@@ -1,9 +1,10 @@
+import re
 from datetime import date, datetime, timezone
 
 from vacation_planner.calendar import Window
 from vacation_planner.config import load_config
 from vacation_planner.models import Nights, Provider, SearchRequest, SearchResult, SeatClass
-from vacation_planner.planner import candidate_pairs, plan, serpapi_share
+from vacation_planner.planner import candidate_pairs, plan, provider_shares
 from vacation_planner.storage import Storage
 
 TODAY = date(2026, 9, 21)
@@ -18,14 +19,29 @@ def test_candidate_pairs_empty_when_window_too_short():
     assert candidate_pairs(Window(date(2027, 1, 29), date(2027, 1, 31)), Nights(7, 14)) == []
 
 
-def test_serpapi_share():
-    cfg = load_config_dir()
-    assert serpapi_share(cfg.settings.budget) == 25
-
-
 def load_config_dir(config_dir=None):
     from tests.conftest import REPO_CONFIG
     return load_config(config_dir or REPO_CONFIG, env={})
+
+
+def set_order(config_dir, order_yaml: str) -> None:
+    st = config_dir / "settings.yaml"
+    st.write_text(re.sub(r"  order:\n(?:    - .*\n)+", f"  order:\n{order_yaml}", st.read_text()))
+
+
+def test_provider_shares_from_repo_config():
+    cfg = load_config_dir()
+    assert provider_shares(cfg, Storage(":memory:"), TODAY) == [
+        (Provider.SERPAPI, 62), (Provider.SEARCHAPI, 25), (Provider.FAST_FLIGHTS, None)]
+
+
+def test_provider_shares_are_capped_by_the_remaining_month():
+    cfg = load_config_dir()
+    db = Storage(":memory:")
+    seed(db, Provider.SERPAPI, 240)
+    assert provider_shares(cfg, db, TODAY)[0] == (Provider.SERPAPI, 10)
+    seed(db, Provider.SERPAPI, 10)
+    assert provider_shares(cfg, db, TODAY)[0] == (Provider.SERPAPI, 0)
 
 
 def test_plan_orders_by_slot_and_assigns_providers(config_dir):
@@ -40,13 +56,61 @@ def test_plan_orders_by_slot_and_assigns_providers(config_dir):
     assert "fruehjahr-2027" in slots and "herbst-2027" not in slots  # herbst-2027 has no targets
     # per-route cap 3
     assert sum(1 for p in ps if p.request.slot_id == "herbst-2026") == 3
-    # first 25 serpapi, rest backup, total <= 60
-    assert all(p.provider is Provider.SERPAPI for p in ps[:25])
-    assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[25:])
-    assert len(ps) <= 60
+    # 18 searches, all inside the SerpApi per-run share of 62
+    assert len(ps) == 18 and all(p.provider is Provider.SERPAPI for p in ps)
     # PMI in pfingsten is economy (cabin any)
     pmi = next(p for p in ps if p.request.destination == "PMI")
     assert pmi.request.seat is SeatClass.ECONOMY and 7 <= pmi.request.nights <= 9
+
+
+def test_plan_walks_down_the_provider_order_as_shares_run_out(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("monthly_budget: 250", "monthly_budget: 8")
+                                .replace("monthly_budget: 100", "monthly_budget: 4"))
+    cfg = load_config_dir(config_dir)
+    ps = plan(cfg, Storage(":memory:"), TODAY)
+    assert len(ps) == 18
+    assert [p.provider for p in ps[:3]] == [Provider.SERPAPI, Provider.SERPAPI, Provider.SEARCHAPI]
+    assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[3:])
+
+
+def test_plan_skips_a_provider_whose_month_is_spent(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("max_pairs_per_route_per_run: 3", "max_pairs_per_route_per_run: 6"))
+    cfg = load_config_dir(config_dir)
+    db = Storage(":memory:")
+    seed(db, Provider.SERPAPI, 250)
+    ps = plan(cfg, db, TODAY)
+    assert len(ps) == 36
+    assert all(p.provider is Provider.SEARCHAPI for p in ps[:25])
+    assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[25:])
+
+
+def test_plan_is_empty_when_every_budgeted_provider_is_spent(config_dir):
+    set_order(config_dir, "    - { name: serpapi, monthly_budget: 250 }\n"
+                          "    - { name: searchapi, monthly_budget: 100 }\n")
+    cfg = load_config_dir(config_dir)
+    db = Storage(":memory:")
+    seed(db, Provider.SERPAPI, 250)
+    seed(db, Provider.SEARCHAPI, 100)
+    assert plan(cfg, db, TODAY) == []
+
+
+def test_plan_stops_at_a_spent_budget_when_nothing_unlimited_follows(config_dir):
+    set_order(config_dir, "    - { name: serpapi, monthly_budget: 250 }\n")
+    cfg = load_config_dir(config_dir)
+    db = Storage(":memory:")
+    seed(db, Provider.SERPAPI, 245)
+    ps = plan(cfg, db, TODAY)
+    assert len(ps) == 5 and all(p.provider is Provider.SERPAPI for p in ps)
+
+
+def test_plan_respects_max_searches_per_run(config_dir):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("max_searches_per_run: 120", "max_searches_per_run: 7"))
+    cfg = load_config_dir(config_dir)
+    ps = plan(cfg, Storage(":memory:"), TODAY)
+    assert len(ps) == 7
 
 
 def test_plan_prefers_unseen_pairs(config_dir):
@@ -70,24 +134,6 @@ def test_plan_skips_started_slots_and_far_future(config_dir):
     assert ps == []
 
 
-def test_plan_without_backup_cuts_at_serpapi_share(config_dir):
-    st = config_dir / "settings.yaml"
-    st.write_text(st.read_text().replace("backup: fast_flights", "backup: null"))
-    cfg = load_config_dir(config_dir)
-    ps = plan(cfg, Storage(":memory:"), TODAY)
-    assert len(ps) <= 25 and all(p.provider is Provider.SERPAPI for p in ps)
-
-
-def test_plan_assigns_backup_beyond_primary_share(config_dir):
-    st = config_dir / "settings.yaml"
-    st.write_text(st.read_text().replace("serpapi_per_month: 100", "serpapi_per_month: 8"))
-    cfg = load_config_dir(config_dir)
-    ps = plan(cfg, Storage(":memory:"), TODAY)
-    assert len(ps) == 18
-    assert all(p.provider is Provider.SERPAPI for p in ps[:2])
-    assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[2:])
-
-
 def test_plan_never_searches_past_outbound_dates(config_dir):
     cfg = load_config_dir(config_dir)
     db = Storage(":memory:")
@@ -101,36 +147,9 @@ def test_plan_never_searches_past_outbound_dates(config_dir):
 SEED_AT = datetime(2026, 9, 10, tzinfo=timezone.utc)
 
 
-def seed_serpapi(db: Storage, n: int) -> None:
-    """n SerpApi searches already spent this month, on a route nothing plans."""
+def seed(db: Storage, provider: Provider, n: int) -> None:
+    """n searches already spent this month by `provider`, on a route nothing plans."""
     run = db.start_run(SEED_AT, n)
     r = SearchRequest("seed", "XXX", "YYY", date(2026, 12, 1), date(2026, 12, 8), SeatClass.ECONOMY, 2, 1)
     for _ in range(n):
-        db.record_search(run, r, Provider.SERPAPI, "ok", SEED_AT)
-
-
-def test_plan_caps_serpapi_at_the_remaining_monthly_budget(config_dir):
-    cfg = load_config_dir(config_dir)
-    db = Storage(":memory:")
-    seed_serpapi(db, 90)
-    ps = plan(cfg, db, TODAY)
-    assert sum(1 for p in ps if p.provider is Provider.SERPAPI) == 10
-    assert all(p.provider is Provider.SERPAPI for p in ps[:10])
-    assert all(p.provider is Provider.FAST_FLIGHTS for p in ps[10:])
-
-
-def test_plan_uses_only_the_backup_when_the_month_is_spent(config_dir):
-    cfg = load_config_dir(config_dir)
-    db = Storage(":memory:")
-    seed_serpapi(db, 100)
-    ps = plan(cfg, db, TODAY)
-    assert ps and all(p.provider is Provider.FAST_FLIGHTS for p in ps)
-
-
-def test_plan_is_empty_when_the_month_is_spent_and_no_backup(config_dir):
-    st = config_dir / "settings.yaml"
-    st.write_text(st.read_text().replace("backup: fast_flights", "backup: null"))
-    cfg = load_config_dir(config_dir)
-    db = Storage(":memory:")
-    seed_serpapi(db, 100)
-    assert plan(cfg, db, TODAY) == []
+        db.record_search(run, r, provider, "ok", SEED_AT)
