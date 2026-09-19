@@ -8,7 +8,7 @@ import pytest
 
 from vacation_planner.config import load_config
 from vacation_planner.models import Provider, SearchRequest, SeatClass
-from vacation_planner.providers.base import AuthError, ProviderError, QuotaExhausted
+from vacation_planner.providers.base import AuthError, ProviderError, QuotaExhausted, redact
 from vacation_planner.providers.searchapi import SearchApiClient, parse_response
 
 FIX = Path(__file__).parent / "fixtures" / "searchapi_ham_bkk.json"
@@ -45,7 +45,22 @@ def test_params_mapping(client):
     assert p["adults"] == "2" and p["children"] == "1"
     assert p["currency"] == "EUR" and p["hl"] == "en" and p["gl"] == "de"
     assert p["stops"] == "one_stop_or_fewer" and p["exclude_airlines"] == "AI"
-    assert p["api_key"] == "KEY"
+    assert "api_key" not in p   # the key travels in the Authorization header, not the URL
+
+
+def test_key_is_sent_as_a_bearer_header_and_never_in_the_url(client, httpx_mock):
+    httpx_mock.add_response(json=fixture())
+    client.search(REQ)
+    sent = httpx_mock.get_requests()[0]
+    assert sent.headers["Authorization"] == "Bearer KEY"
+    assert "KEY" not in str(sent.url)
+
+
+def test_errors_never_carry_the_key(client, httpx_mock):
+    httpx_mock.add_response(status_code=500, json={"error": "failed for api_key=KEY"}, is_reusable=True)
+    with pytest.raises(ProviderError) as e:
+        client.search(REQ)
+    assert "KEY" not in str(e.value) and "***" in str(e.value)
 
 
 @pytest.mark.parametrize("max_stops, expected", [(0, "nonstop"), (1, "one_stop_or_fewer"),
@@ -169,3 +184,26 @@ def test_client_reads_its_own_price_flag(config_dir, httpx_mock):
     httpx_mock.add_response(json=fixture())
     o = c.search(REQ).offers[0]
     assert (o.per_person, o.price_total) == (12330, 12330 * 3)   # per-person price, 3 travellers
+
+
+def test_rate_limit_wording_is_a_transient_error_not_quota(client, httpx_mock):
+    """A bare "limit" in the message is not the exhausted plan: retry it, keep the provider."""
+    for _ in range(3):
+        httpx_mock.add_response(status_code=400, json={"error": "Rate limit exceeded for this endpoint."})
+    with pytest.raises(ProviderError) as e:
+        client.search(REQ)
+    assert not isinstance(e.value, QuotaExhausted)
+    assert client._sleeps == [2, 4]
+
+
+def test_running_out_of_range_is_not_quota(client, httpx_mock):
+    """Only the plan wordings kill the provider; "out of" on its own must stay retryable."""
+    for _ in range(3):
+        httpx_mock.add_response(status_code=400, json={"error": "Date is out of range."})
+    with pytest.raises(ProviderError) as e:
+        client.search(REQ)
+    assert not isinstance(e.value, QuotaExhausted)
+
+
+def test_redact_replaces_every_secret():
+    assert redact("a=KEY b=OTHER", ["KEY", "", None or ""]) == "a=*** b=OTHER"

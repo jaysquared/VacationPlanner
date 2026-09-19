@@ -82,3 +82,13 @@ def test_run_end_to_end_with_fake(config_dir, tmp_path):
 def test_fake_refuses_default_db(config_dir):
     r = runner.invoke(app, ["--config-dir", str(config_dir), "--today", "2026-09-21", "scan", "--fake"])
     assert r.exit_code != 0 and "--db" in r.output
+
+
+def test_http_client_loggers_are_quiet(config_dir, tmp_path):
+    """httpx logs the full request URL at INFO, api_key included; CI job logs are public."""
+    for name in ("httpx", "httpcore"):
+        logging.getLogger(name).setLevel(logging.NOTSET)
+    r = runner.invoke(app, common(config_dir, tmp_path) + ["holidays"])
+    assert r.exit_code == 0, r.output
+    assert logging.getLogger("httpx").level == logging.WARNING
+    assert logging.getLogger("httpcore").level == logging.WARNING

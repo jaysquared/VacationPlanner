@@ -1,5 +1,7 @@
 # Vacation Planner Implementation Plan
 
+> **Superseded in part:** the provider design (primary/backup, `serpapi_per_month`) was replaced by the ordered provider list in the design spec §2.5 on 2026-09-19. This plan is kept as history.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** A weekly GitHub Actions job that searches Google Flights for a Hamburg family's school-holiday trips, stores price history in SQLite, flags deals, publishes an HTML report and emails new deals.

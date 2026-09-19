@@ -24,6 +24,14 @@ class FlightClient(Protocol):
     def search(self, req: SearchRequest, raw_dir: Path | None = None) -> SearchResult: ...
 
 
+def redact(text: str, secrets: Iterable[str]) -> str:
+    """Blank out API keys in a message: error strings are stored in the DB and printed in CI logs."""
+    for secret in secrets:
+        if secret:
+            text = text.replace(secret, "***")
+    return text
+
+
 def filter_excluded(offers: list[Offer], excluded: Iterable[str]) -> list[Offer]:
     ex = {e.upper() for e in excluded}
     return [o for o in offers if not ({a.upper() for a in o.airlines} & ex)]

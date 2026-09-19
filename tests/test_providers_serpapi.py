@@ -83,6 +83,13 @@ def test_search_filters_excluded_airlines_and_saves_raw(client, httpx_mock, tmp_
     assert json.loads(Path(res.raw_path).read_text())["search_metadata"]["status"] == "Success"
 
 
+def test_errors_never_carry_the_key(client, httpx_mock):
+    httpx_mock.add_response(status_code=500, json={"error": "failed for api_key=KEY"}, is_reusable=True)
+    with pytest.raises(ProviderError) as e:
+        client.search(REQ)
+    assert "KEY" not in str(e.value) and "***" in str(e.value)
+
+
 def test_quota_error_is_not_retried(client, httpx_mock):
     httpx_mock.add_response(status_code=429, json={"error": "Your account has run out of searches."})
     with pytest.raises(QuotaExhausted):

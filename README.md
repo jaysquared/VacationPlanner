@@ -36,7 +36,7 @@ Searches go to the providers listed in `config/settings.yaml` under `providers.o
 | SearchApi.io (`engine=google_flights`) | `SEARCHAPI_KEY` | free plan 100 searches — **check the account dashboard whether that allowance renews monthly or is a one-time credit**, and set `monthly_budget` accordingly (the config assumes monthly) |
 | `fast-flights` (keyless scraper) | — | unlimited, 5 s pause between calls |
 
-A listed provider whose key is missing is skipped with a warning; if none is usable the run stops and names the env vars. The per-run share is `monthly_budget / budget.runs_per_month`, capped by the searches already recorded this calendar month (ok and error rows both cost a credit), so a month with five Mondays cannot overspend a free tier.
+A listed provider whose key is missing is skipped with a warning; if none is usable the run stops and names the env vars. The per-run share is `monthly_budget / budget.runs_per_month`, capped by `monthly_budget` minus the searches already recorded this calendar month (ok and error rows both cost a credit), so a month with five Mondays cannot overspend a free tier.
 
 `fast-flights` sends a `SOCS=CAI` consent cookie with its requests so it works from EU networks, where Google would otherwise return a consent interstitial instead of the flights page.
 

@@ -162,3 +162,17 @@ def test_fallbacks_still_count_against_the_monthly_budget():
     s = execute(planned, clients, db, settings(), lambda: NOW)
     assert (s.ok, s.errors, s.fallbacks) == (3, 0, 2)   # a fallback that worked is not an error
     assert db.searches_by_provider_since(SERP, NOW) == 3   # 2 failed attempts + 1 ok
+
+
+def test_every_provider_out_of_quota_errors_once_then_skips_the_rest():
+    db = Storage(":memory:")
+    clients = all_clients(serp=Serp(quota_after=-1), search=Search(quota_after=-1), fast=Fast(quota_after=-1))
+    planned = [PlannedSearch(req(d), SERP) for d in ("BKK", "DXB", "MLE")]
+    s = execute(planned, clients, db, settings(), lambda: NOW)
+    assert (s.ok, s.errors, s.skipped, s.fallbacks, s.status) == (0, 1, 2, 0, "partial")
+    err = db.searches_in_run(s.run_id, "error")
+    assert [(r.destination, r.provider) for r in err] == [("BKK", SERP), ("BKK", SEARCH), ("BKK", FAST)]
+    skipped = db.searches_in_run(s.run_id, "skipped")
+    assert [r.destination for r in skipped] == ["DXB", "MLE"]
+    assert all(r.error == "no provider available" for r in skipped)
+    assert all(len(c.calls) == 1 for c in clients.values())   # nothing is called twice

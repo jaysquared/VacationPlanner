@@ -41,6 +41,10 @@ def main(ctx: typer.Context,
          today: Optional[str] = typer.Option(None, "--today", help="Override today's date (YYYY-MM-DD)"),
          verbose: bool = typer.Option(False, "--verbose", "-v")):
     logging.basicConfig(level=logging.DEBUG if verbose else logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+    for noisy in ("httpx", "httpcore"):
+        # httpx logs the full request URL at INFO. A query API key would land in the
+        # GitHub Actions job log, which is public on a public repo.
+        logging.getLogger(noisy).setLevel(logging.WARNING)
     try:
         cfg = load_config(config_dir)
     except ConfigError as e:
