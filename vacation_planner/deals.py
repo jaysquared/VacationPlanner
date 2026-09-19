@@ -41,17 +41,29 @@ def evaluate(price_total: float, per_person: float, price_level: str | None, his
 
 def detect_for_run(storage: Storage, run_id: int, config: Config, now: datetime) -> list[DetectedDeal]:
     s = config.settings.deals
+    alt = config.settings.alternate_origins
     out: list[DetectedDeal] = []
     for search in storage.searches_in_run(run_id, status="ok"):
         offer = storage.cheapest_offer(search.id)
         if offer is None:
             continue
+        beats_home = False
+        if search.origin != alt.home:
+            # A fare from an alternate origin only counts once it beats the home
+            # airport by both margins; otherwise it is no deal, whatever else says so.
+            home_price = storage.best_price_for(search.slot_id, alt.home, search.destination, search.seat)
+            if home_price is not None:
+                if not alt.beats_home(offer.price_total, home_price):
+                    continue
+                beats_home = True
         history = storage.prior_cheapest_prices(search.slot_id, search.origin, search.destination, search.seat, search.id)
         route_history = storage.prior_route_prices(search.origin, search.destination, search.seat, search.id)
         max_pp = config.destination(search.destination).max_price_per_person if search.destination in config.destinations else None
         reasons, median = evaluate(offer.price_total, offer.per_person, offer.price_level, history, route_history, max_pp, s)
         if not reasons:
             continue
+        if beats_home:
+            reasons.append(DealReason.CHEAPER_THAN_HOME)
         score = len(reasons) + ((1 - offer.price_total / median) if median else 0.0)
         last = storage.last_notified_price(search.slot_id, search.origin, search.destination, search.seat)
         notifiable = last is None or offer.price_total <= s.renotify_drop_ratio * last

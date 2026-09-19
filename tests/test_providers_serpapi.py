@@ -7,7 +7,7 @@ import httpx
 import pytest
 
 from vacation_planner.config import load_config
-from vacation_planner.models import Provider, SearchRequest, SeatClass
+from vacation_planner.models import Leg, Provider, SearchRequest, SeatClass
 from vacation_planner.providers.base import AuthError, ProviderError, QuotaExhausted
 from vacation_planner.providers.serpapi import SerpApiClient, airline_codes, parse_response
 
@@ -15,6 +15,20 @@ FIX = Path(__file__).parent / "fixtures" / "serpapi_ham_bkk.json"
 REQ = SearchRequest("herbst-2026", "HAM", "BKK", date(2026, 10, 17), date(2026, 10, 31), SeatClass.BUSINESS, 2, 1)
 
 PRICES = [13830, 16421, 16648, 16824, 16949, 18642, 22913, 23062]
+# What survives the layover rule (<= 180 min, nothing touching 23:00-05:00):
+# 16648 stops in VIE 22:00-23:35, 16824/16949/18642 stop for 190-230 min,
+# 22913 stops in DXB 23:50-02:50.
+LEGAL_PRICES = [13830, 16421, 23062]
+
+NIGHT_STOP_ITINERARY = {
+    "flights": [{"departure_airport": {"id": "HAM", "time": "2026-10-17 18:00"},
+                 "arrival_airport": {"id": "IST", "time": "2026-10-17 21:00"},
+                 "duration": 180, "airline": "Turkish", "flight_number": "TK 1662"},
+                {"departure_airport": {"id": "IST", "time": "2026-10-18 01:30"},
+                 "arrival_airport": {"id": "BKK", "time": "2026-10-18 14:00"},
+                 "duration": 570, "airline": "Turkish", "flight_number": "TK 68"}],
+    "total_duration": 930, "price": 7000,
+}
 
 AI_ITINERARY = {
     "flights": [{"departure_airport": {"id": "HAM", "time": "2026-10-17 06:00"},
@@ -42,7 +56,7 @@ def test_params_mapping(client):
     assert p["engine"] == "google_flights" and p["departure_id"] == "HAM" and p["arrival_id"] == "BKK"
     assert p["outbound_date"] == "2026-10-17" and p["return_date"] == "2026-10-31" and p["type"] == "1"
     assert p["travel_class"] == "3" and p["adults"] == "2" and p["children"] == "1"
-    assert p["currency"] == "EUR" and p["stops"] == "2" and p["exclude_airlines"] == "AI"
+    assert p["currency"] == "EUR" and p["stops"] == "3" and p["exclude_airlines"] == "AI"   # max_stops 2
     assert p["api_key"] == "KEY"
 
 
@@ -59,6 +73,21 @@ def test_parse_response_reads_both_lists():
     assert o.airlines == ["DE"]
     assert o.duration_minutes == 870 and o.departs_at == "2026-10-17 17:05" and o.arrives_at == "2026-10-18 12:35"
     assert o.google_url.startswith("https://www.google.com/travel/flights")
+
+
+def test_parse_response_reads_the_legs():
+    o = parse_response(fixture(), REQ, price_is_total=True)[0]
+    assert o.legs == [Leg("HAM", "FRA", "2026-10-17 17:05", "2026-10-17 18:10"),
+                      Leg("FRA", "BKK", "2026-10-17 20:15", "2026-10-18 12:35")]
+
+
+def test_search_drops_itineraries_that_break_the_layover_rule(client, httpx_mock):
+    data = fixture()
+    data["other_flights"].append(copy.deepcopy(NIGHT_STOP_ITINERARY))   # IST 21:00 -> 01:30
+    httpx_mock.add_response(json=data)
+    res = client.search(REQ)
+    assert [o.price_total for o in res.offers] == LEGAL_PRICES   # incl. the 125 min Condor stop in FRA
+    assert 7000 not in [o.price_total for o in res.offers]
 
 
 def test_parse_response_without_price_insights_has_no_level_or_range():
@@ -78,7 +107,7 @@ def test_search_filters_excluded_airlines_and_saves_raw(client, httpx_mock, tmp_
     data["other_flights"].append(copy.deepcopy(AI_ITINERARY))   # the API ignored exclude_airlines
     httpx_mock.add_response(json=data)
     res = client.search(REQ, raw_dir=tmp_path)
-    assert [o.price_total for o in res.offers] == PRICES        # the AI itinerary is dropped
+    assert [o.price_total for o in res.offers] == LEGAL_PRICES  # the AI itinerary is dropped
     assert res.raw_path and Path(res.raw_path).exists()
     assert json.loads(Path(res.raw_path).read_text())["search_metadata"]["status"] == "Success"
 
@@ -123,7 +152,7 @@ def test_transient_error_retries_then_raises(client, httpx_mock):
 def test_transient_then_success(client, httpx_mock):
     httpx_mock.add_exception(httpx.ConnectError("boom"))
     httpx_mock.add_response(json=fixture())
-    assert len(client.search(REQ).offers) == 8
+    assert len(client.search(REQ).offers) == len(LEGAL_PRICES)
 
 
 def test_malformed_payload_raises_provider_error_and_keeps_raw(client, httpx_mock, tmp_path):

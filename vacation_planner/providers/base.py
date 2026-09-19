@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable, Protocol
 
+from ..config import LayoverSettings
+from ..itinerary import passes_layover_rule
 from ..models import Offer, Provider, SearchRequest, SearchResult
 
 
@@ -35,6 +37,15 @@ def redact(text: str, secrets: Iterable[str]) -> str:
 def filter_excluded(offers: list[Offer], excluded: Iterable[str]) -> list[Offer]:
     ex = {e.upper() for e in excluded}
     return [o for o in offers if not ({a.upper() for a in o.airlines} & ex)]
+
+
+def filter_layovers(offers: list[Offer], settings: LayoverSettings) -> list[Offer]:
+    """Drop itineraries with a stop that is too long or falls in the forbidden window.
+
+    An offer whose legs the provider did not
+    report is kept: the rule can only reject what it can see.
+    """
+    return [o for o in offers if not o.legs or passes_layover_rule(o.legs, settings)]
 
 
 def per_person(price: float, req: SearchRequest, price_is_total: bool) -> tuple[float, float]:

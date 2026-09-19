@@ -10,12 +10,12 @@ from vacation_planner.storage import Storage
 NOW = datetime(2026, 9, 21, 5, 0, tzinfo=timezone.utc)
 
 
-def req(dest="BKK", out=date(2026, 10, 17), ret=date(2026, 10, 31), seat=SeatClass.BUSINESS):
-    return SearchRequest("herbst-2026", "HAM", dest, out, ret, seat, 2, 1)
+def req(dest="BKK", out=date(2026, 12, 19), ret=date(2026, 12, 31), seat=SeatClass.BUSINESS, origin="HAM"):
+    return SearchRequest("weihnachten-2026", origin, dest, out, ret, seat, 2, 1)
 
 
 def offer(price, level=None):
-    return Offer(Provider.SERPAPI, price, "EUR", price / 3, ["LH", "TG"], 1, 875, "2026-10-17 10:35", "2026-10-18 06:10",
+    return Offer(Provider.SERPAPI, price, "EUR", price / 3, ["LH", "TG"], 1, 875, "2026-12-19 10:35", "2026-12-20 06:10",
                  level, 7200, 9800, "https://www.google.com/travel/flights?x", {})
 
 
@@ -27,7 +27,7 @@ def seeded(config_dir):
         db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(p)]), NOW)
     run = db.start_run(NOW, 2)
     db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000, "low")]), NOW)
-    db.save_result(run, SearchResult(req(out=date(2026, 10, 18), ret=date(2026, 11, 1)), Provider.SERPAPI, [offer(7600)]), NOW)
+    db.save_result(run, SearchResult(req(out=date(2026, 12, 20), ret=date(2027, 1, 1)), Provider.SERPAPI, [offer(7600)]), NOW)
     db.finish_run(run, 2, "ok", NOW)
     detect_for_run(db, run, cfg, NOW)
     return cfg, db, run
@@ -41,8 +41,8 @@ def test_build_report_summarises_best_and_median(config_dir):
     cfg, db, run = seeded(config_dir)
     data = build_report(db, cfg, NOW, last_run_id=run)
     assert len(data.new_deals) == 1
-    herbst = next(routes for slot, window, routes in data.slots if slot.id == "herbst-2026")
-    r = herbst[0]
+    weihnachten = next(routes for slot, window, routes in data.slots if slot.id == "weihnachten-2026")
+    r = weihnachten[0]
     assert r.destination.code == "BKK" and r.best.offer.price_total == 7000
     assert r.median == 8800 and round(r.ratio, 3) == 0.795 and r.is_deal is True   # median of 9000, 8800, 9100, 7000, 7600
     assert data.usage == [(Provider.SERPAPI, 5, 250), (Provider.SEARCHAPI, 0, 100)]
@@ -55,17 +55,68 @@ def test_render_writes_index_and_route_pages(config_dir, tmp_path):
     cfg, db, run = seeded(config_dir)
     written = render(db, cfg, tmp_path, NOW, last_run_id=run)
     index = (tmp_path / "index.html").read_text()
-    assert "Herbstferien 2026" in index and "7,000 €" in index and "2,333 €" in index
-    assert "routes/herbst-2026-HAM-BKK-business.html" in index
-    assert "No targets configured." in index          # herbst-2027 has targets: []
-    assert "Not searched yet." in index                # weihnachten-2026 has targets but no data
+    assert "Weihnachtsferien 2026/27" in index and "7,000 €" in index and "2,333 €" in index
+    assert "routes/weihnachten-2026-HAM-BKK-business.html" in index
+    assert "No targets configured." in index          # herbst-2026 has targets: []
+    assert "Not searched yet." in index                # pfingsten-2027 has targets but no data
     assert "google low" in index and "below median" in index and "new low" in index   # reason badges
     assert 'class="level-low"' in index
     assert "<script" not in index
     assert "serpapi 5 / 250" in index and "searchapi 0 / 100" in index   # budget footer
-    route = (tmp_path / "routes" / "herbst-2026-HAM-BKK-business.html").read_text()
+    route = (tmp_path / "routes" / "weihnachten-2026-HAM-BKK-business.html").read_text()
     assert route.count("<tr") >= 6  # header + 5 observations
     assert all(p.exists() for p in written)
+
+
+def with_frankfurt(config_dir):
+    cfg, db, run = seeded(config_dir)          # HAM best is 7,000
+    fra = db.start_run(NOW, 1)
+    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(5250)]), NOW)
+    db.save_result(fra, SearchResult(req(origin="FRA", out=date(2026, 12, 20), ret=date(2027, 1, 1)),
+                                     Provider.SERPAPI, [offer(6000)]), NOW)
+    return cfg, db, run
+
+
+def test_alternate_origins_share_one_row_per_destination(config_dir):
+    cfg, db, run = with_frankfurt(config_dir)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    routes = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")
+    assert len(routes) == 1                                   # HAM and FRA share the (BKK, business) row
+    r = routes[0]
+    assert r.best.search.origin == "HAM" and r.best.offer.price_total == 7000
+    assert [(origin, obs.offer.price_total, round(saving, 4)) for origin, obs, saving in r.alternates] \
+        == [("FRA", 5250, 0.25)]
+
+
+def test_render_shows_the_frankfurt_price_and_its_saving(config_dir, tmp_path):
+    cfg, db, run = with_frankfurt(config_dir)
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    index = (tmp_path / "index.html").read_text()
+    assert "FRA 5,250 € (−25 %)" in index
+    assert index.count("routes/weihnachten-2026-HAM-BKK-business.html") == 1   # no duplicate HAM row
+    assert "routes/weihnachten-2026-FRA-BKK-business.html" in index
+    assert (tmp_path / "routes" / "weihnachten-2026-FRA-BKK-business.html").exists()
+
+
+def test_a_dearer_alternate_origin_is_shown_with_a_plus(config_dir, tmp_path):
+    cfg, db, run = seeded(config_dir)          # HAM best is 7,000
+    fra = db.start_run(NOW, 1)
+    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7700)]), NOW)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    routes = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")
+    assert routes[0].best.search.origin == "HAM"
+    assert round(routes[0].alternates[0][2], 2) == -0.10
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    assert "FRA 7,700 € (+10 %)" in (tmp_path / "index.html").read_text()
+
+
+def test_an_equally_priced_alternate_origin_shows_no_percentage(config_dir, tmp_path):
+    cfg, db, run = seeded(config_dir)          # HAM best is 7,000
+    fra = db.start_run(NOW, 1)
+    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7000)]), NOW)
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    index = (tmp_path / "index.html").read_text()
+    assert "FRA 7,000 €<" in index and "−0 %" not in index
 
 
 def test_render_with_empty_db(config_dir, tmp_path):
@@ -79,5 +130,5 @@ def test_route_median_honours_min_history_points(config_dir):
     st.write_text(st.read_text().replace("min_history_points: 3", "min_history_points: 6"))
     cfg, db, run = seeded(config_dir)            # 5 observations on the BKK route
     data = build_report(db, cfg, NOW, last_run_id=run)
-    herbst = next(routes for slot, window, routes in data.slots if slot.id == "herbst-2026")
-    assert herbst[0].median is None and herbst[0].ratio is None
+    weihnachten = next(routes for slot, window, routes in data.slots if slot.id == "weihnachten-2026")
+    assert weihnachten[0].median is None and weihnachten[0].ratio is None

@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta, timezone
 import pytest
 
 from vacation_planner.models import (
-    DealReason, Offer, Provider, SearchRequest, SearchResult, SeatClass,
+    DealReason, Leg, Offer, Provider, SearchRequest, SearchResult, SeatClass,
 )
 from vacation_planner.storage import Storage
 
@@ -18,12 +18,16 @@ def req(**over) -> SearchRequest:
     return SearchRequest(**base)
 
 
-def offer(price: float, level=None, airlines=("LH",), provider=Provider.SERPAPI) -> Offer:
+LEGS = [Leg("HAM", "FRA", "2026-10-17 10:00", "2026-10-17 11:10"),
+        Leg("FRA", "BKK", "2026-10-17 13:55", "2026-10-18 06:00")]
+
+
+def offer(price: float, level=None, airlines=("LH",), provider=Provider.SERPAPI, legs=LEGS) -> Offer:
     return Offer(provider=provider, price_total=price, currency="EUR", per_person=price / 3,
                  airlines=list(airlines), stops=1, duration_minutes=800,
                  departs_at="2026-10-17T10:00", arrives_at="2026-10-18T06:00",
                  price_level=level, typical_low=None, typical_high=None,
-                 google_url="https://g/x", raw={"k": 1})
+                 google_url="https://g/x", raw={"k": 1}, legs=list(legs))
 
 
 @pytest.fixture
@@ -39,6 +43,24 @@ def test_migrations_are_idempotent(tmp_path):
     Storage(p).close()  # second open must not fail on existing tables
 
 
+def test_migration_upgrades_a_database_created_by_an_earlier_version(tmp_path):
+    import sqlite3
+    from importlib import resources
+
+    path = tmp_path / "v1.sqlite"
+    conn = sqlite3.connect(path)
+    conn.execute("CREATE TABLE IF NOT EXISTS schema_version (version INTEGER NOT NULL)")
+    conn.executescript(resources.files("vacation_planner.migrations").joinpath("001_initial.sql").read_text())
+    conn.close()
+
+    db = Storage(path)   # applies 002 on top of the v1 database
+    run = db.start_run(NOW, planned=1)
+    sid = db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(5000)]), NOW)
+    assert db.cheapest_offer(sid).legs == LEGS
+    assert db.conn.execute("SELECT MAX(version) AS v FROM schema_version").fetchone()["v"] == 2
+    db.close()
+
+
 def test_save_result_round_trip(db: Storage):
     run = db.start_run(NOW, planned=1)
     sid = db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(6000, "low"), offer(5400)]), NOW)
@@ -47,6 +69,7 @@ def test_save_result_round_trip(db: Storage):
     assert rows[0].seat is SeatClass.BUSINESS and rows[0].provider is Provider.SERPAPI
     cheapest = db.cheapest_offer(sid)
     assert cheapest.price_total == 5400 and cheapest.airlines == ["LH"]
+    assert cheapest.legs == LEGS and db.offer_by_id(cheapest.id).legs == LEGS
     db.finish_run(run, executed=1, status="ok", now=NOW)
     assert db.last_run_id() == run
 
@@ -69,6 +92,20 @@ def test_prior_prices_exclude_current_and_other_slots(db: Storage):
     c = db.save_result(run, SearchResult(req(), Provider.FAST_FLIGHTS, [offer(5000)]), NOW)
     assert db.prior_cheapest_prices("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS, before_search_id=c) == [6000]
     assert sorted(db.prior_route_prices("HAM", "BKK", SeatClass.BUSINESS, before_search_id=c)) == [6000, 7000]
+
+
+def test_best_price_for_uses_the_newest_observation_per_pair(db: Storage):
+    earlier = datetime(2026, 9, 14, 5, 0, tzinfo=timezone.utc)
+    run = db.start_run(earlier, 4)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(6000)]), earlier)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)   # newer, dearer
+    db.save_result(run, SearchResult(req(outbound_date=date(2026, 10, 18), return_date=date(2026, 11, 1)),
+                                     Provider.SERPAPI, [offer(6500)]), NOW)
+    db.record_search(run, req(origin="FRA"), Provider.SERPAPI, "error", NOW, error="boom")
+    assert db.best_price_for("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS) == 6500
+    assert db.best_price_for("herbst-2026", "FRA", "BKK", SeatClass.BUSINESS) is None
+    assert db.best_price_for("sommer-2027", "HAM", "BKK", SeatClass.BUSINESS) is None
+    assert db.best_price_for("herbst-2026", "HAM", "BKK", SeatClass.ECONOMY) is None
 
 
 def test_deals_pending_and_notified(db: Storage):
@@ -95,6 +132,12 @@ def test_report_queries(db: Storage):
     assert {(o.search.destination, o.offer.price_total) for o in best} == {("BKK", 5500), ("DXB", 3000)}
     hist = db.route_observations("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS)
     assert [o.offer.price_total for o in hist] == [5500, 6000]
+
+
+def test_offers_without_legs_round_trip_as_an_empty_list(db: Storage):
+    run = db.start_run(NOW, planned=1)
+    sid = db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(5000, legs=[])]), NOW)
+    assert db.cheapest_offer(sid).legs == []
 
 
 def test_save_result_is_atomic(db: Storage, monkeypatch):

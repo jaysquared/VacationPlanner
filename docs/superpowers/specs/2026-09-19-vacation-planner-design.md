@@ -129,7 +129,16 @@ destinations:
   - code: PMI
     name: Palma de Mallorca
     cabin: any
+  - code: HKT
+    name: Phuket
+    cabin: business
+    max_price_per_person: 2000
+    origins: [HAM, FRA]      # optional; defaults to settings.origins
 ```
+
+`origins` overrides `settings.origins` for that destination only. Each
+(origin, destination) pair is a separate route, so the per-route pair cap
+applies per origin.
 
 Starter set (user prunes/extends): Europe `LIS PMI ATH FNC TFS LCA`; long haul
 `BKK HKT DXB MLE CPT MRU JFK MIA CUN NRT SIN DPS`.
@@ -193,7 +202,10 @@ Official dates, for reference:
 origins: [HAM]                  # list so FRA/CPH can be added later
 nights: { min: 7, max: 14 }     # default trip length, per-slot override allowed
 bridge_days: { before: 0, after: 0 }
-max_stops: 1                    # 0 nonstop, 1 one stop, 2 two stops (Google param semantics mapped in client)
+max_stops: 2                    # 0 nonstop, 1 one stop, 2 two stops (Google param semantics mapped in client)
+layovers:
+  max_minutes: 180                        # each individual stop
+  forbidden_window: ["23:00", "05:00"]    # local time; a stop touching this window is rejected
 excluded_airlines: [AI]
 providers:
   order:
@@ -210,6 +222,10 @@ deals:
   min_history_points: 3         # below this, fall back to route-level median across slots
   renotify_drop_ratio: 0.95     # re-report only if price falls to <= 95% of last reported
   lookahead_days: 330           # ignore slots starting later than this
+alternate_origins:
+  home: HAM
+  min_saving_ratio: 0.20        # a FRA fare must be >= 20 % cheaper than the best HAM fare
+  min_saving_total: 500         # ... and >= 500 EUR cheaper in absolute terms
 report:
   output_dir: docs/site
 email:
@@ -228,12 +244,15 @@ Plain dataclasses / pydantic models shared by all stages:
   Derived: `free_window` = (start extended back to the preceding Saturday if
   start is a Monday, end extended forward to the following Sunday if end is a
   Friday), then widened by bridge days.
-- `Destination` — code, name, cabin, max price.
+- `Destination` — code, name, cabin, max price, optional origins.
 - `SearchRequest` — origin, destination, outbound_date, return_date, cabin,
   adults, children, slot_id. Hashable; equality is the dedup key.
 - `Offer` — search reference, price_total, currency, per_person, airlines,
   stops, duration_minutes, departs_at, arrives_at, price_level,
-  typical_low, typical_high, google_url, raw flight JSON.
+  typical_low, typical_high, google_url, raw flight JSON, `legs`.
+- `Leg` — one flight of an itinerary: origin, destination, departs_at,
+  arrives_at (local times, "YYYY-MM-DD HH:MM", as the provider reports them).
+  The gaps between consecutive legs are the layovers (5.4a).
 - `Deal` — offer reference, slot_id, reasons (list of enum), score,
   detected_at, notified_at.
 
@@ -259,8 +278,10 @@ Input: config, today's date, storage (for freshness). Output: ordered list of
 
 1. Select slots that have targets and whose start is after today and within
    `lookahead_days`. Order by start date ascending.
-2. For each (slot, origin, target) route, enumerate all (outbound, return)
-   pairs inside the free window that satisfy the slot's night range.
+2. For each (slot, target) pick the origins: the destination's own `origins`
+   if it has them, otherwise `settings.origins`. For each (slot, origin,
+   target) route, enumerate all (outbound, return) pairs inside the free
+   window that satisfy the slot's night range.
 3. Rank pairs per route: pairs with no data first, then oldest observation
    first. Take at most `max_pairs_per_route_per_run`.
 4. Concatenate routes in slot order and cut at `max_searches_per_run`.
@@ -293,6 +314,29 @@ implementations plus a fake for tests.
 - `providers/executor.py`: walks the plan, tries the providers per 2.5,
   and writes each result through storage in its own transaction.
 
+### 5.4a Layover rule
+
+`settings.layovers` sets `max_minutes` (per individual stop) and an optional
+`forbidden_window` of local times, e.g. `["23:00", "05:00"]`.
+`itinerary.layovers(legs)` turns consecutive legs into `Layover(airport,
+starts_at, ends_at, minutes)`; `itinerary.passes_layover_rule(legs,
+settings)` is false as soon as one layover is longer than `max_minutes` or
+its half-open interval `[starts_at, ends_at)` overlaps the window on any day
+it spans (the window wraps midnight when its start is later than its end).
+A layover whose minutes are negative (the next leg departs before the previous
+one lands) never passes. Every client applies the rule through
+`providers.base.filter_layovers` directly after the excluded-airline filter and
+inside the parse guard, so an unparseable leg time surfaces as
+`ProviderError("<provider>: parse failed: ...")`; an offer whose legs the
+provider did not report is kept.
+
+Scope: the rule is evaluated on the outbound legs the providers report;
+return-leg stops are not visible without a second paid request and are not
+checked. Verify the return itinerary on the Google Flights link before booking.
+(All three providers price an outbound option for the whole round trip and hide
+the matching return itineraries behind a second `departure_token` call, which
+would double the cost per search.)
+
 ### 5.5 `storage` — SQLite
 
 File `data/planner.sqlite`, committed to the repo. Schema managed by numbered
@@ -304,7 +348,9 @@ migration scripts applied on startup.
   error)`
 - `offers(id, search_id, provider, price_total, currency, per_person, airlines_json,
   stops, duration_minutes, departs_at, arrives_at, price_level, typical_low,
-  typical_high, google_url, flight_json)`
+  typical_high, google_url, flight_json, legs_json)` — `legs_json` added by
+  migration `002_offer_legs.sql` (default `'[]'`), so the layover rule can be
+  re-checked from stored data
 - `deals(id, offer_id, slot_id, reasons_json, score, detected_at,
   notified_at)`
 - View: `cheapest_per_search`, plus the `route_observations` query method
@@ -329,6 +375,19 @@ reasons, tie-broken by ratio to median. Notification dedup: a deal is marked
 notifiable only if no prior notified deal exists for (slot, route, cabin)
 or the price is ≤ `renotify_drop_ratio` × the last notified price.
 
+### 5.6a Alternate origins
+
+`settings.alternate_origins` = `{home, min_saving_ratio, min_saving_total}`.
+For a search whose origin is not `home`, storage supplies the best current
+price at `home` for the same (slot, destination, seat) — the cheapest of the
+newest observation per date pair (`Storage.best_price_for`). If such a price
+exists and the alternate fare is not both `<= (1 - min_saving_ratio) x home`
+and `<= home - min_saving_total`, the offer is not a deal at all and nothing
+is recorded, whatever the other rules say. If it clears both margins,
+`CHEAPER_THAN_HOME` is appended to the reasons it earned on its own; a fare
+with no other reason still is not a deal. With no `home` price on record yet
+the fare is evaluated normally.
+
 ### 5.7 `report` — HTML
 
 Jinja2 templates → `docs/site/index.html` plus one page per route
@@ -337,13 +396,15 @@ needed for v1.
 
 Index page:
 1. New deals since last run (empty state text if none).
-2. One section per upcoming slot: table of targets with best current price,
-   per-person price, airline(s), stops, outbound/return dates, ratio to
-   median, price level, Google Flights link, deal badge.
+2. One section per upcoming slot: one row per (destination, seat) with the
+   best current price at the home origin, per-person price, airline(s),
+   stops, outbound/return dates, ratio to median, price level, Google
+   Flights link, deal badge — plus, in its own column, the best price at
+   each alternate origin and how much it saves ("FRA 9,000 € (−25 %)").
 3. Footer: run time, searches executed, budget used this month.
 
-Route page: table of every observation (date searched, dates flown, price,
-airline, level) newest first.
+Route page: one per (slot, origin, destination, seat), with every observation
+(date searched, dates flown, price, airline, level) newest first.
 
 ### 5.8 `notify` — email
 

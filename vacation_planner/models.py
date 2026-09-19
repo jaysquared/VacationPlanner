@@ -27,6 +27,7 @@ class DealReason(str, Enum):
     GOOGLE_LOW = "google_low"
     UNDER_MAX = "under_max"
     NEW_LOW = "new_low"
+    CHEAPER_THAN_HOME = "cheaper_than_home"
 
 
 def seat_for(cabin: Cabin) -> SeatClass:
@@ -55,6 +56,8 @@ class Destination:
     name: str
     cabin: Cabin
     max_price_per_person: float | None = None
+    #: Origins to search for this destination; None falls back to `settings.origins`.
+    origins: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -66,6 +69,16 @@ class Child:
 class Travellers:
     adults: int
     children: tuple[Child, ...]
+
+
+@dataclass(frozen=True)
+class Leg:
+    """One flight inside an itinerary. Times are local, "YYYY-MM-DD HH:MM"."""
+
+    origin: str
+    destination: str
+    departs_at: str
+    arrives_at: str
 
 
 @dataclass(frozen=True)
@@ -104,6 +117,7 @@ class Offer:
     typical_high: float | None
     google_url: str
     raw: dict = field(default_factory=dict)
+    legs: list[Leg] = field(default_factory=list)
 
 
 @dataclass

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, time
 from pathlib import Path
 from typing import Literal, Mapping
 
@@ -31,6 +31,7 @@ class _Destination(BaseModel):
     name: str
     cabin: Cabin
     max_price_per_person: float | None = None
+    origins: list[str] | None = None
 
 
 class _Destinations(BaseModel):
@@ -122,11 +123,46 @@ class BudgetSettings(BaseModel):
         return v
 
 
+class LayoverSettings(BaseModel):
+    """Limits on the stops of an itinerary (see `itinerary.passes_layover_rule`)."""
+
+    max_minutes: int = 180
+    #: Local-time window no stop may touch, e.g. ["23:00", "05:00"]. None disables the check.
+    forbidden_window: tuple[str, str] | None = ("23:00", "05:00")
+
+    @field_validator("forbidden_window")
+    @classmethod
+    def _parseable(cls, v: tuple[str, str] | None) -> tuple[str, str] | None:
+        for text in v or ():
+            try:
+                hour, minute = text.split(":")
+                time(int(hour), int(minute))
+            except (ValueError, TypeError):
+                raise ValueError(f"expected a HH:MM time, got {text!r}") from None
+        return v
+
+
 class DealSettings(BaseModel):
     median_ratio: float
     min_history_points: int
     renotify_drop_ratio: float
     lookahead_days: int
+
+
+class AlternateOriginSettings(BaseModel):
+    """How much cheaper a non-home origin has to be before it counts as a deal.
+
+    Flying from Frankfurt costs a train ride and a day, so a FRA fare is only
+    interesting if it beats the best Hamburg fare by both margins.
+    """
+
+    home: str = "HAM"
+    min_saving_ratio: float = 0.20
+    min_saving_total: float = 500
+
+    def beats_home(self, price: float, home_price: float) -> bool:
+        return (price <= (1 - self.min_saving_ratio) * home_price
+                and price <= home_price - self.min_saving_total)
 
 
 class ReportSettings(BaseModel):
@@ -142,10 +178,12 @@ class Settings(BaseModel):
     nights: Nights
     bridge_days: BridgeDays = BridgeDays()
     max_stops: int = 1
+    layovers: LayoverSettings = LayoverSettings()
     excluded_airlines: list[str] = []
     providers: ProviderSettings
     budget: BudgetSettings
     deals: DealSettings
+    alternate_origins: AlternateOriginSettings = AlternateOriginSettings()
     report: ReportSettings = ReportSettings()
     email: EmailSettings = EmailSettings()
 
@@ -221,7 +259,9 @@ def load_config(config_dir: Path, env: Mapping[str, str] | None = None) -> Confi
     for d in dests.destinations:
         if d.code in destinations:
             raise ConfigError(f"destinations.yaml: duplicate code {d.code}")
-        destinations[d.code] = Destination(d.code, d.name, d.cabin, d.max_price_per_person)
+        destinations[d.code] = Destination(
+            d.code, d.name, d.cabin, d.max_price_per_person,
+            tuple(d.origins) if d.origins is not None else None)
 
     slots: list[Slot] = []
     seen: set[str] = set()

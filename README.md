@@ -49,3 +49,63 @@ Both APIs were verified live on 2026-09-19 with the same search (HAM→BKK Busin
 - `config/holidays.yaml` — the slots and, per slot, which destinations to search (`targets`). Only listed targets are ever searched.
 - `config/destinations.yaml` — the catalogue; `cabin: business` for long haul, `cabin: any` for Europe.
 - `config/settings.yaml` — origins, trip length, budget, providers, deal thresholds.
+
+### Origins per destination
+
+`settings.yaml` lists the default `origins` (`[HAM]`). A destination may name its
+own, and then only those are searched for it:
+
+```yaml
+destinations:
+  - { code: TFS, name: Tenerife South, cabin: any }                                  # HAM only
+  - { code: HKT, name: Phuket, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
+```
+
+Each (origin, destination) pair is a route of its own, so
+`budget.max_pairs_per_route_per_run` applies per origin.
+
+### Layovers
+
+Up to `max_stops` stops per direction, and every single stop must be short and
+outside the night:
+
+```yaml
+layovers:
+  max_minutes: 180                        # each individual stop
+  forbidden_window: ["23:00", "05:00"]    # local time; a stop touching this window is rejected
+```
+
+A stop is measured in the stopover airport's local time, from the arrival of one
+leg to the departure of the next. It is rejected when it is longer than
+`max_minutes` or overlaps the window on any day it spans — so 23:00–05:00 kills a
+22:30–01:00 wait and a 04:30–06:00 one, while 05:00–07:00 is fine. Set
+`forbidden_window: null` to check the duration only. Itineraries a provider
+reports without legs are never rejected by this rule, and an itinerary whose legs
+are out of order (a departure before the previous arrival) always is.
+
+**Outbound only.** All three providers return outbound options priced for the whole
+round trip; the matching return itineraries sit behind a second `departure_token`
+request that this scanner never makes. So: the rule is evaluated on the outbound
+legs the providers report; return-leg stops are not visible without a second paid
+request and are not checked. Verify the return itinerary on the Google Flights link
+before booking.
+
+### Frankfurt has to be worth the trip
+
+Getting to Frankfurt costs a train ride and most of a day, so a fare from an
+origin other than `home` only counts as a deal if it beats the best known
+Hamburg fare for the same slot, destination and cabin by **both** margins:
+
+```yaml
+alternate_origins:
+  home: HAM
+  min_saving_ratio: 0.20          # a FRA fare must be >= 20 % cheaper than the best HAM fare
+  min_saving_total: 500           # ... and >= 500 EUR cheaper in absolute terms
+```
+
+If it does not, it is not reported at all, however low Google calls it. If there
+is no Hamburg price on record yet, the fare is judged on the normal rules alone.
+A deal that clears both margins carries the extra reason `cheaper_than_home`.
+In the report, Hamburg and Frankfurt share one row per destination: the
+alternate origin shows up as `FRA 9,000 € (−25 %)` next to the Hamburg price,
+and each origin keeps its own history page.

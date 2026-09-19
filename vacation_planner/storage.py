@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import date, datetime, timezone
 from importlib import resources
 from pathlib import Path
 
-from .models import DealReason, Offer, Provider, SearchRequest, SearchResult, SeatClass
+from .models import DealReason, Leg, Offer, Provider, SearchRequest, SearchResult, SeatClass
 
 
 def _iso(dt: datetime) -> str:
@@ -64,6 +64,7 @@ class OfferRow:
     typical_low: float | None
     typical_high: float | None
     google_url: str
+    legs: list[Leg] = field(default_factory=list)
 
     @staticmethod
     def from_row(r: sqlite3.Row) -> "OfferRow":
@@ -74,6 +75,7 @@ class OfferRow:
             duration_minutes=r["duration_minutes"], departs_at=r["departs_at"],
             arrives_at=r["arrives_at"], price_level=r["price_level"],
             typical_low=r["typical_low"], typical_high=r["typical_high"], google_url=r["google_url"],
+            legs=[Leg(**leg) for leg in json.loads(r["legs_json"])],
         )
 
 
@@ -106,7 +108,7 @@ class Observation:
 
 
 _SEARCH_COLS = "id, run_id, slot_id, origin, destination, outbound_date, return_date, seat, adults, children, provider, requested_at, status, error"
-_OFFER_COLS = "id, search_id, provider, price_total, per_person, airlines_json, stops, duration_minutes, departs_at, arrives_at, price_level, typical_low, typical_high, google_url"
+_OFFER_COLS = "id, search_id, provider, price_total, per_person, airlines_json, stops, duration_minutes, departs_at, arrives_at, price_level, typical_low, typical_high, google_url, legs_json"
 
 
 class Storage:
@@ -178,10 +180,11 @@ class Storage:
         self.conn.executemany(
             """INSERT INTO offers (search_id, provider, price_total, currency, per_person, airlines_json,
                stops, duration_minutes, departs_at, arrives_at, price_level, typical_low, typical_high,
-               google_url, flight_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+               google_url, flight_json, legs_json) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
             [(search_id, o.provider.value, o.price_total, o.currency, o.per_person,
               json.dumps(o.airlines), o.stops, o.duration_minutes, o.departs_at, o.arrives_at,
-              o.price_level, o.typical_low, o.typical_high, o.google_url, json.dumps(o.raw, default=str))
+              o.price_level, o.typical_low, o.typical_high, o.google_url, json.dumps(o.raw, default=str),
+              json.dumps([asdict(leg) for leg in o.legs]))
              for o in offers])
 
     def record_offers(self, search_id: int, offers: list[Offer]) -> None:
@@ -241,6 +244,20 @@ class Storage:
                WHERE s.status='ok' AND s.origin=? AND s.destination=? AND s.seat=? AND s.id<?""",
             (origin, destination, seat.value, before_search_id))
         return [r["price_total"] for r in rows]
+
+    def best_price_for(self, slot_id: str, origin: str, destination: str, seat: SeatClass) -> float | None:
+        """Cheapest current price on a route: the newest observation per date pair, minimised."""
+        r = self.conn.execute(
+            """SELECT MIN(c.price_total) AS p FROM searches s JOIN cheapest_per_search c ON c.search_id=s.id
+               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=?
+                 AND s.id = (
+                   SELECT s2.id FROM searches s2 JOIN cheapest_per_search c2 ON c2.search_id=s2.id
+                   WHERE s2.status='ok' AND s2.slot_id=s.slot_id AND s2.origin=s.origin
+                     AND s2.destination=s.destination AND s2.seat=s.seat
+                     AND s2.outbound_date=s.outbound_date AND s2.return_date=s.return_date
+                   ORDER BY s2.requested_at DESC, s2.id DESC LIMIT 1)""",
+            (slot_id, origin, destination, seat.value)).fetchone()
+        return r["p"]
 
     # ---- deals ----
     def insert_deal(self, offer_id: int, search_id: int, slot_id: str, reasons: list[DealReason],
