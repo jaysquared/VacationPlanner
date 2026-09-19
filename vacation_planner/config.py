@@ -99,7 +99,7 @@ class EmailSettings(BaseModel):
 
 class Settings(BaseModel):
     origins: list[str]
-    nights: _Nights
+    nights: Nights
     bridge_days: BridgeDays = BridgeDays()
     max_stops: int = 1
     excluded_airlines: list[str] = []

@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from vacation_planner.config import ConfigError, load_config
-from vacation_planner.models import Cabin, Provider
+from vacation_planner.models import Cabin, Nights, Provider
 
 
 def test_loads_repo_config(config_dir: Path):
@@ -17,6 +17,7 @@ def test_loads_repo_config(config_dir: Path):
     assert herbst.start == date(2026, 10, 19) and herbst.targets == ("BKK",)
     assert cfg.settings.providers.primary is Provider.SERPAPI
     assert cfg.settings.budget.serpapi_per_month == 100
+    assert cfg.settings.nights == Nights(7, 14)
     assert cfg.secrets.serpapi_key is None
 
 
