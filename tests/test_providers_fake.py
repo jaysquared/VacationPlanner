@@ -40,3 +40,14 @@ def test_fake_failures():
     c.search(req("DXB"))
     with pytest.raises(QuotaExhausted):
         c.search(req("DXB"))
+
+
+def test_fake_configured_empty_list_yields_no_offers():
+    c = FakeFlightClient(prices={("HAM", "BKK"): []})
+    assert c.search(req()).offers == []
+
+
+def test_per_person_rejects_zero_pax():
+    zero_pax_req = SearchRequest("herbst-2026", "HAM", "BKK", date(2026, 10, 17), date(2026, 10, 31), SeatClass.BUSINESS, 0, 0)
+    with pytest.raises(ValueError):
+        per_person(1000, zero_pax_req, True)

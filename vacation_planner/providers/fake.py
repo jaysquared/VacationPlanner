@@ -23,7 +23,7 @@ class FakeFlightClient:
             raise ProviderError(f"fake failure for {key}")
         if self.quota_after is not None and len(self.calls) > self.quota_after + 1:
             raise QuotaExhausted("fake quota exhausted")
-        prices = self.prices.get(key) or [1000 + 100 * req.nights]
+        prices = self.prices[key] if key in self.prices else [1000 + 100 * req.nights]
         offers = [
             Offer(provider=self.provider, price_total=float(p), currency="EUR", per_person=float(p) / req.pax,
                   airlines=["LH"], stops=1, duration_minutes=720,

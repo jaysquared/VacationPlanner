@@ -26,6 +26,8 @@ def filter_excluded(offers: list[Offer], excluded: Iterable[str]) -> list[Offer]
 
 
 def per_person(price: float, req: SearchRequest, price_is_total: bool) -> tuple[float, float]:
+    if req.pax < 1:
+        raise ValueError("search request needs at least one passenger")
     if price_is_total:
         return float(price), float(price) / req.pax
     return float(price) * req.pax, float(price)
