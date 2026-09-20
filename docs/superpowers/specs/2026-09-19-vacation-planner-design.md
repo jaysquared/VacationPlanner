@@ -457,7 +457,9 @@ column, max 640 px, inline CSS, no images or scripts) with the same sections:
    (with "level · airlines · stops" beneath it), origin (with the alternate
    origins beneath it, "FRA 9,000 € (−25 %)"), dates, price (total, with the
    per-person price beneath it), vs last week, lowest seen — then the Book
-   link. "Lowest seen" is blank when this week *is* the lowest.
+   link. "Lowest seen" shows "–" when this week *is* the lowest on record.
+   Each table sits in an `overflow-x:auto` wrapper, so a narrow phone scrolls it
+   sideways instead of squeezing the columns; the 640 px container is unchanged.
 4. **Not searched this run** — per slot, either "no targets configured", or
    "not searched in this run" (nothing of it ran), or "searched but no result:
    LGK, KUL" (the targets with no successful search this run). Only slots
@@ -478,7 +480,9 @@ not explained with Hamburg's price level, nor with a median the rule never saw.
 `compose_digest(data, deals, config, report_url)` builds (subject, text, html)
 from a `ReportData` and the notifiable deals. The subject is
 "Vacation Planner · 2 new deals · cheapest Weihnachten: Phuket 11,785 €", or
-"Vacation Planner · weekly update" when nothing is new.
+"Vacation Planner · weekly update" when nothing is new. The count is the number
+of cards of section 2, one per route, not the number of deal rows -- several date
+pairs of one route share a card, and the subject must match what the mail shows.
 
 `send_pending` obeys `email.mode` (3.4), takes the just-finished run's
 `ExecutionSummary` when `run` calls it and falls back to storage otherwise. It

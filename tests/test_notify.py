@@ -341,7 +341,8 @@ def test_two_deals_on_one_route_share_a_card(config_dir):
     assert len(db.pending_deals()) == 2
 
     subject, text, html = digest(cfg, db)
-    assert "2 new deals" in subject
+    # the subject counts what the reader will see: cards, not database rows
+    assert "1 new deal ·" in subject
     assert html.count("Book on Google Flights") == 1          # one card, not two
     assert "Phuket (HKT) from Hamburg · 20 Dec – 1 Jan · Business" in html   # the cheaper one
     assert "also 19–29 Dec 9,000 €" in html and "also 19–29 Dec 9,000 €" in text
@@ -377,3 +378,11 @@ def test_not_searched_names_missing_targets_and_collapses_the_far_future(config_
     assert "15 later holidays have no targets configured (Herbstferien 2027 – Sommerferien 2030)" in html
     assert "Weihnachtsferien 2029/30" not in html        # collapsed away
     assert "15 later holidays have no targets configured (Herbstferien 2027 – Sommerferien 2030)" in text
+
+
+def test_each_holiday_table_scrolls_sideways_on_a_narrow_screen(config_dir):
+    """A phone should be able to push the table sideways instead of squeezing it."""
+    cfg, db, _run = seeded(config_dir)
+    _subject, _text, html = digest(cfg, db)
+    assert html.count('<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">') == 1
+    assert "max-width:640px" in html          # the container itself is unchanged

@@ -38,8 +38,10 @@ with the same five sections in both bodies:
    stops` underneath), origin (with `FRA 9,000 € (−25 %)` underneath), dates,
    price (with the per-person price underneath), **vs last week** (`▼ 12 %`
    against the cheapest price of the last run that saw the route) and **lowest
-   seen** (the cheapest price ever recorded for it — blank when that is this
-   week's price), plus a Book link.
+   seen** (the cheapest price ever recorded for it — `–` while this week's
+   price *is* the lowest on record, since the number is already in the price
+   column), plus a Book link. Each table scrolls sideways on a narrow phone
+   instead of squeezing its columns.
 4. **Not searched this run** — per holiday: `no targets configured`, `not
    searched in this run`, or `searched but no result: LGK, KUL` for the targets
    that came back empty. Holidays further out than `deals.lookahead_days`
@@ -50,7 +52,9 @@ with the same five sections in both bodies:
 
 The subject says it all at a glance:
 `Vacation Planner · 2 new deals · cheapest Weihnachten: Phuket 11,785 €`, or
-`Vacation Planner · weekly update` when nothing is new.
+`Vacation Planner · weekly update` when nothing is new. The count is the number
+of cards in section 2 — one per route — not the number of stored deal rows, so
+it matches what the mail actually shows.
 
 ### Email modes
 
