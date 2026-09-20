@@ -92,3 +92,21 @@ def test_http_client_loggers_are_quiet(config_dir, tmp_path):
     assert r.exit_code == 0, r.output
     assert logging.getLogger("httpx").level == logging.WARNING
     assert logging.getLogger("httpcore").level == logging.WARNING
+
+
+def test_run_hands_the_execution_summary_and_report_url_to_notify(config_dir, tmp_path, monkeypatch):
+    out = tmp_path / "site"
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("output_dir: docs/site", f"output_dir: {out}"))
+    seen = {}
+
+    def fake_send(storage, config, now, report_url=None, summary=None, **kw):
+        seen.update(report_url=report_url, summary=summary)
+        return 0
+
+    monkeypatch.setattr("vacation_planner.notify.send_pending", fake_send)
+    r = runner.invoke(app, common(config_dir, tmp_path)
+                      + ["run", "--fake", "--limit", "3", "--report-url", "https://x/r"])
+    assert r.exit_code == 0, r.output
+    assert seen["report_url"] == "https://x/r"
+    assert seen["summary"] is not None and seen["summary"].ok == 3 and seen["summary"].run_id == 1

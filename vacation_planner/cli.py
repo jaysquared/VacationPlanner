@@ -177,7 +177,7 @@ def report_cmd(ctx: typer.Context):
 
 @app.command("notify")
 def notify_cmd(ctx: typer.Context, report_url: Optional[str] = typer.Option(None, "--report-url")):
-    """Email pending deals."""
+    """Send the weekly digest email (per settings email.mode)."""
     c: Ctx = ctx.obj
     n = _notify.send_pending(_storage(c), c.config, c.now, report_url)
     typer.echo(f"notified {n} deals")
@@ -197,5 +197,5 @@ def run(ctx: typer.Context, limit: Optional[int] = typer.Option(None, "--limit")
         out = c.config.root / out
     written = render(storage, c.config, out, c.now, last_run_id=summary.run_id)
     typer.echo(f"wrote {len(written)} files to {out}")
-    n = _notify.send_pending(storage, c.config, c.now, report_url)
+    n = _notify.send_pending(storage, c.config, c.now, report_url, summary)
     typer.echo(f"notified {n} deals")

@@ -29,4 +29,4 @@ alternate_origins:
 report:
   output_dir: docs/site
 email:
-  mode: deals_only
+  mode: digest                    # digest | deals_only | never
