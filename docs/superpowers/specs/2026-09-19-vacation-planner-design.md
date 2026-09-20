@@ -312,7 +312,17 @@ implementations plus a fake for tests.
   filters out itineraries with excluded airlines, maps results to `Offer`
   with `typical_low/high` empty and a constructed Google Flights URL. Sleeps
   its entry's `pause_seconds` before each call. Raises `ProviderError` on
-  parse failure or empty response.
+  parse failure or empty response. "No results" is not a failure: a Google page
+  with no matching itineraries (no Business fare on the route, say) makes the
+  library's parser raise `FlightsNotFound`, `TypeError` or `IndexError`, and the
+  client turns all three into an ok `SearchResult` with no offers, logged at
+  INFO. Every other exception stays a `ProviderError`. Airline names the page's
+  metadata gives no code for fall back to `KNOWN_AIRLINE_CODES` (Edelweiss,
+  Discover, Lufthansa City, Transavia, Condor, Eurowings) and otherwise keep the
+  raw name with a DEBUG note.
+  A search with no offers counts as "searched but no result" in the report and
+  the digest (`ReportData.searched` holds the destinations that came back with a
+  price), so an empty result is visible rather than silently absent.
 - `providers/searchapi.py`: the same for SearchApi.io (2.2), reusing the
   SerpApi airline-code helper; 401/403 raise `AuthError`.
 - `providers/executor.py`: walks the plan, tries the providers per 2.5,

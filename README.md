@@ -98,6 +98,8 @@ A listed provider whose key is missing is skipped with a warning; if none is usa
 
 `fast-flights` sends a `SOCS=CAI` consent cookie with its requests so it works from EU networks, where Google would otherwise return a consent interstitial instead of the flights page.
 
+When the Google page holds no matching itineraries at all — no Business fare on the route, say — the scraper's parser has nothing to index into. That is **not** counted as a failed search: `fast-flights` records an ok search with no offers and notes it at INFO, so the run keeps its `ok` status and the destination shows up under `searched but no result` in the digest instead of as an error.
+
 ## First live run
 
 Both APIs were verified live on 2026-09-19 with the same search (HAM→BKK Business, 2 adults + 1 child, 17–31 Oct 2026): SerpApi, SearchApi.io and `fast-flights` all reported the same Emirates itinerary at 16,824 EUR. That price is the **total for all travellers** (5,608 EUR per person), so `providers.price_is_total` is `true` for all three. The recorded responses are the test fixtures `tests/fixtures/serpapi_ham_bkk.json` and `tests/fixtures/searchapi_ham_bkk.json`; note that the SerpApi response carried no `price_insights`, so price levels are only sometimes available.

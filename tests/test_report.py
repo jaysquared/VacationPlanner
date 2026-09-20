@@ -177,3 +177,19 @@ def test_index_marks_a_rise_and_an_unknown_previous_price(config_dir, tmp_path):
     index = (tmp_path / "index.html").read_text()
     assert '<td class="num up">▲ 5 %</td>' in index       # 7,000 → 7,350
     assert '<td class="num">–</td>' in index              # MLE has no earlier run
+
+
+def test_a_search_without_offers_does_not_count_as_searched(config_dir):
+    """fast-flights records "no itineraries" as an ok search with no offers.
+
+    The destination has no price this run, so the digest must still list it under
+    "searched but no result" instead of dropping it silently.
+    """
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    run = db.start_run(NOW, 2)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)
+    db.save_result(run, SearchResult(req(dest="PQC"), Provider.FAST_FLIGHTS, []), NOW)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    assert data.searched == {"weihnachten-2026": {"BKK"}}
+    assert data.counts == {"ok": 2}     # the search itself did happen

@@ -23,6 +23,18 @@ SEAT = {SeatClass.ECONOMY: "economy", SeatClass.BUSINESS: "business"}
 
 CONSENT_COOKIE = "SOCS=CAI"   # skips Google's EU consent interstitial
 
+#: Carriers the scraped page's airline metadata regularly omits. Without a code the
+#: itinerary would carry a raw name, which reads badly in the digest and matches no
+#: `excluded_airlines` entry; these six turned up repeatedly on German long-haul routes.
+KNOWN_AIRLINE_CODES = {
+    "Edelweiss Air": "WK",
+    "Discover Airlines": "4Y",
+    "Lufthansa City Airlines": "VL",
+    "Transavia": "HV",
+    "Condor": "DE",
+    "Eurowings": "EW",
+}
+
 
 class ConsentFetch(FetchIntegration):
     """Fetch the Google Flights page with a consent cookie so EU IPs get the data page, not the consent wall."""
@@ -64,9 +76,11 @@ def parse_results(results: ResultList, req: SearchRequest, url: str, price_is_to
         total, pp = per_person(it.price, req, price_is_total)
         codes = []
         for name in it.airlines:
-            code = name_to_code.get(name)
+            code = name_to_code.get(name) or KNOWN_AIRLINE_CODES.get(name)
             if code is None:
-                log.warning("fast_flights: no IATA code for airline %r; keeping the raw name", name)
+                # Routine on Google's pages, and harmless: the exclusion filter matches
+                # names as well as codes, so an unmapped carrier is still filtered.
+                log.debug("fast_flights: no IATA code for airline %r; keeping the raw name", name)
                 code = name
             if code not in codes:
                 codes.append(code)
@@ -116,8 +130,14 @@ class FastFlightsClient:
         self.sleep(self.pause_seconds)
         try:
             results = self.fetch(q)
-        except FlightsNotFound as e:
-            raise ProviderError(f"fast_flights: no flights: {e}") from e
+        except (FlightsNotFound, TypeError, IndexError) as e:
+            # A Google page with no matching itineraries (no Business fare for PQC, say)
+            # leaves the library's parser indexing into nothing. That is a search with
+            # nothing to report, not a failure: an error row here would blame the
+            # provider, push the run to `partial`, and fall back to nowhere.
+            log.info("fast_flights: no itineraries for %s->%s %s/%s (%s: %s)", req.origin,
+                     req.destination, req.outbound_date, req.return_date, type(e).__name__, e)
+            return SearchResult(req, self.provider, [], None)
         except Exception as e:  # network, parse, layout change
             raise ProviderError(f"fast_flights: {type(e).__name__}: {e}") from e
         if not results:

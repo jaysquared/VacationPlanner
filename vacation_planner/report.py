@@ -54,7 +54,7 @@ class ReportData:
     slots: list[tuple[Slot, Window, list[RouteSummary]]]
     usage: list[tuple[Provider, int, int]]   # provider, searches this month, monthly budget
     run: RunRow | None = None                # the run the report was built from
-    #: slot id -> destinations with at least one ok search in that run
+    #: slot id -> destinations that came back with a price in that run
     searched: dict[str, set[str]] = field(default_factory=dict)
     counts: dict[str, int] = field(default_factory=dict)        # searches of that run by status
     providers: dict[Provider, int] = field(default_factory=dict)  # ok searches of that run by provider
@@ -159,7 +159,11 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
              for e in config.settings.providers.budgeted()]
     searched: dict[str, set[str]] = {}
     for s in (storage.searches_in_run(last_run_id, "ok") if last_run_id is not None else []):
-        searched.setdefault(s.slot_id, set()).add(s.destination)
+        # An ok search with no offers is fast-flights' "no itineraries on the page":
+        # the destination was asked about and came back empty, which the digest
+        # reports as "searched but no result" rather than dropping in silence.
+        if storage.cheapest_offer(s.id) is not None:
+            searched.setdefault(s.slot_id, set()).add(s.destination)
     return ReportData(now, new_deals, slots, usage, run=storage.run_info(last_run_id),
                       searched=searched,
                       counts=storage.search_counts(last_run_id),
