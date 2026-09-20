@@ -23,6 +23,22 @@ SEAT = {SeatClass.ECONOMY: "economy", SeatClass.BUSINESS: "business"}
 
 CONSENT_COOKIE = "SOCS=CAI"   # skips Google's EU consent interstitial
 
+#: Carriers the scraped page's airline metadata regularly omits. Without a code the
+#: itinerary would carry a raw name, which reads badly in the digest and matches no
+#: `excluded_airlines` entry; these six turned up repeatedly on German long-haul routes.
+KNOWN_AIRLINE_CODES = {
+    "Edelweiss Air": "WK",
+    "Discover Airlines": "4Y",
+    "Lufthansa City Airlines": "VL",
+    "Transavia": "HV",
+    "Condor": "DE",
+    "Eurowings": "EW",
+}
+
+#: Airline names already reported this run. `FastFlightsClient.__init__` clears it, so the
+#: first sighting of an unmapped name per run warns and the rest are DEBUG.
+_unmapped_airlines: set[str] = set()
+
 
 class ConsentFetch(FetchIntegration):
     """Fetch the Google Flights page with a consent cookie so EU IPs get the data page, not the consent wall."""
@@ -64,9 +80,17 @@ def parse_results(results: ResultList, req: SearchRequest, url: str, price_is_to
         total, pp = per_person(it.price, req, price_is_total)
         codes = []
         for name in it.airlines:
-            code = name_to_code.get(name)
+            code = name_to_code.get(name) or KNOWN_AIRLINE_CODES.get(name)
             if code is None:
-                log.warning("fast_flights: no IATA code for airline %r; keeping the raw name", name)
+                # Not harmless: `excluded_airlines` holds IATA codes, and the client can
+                # only translate them through the page's own metadata -- so an excluded
+                # carrier the metadata does not name passes the filter under its raw
+                # name. Worth one warning per run, and a DEBUG note for the repeats,
+                # because a hundred searches must not bury the rest of the log.
+                first = name not in _unmapped_airlines
+                _unmapped_airlines.add(name)
+                log.log(logging.WARNING if first else logging.DEBUG,
+                        "fast_flights: no IATA code for airline %r; keeping the raw name", name)
                 code = name
             if code not in codes:
                 codes.append(code)
@@ -94,6 +118,7 @@ class FastFlightsClient:
         self.settings = settings
         self.fetch = fetch
         self.sleep = sleep
+        _unmapped_airlines.clear()   # one client per run, so "once per run" starts here
         try:   # keyless and unlimited, so it is rate-limited by a pause instead of a budget
             self.pause_seconds = settings.providers.entry(Provider.FAST_FLIGHTS).pause_seconds
         except KeyError:
@@ -111,17 +136,30 @@ class FastFlightsClient:
             currency="EUR", language="en-US",
         )
 
+    def _no_itineraries(self, req: SearchRequest, why: str) -> SearchResult:
+        """An ok search with no offers, for a page that simply holds no matching flights."""
+        log.info("fast_flights: no itineraries for %s->%s %s/%s (%s)", req.origin,
+                 req.destination, req.outbound_date, req.return_date, why)
+        # The executor treats any returned result as success and stops the fallback chain
+        # here, which is right only while fast_flights is last in `providers.order`.
+        return SearchResult(req, self.provider, [], None)
+
     def search(self, req: SearchRequest, raw_dir: Path | None = None) -> SearchResult:
         q = self.build_query(req)
         self.sleep(self.pause_seconds)
         try:
             results = self.fetch(q)
-        except FlightsNotFound as e:
-            raise ProviderError(f"fast_flights: no flights: {e}") from e
+        except (FlightsNotFound, TypeError, IndexError) as e:
+            # A Google page with no matching itineraries (no Business fare for PQC, say)
+            # leaves the library's parser indexing into nothing. That is a search with
+            # nothing to report, not a failure: an error row here would blame the
+            # provider and push the run to `partial`.
+            return self._no_itineraries(req, f"{type(e).__name__}: {e}")
         except Exception as e:  # network, parse, layout change
             raise ProviderError(f"fast_flights: {type(e).__name__}: {e}") from e
         if not results:
-            raise ProviderError("fast_flights: empty result")
+            # The same "nothing on the page" case, reached without an exception.
+            return self._no_itineraries(req, "empty result list")
         meta = getattr(results, "metadata", None)
         airlines = list(meta.airlines) if meta else []
         excluded = {e.upper() for e in self.settings.excluded_airlines}

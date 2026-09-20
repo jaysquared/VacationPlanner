@@ -22,8 +22,8 @@ def offer(price, level=None):
 def seeded(config_dir):
     cfg = load_config(config_dir, env={})
     db = Storage(":memory:")
-    old = db.start_run(NOW, 3)
-    for p in (9000, 8800, 9100):
+    for p in (9100, 9000, 8800):   # three weekly scans; the last one is "last week"
+        old = db.start_run(NOW, 1)
         db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(p)]), NOW)
     run = db.start_run(NOW, 2)
     db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000, "low")]), NOW)
@@ -40,11 +40,12 @@ def test_route_page_name():
 def test_build_report_summarises_best_and_median(config_dir):
     cfg, db, run = seeded(config_dir)
     data = build_report(db, cfg, NOW, last_run_id=run)
-    assert len(data.new_deals) == 1
+    # both date pairs of this run beat the earlier run's 9,000 / 8,800 / 9,100
+    assert len(data.new_deals) == 2
     weihnachten = next(routes for slot, window, routes in data.slots if slot.id == "weihnachten-2026")
     r = weihnachten[0]
     assert r.destination.code == "BKK" and r.best.offer.price_total == 7000
-    assert r.median == 8800 and round(r.ratio, 3) == 0.795 and r.is_deal is True   # median of 9000, 8800, 9100, 7000, 7600
+    assert r.median == 8800 and round(r.ratio, 3) == 0.795 and r.is_deal is True   # median of 9100, 9000, 8800, 7000, 7600
     assert data.usage == [(Provider.SERPAPI, 5, 250), (Provider.SEARCHAPI, 0, 100)]
     # past slots are hidden, future slots without targets are shown
     ids = [slot.id for slot, _, _ in data.slots]
@@ -138,7 +139,7 @@ def test_build_report_adds_previous_and_lowest_ever(config_dir):
     cfg, db, run = seeded(config_dir)
     data = build_report(db, cfg, NOW, last_run_id=run)
     r = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")[0]
-    assert r.previous == 8800          # cheapest of the earlier run (9000, 8800, 9100)
+    assert r.previous == 8800          # the most recent earlier run
     assert r.lowest_ever == 7000       # min over every observation of the route
     assert data.run is not None and data.run.id == run and data.run.status == "ok"
     assert data.counts == {"ok": 2} and data.providers == {Provider.SERPAPI: 2}
@@ -176,3 +177,19 @@ def test_index_marks_a_rise_and_an_unknown_previous_price(config_dir, tmp_path):
     index = (tmp_path / "index.html").read_text()
     assert '<td class="num up">▲ 5 %</td>' in index       # 7,000 → 7,350
     assert '<td class="num">–</td>' in index              # MLE has no earlier run
+
+
+def test_a_search_without_offers_does_not_count_as_searched(config_dir):
+    """fast-flights records "no itineraries" as an ok search with no offers.
+
+    The destination has no price this run, so the digest must still list it under
+    "searched but no result" instead of dropping it silently.
+    """
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    run = db.start_run(NOW, 2)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)
+    db.save_result(run, SearchResult(req(dest="PQC"), Provider.FAST_FLIGHTS, []), NOW)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    assert data.searched == {"weihnachten-2026": {"BKK"}}
+    assert data.counts == {"ok": 2}     # the search itself did happen

@@ -10,24 +10,39 @@ NOW = datetime(2026, 9, 21, tzinfo=timezone.utc)
 
 
 def test_evaluate_below_median_uses_slot_history_first():
-    reasons, median = evaluate(800, 800 / 3, None, [1000, 1000, 1000], [500, 500, 500], None, S)
+    reasons, median = evaluate(800, 800 / 3, None, [1000, 1000, 1000], 3, [500, 500, 500], 3, None, S)
     assert reasons == [DealReason.BELOW_MEDIAN, DealReason.NEW_LOW] and median == 1000
 
 
 def test_evaluate_falls_back_to_route_history():
-    reasons, median = evaluate(800, 1, None, [1000], [1000, 1000, 1000], None, S)
+    reasons, median = evaluate(800, 1, None, [1000], 1, [1000, 1000, 1000], 3, None, S)
     assert DealReason.BELOW_MEDIAN in reasons and median == 1000
-    reasons, median = evaluate(800, 1, None, [1000], [1000], None, S)
+    reasons, median = evaluate(800, 1, None, [1000], 1, [1000], 1, None, S)
     assert DealReason.BELOW_MEDIAN not in reasons and median is None
 
 
+def test_evaluate_counts_runs_not_observations():
+    """Three date pairs of one weekly scan are one history point, not three."""
+    reasons, median = evaluate(800, 1, None, [1000, 1000, 1000], 1, [1000, 1000, 1000], 1, None, S)
+    assert reasons == [] and median is None
+    reasons, median = evaluate(800, 1, None, [1000, 1000, 1000], 3, [], 0, None, S)
+    assert reasons == [DealReason.BELOW_MEDIAN, DealReason.NEW_LOW] and median == 1000
+
+
+def test_evaluate_new_low_needs_min_history_points():
+    """One or two weeks are not a record to beat; they are the start of one."""
+    assert evaluate(1800, 1, None, [2000, 1900], 2, [], 0, None, S)[0] == []
+    assert evaluate(1800, 1, None, [2000, 1900, 1950], 3, [], 0, None, S)[0] == [DealReason.NEW_LOW]
+
+
 def test_evaluate_google_low_and_under_max():
-    assert evaluate(900, 300, "low", [], [], 300, S)[0] == [DealReason.GOOGLE_LOW, DealReason.UNDER_MAX]
-    assert evaluate(900, 301, "typical", [], [], 300, S)[0] == []
+    assert evaluate(900, 300, "low", [], 0, [], 0, 300, S)[0] == [DealReason.GOOGLE_LOW, DealReason.UNDER_MAX]
+    assert evaluate(900, 301, "typical", [], 0, [], 0, 300, S)[0] == []
 
 
-def req(dest="BKK", slot="weihnachten-2026", origin="HAM"):
-    return SearchRequest(slot, origin, dest, date(2026, 12, 19), date(2026, 12, 31), SeatClass.BUSINESS, 2, 1)
+def req(dest="BKK", slot="weihnachten-2026", origin="HAM",
+        out=date(2026, 12, 19), ret=date(2026, 12, 31)):
+    return SearchRequest(slot, origin, dest, out, ret, SeatClass.BUSINESS, 2, 1)
 
 
 def offer(price, level=None):
@@ -82,9 +97,9 @@ def test_the_home_origin_is_never_margin_checked(config_dir):
 def test_detect_for_run_records_deals_and_renotify_rule(config_dir):
     cfg = load_config(config_dir, env={})
     db = Storage(":memory:")
-    old = db.start_run(NOW, 3)
-    for p in (9000, 9000, 9000):
-        db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(p)]), NOW)
+    for _ in range(3):   # three weekly scans, i.e. three history points
+        week = db.start_run(NOW, 1)
+        db.save_result(week, SearchResult(req(), Provider.SERPAPI, [offer(9000)]), NOW)
     run = db.start_run(NOW, 2)
     db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000, "low")]), NOW)  # 78% of median; 2,333 pp is over the 2,000 max
     db.save_result(run, SearchResult(req("DXB"), Provider.SERPAPI, [offer(9000, "typical")]), NOW)  # DXB is not in the catalogue -> no max
@@ -104,3 +119,84 @@ def test_detect_for_run_records_deals_and_renotify_rule(config_dir):
     run3 = db.start_run(NOW, 1)
     db.save_result(run3, SearchResult(req(), Provider.SERPAPI, [offer(6000, "low")]), NOW)   # >5% lower
     assert detect_for_run(db, run3, cfg, NOW)[0].notifiable is True
+
+
+def seed_history(db, prices, slot="weihnachten-2026"):
+    """One earlier run per price on the (slot, HAM, BKK, business) route.
+
+    A history point is a weekly scan, so each price needs a run of its own.
+    """
+    for p in prices:
+        week = db.start_run(NOW, 1)
+        db.save_result(week, SearchResult(req(slot=slot), Provider.SERPAPI, [offer(p)]), NOW)
+
+
+def test_a_cheaper_pair_in_the_same_run_is_not_history(config_dir):
+    """Another date pair searched minutes earlier is this week's price, not last week's."""
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    seed_history(db, (10000, 10000, 10000))
+    run = db.start_run(NOW, 2)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(8000)]), NOW)
+    db.save_result(run, SearchResult(req(out=date(2026, 12, 20), ret=date(2027, 1, 1)),
+                                     Provider.SERPAPI, [offer(9500)]), NOW)
+    deals = {d.search.outbound_date: d for d in detect_for_run(db, run, cfg, NOW)}
+    assert deals[date(2026, 12, 19)].reasons == [DealReason.BELOW_MEDIAN, DealReason.NEW_LOW]
+    # the 8,000 EUR pair above it does not rob this one of its new low
+    assert deals[date(2026, 12, 20)].reasons == [DealReason.NEW_LOW]
+    assert deals[date(2026, 12, 20)].median == 10000
+
+
+def test_below_median_ignores_the_prices_of_the_same_run(config_dir):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    seed_history(db, (10000, 10000, 10000))
+    run = db.start_run(NOW, 4)
+    for day in (20, 21, 22):   # three cheap pairs that would drag a same-run median down
+        db.save_result(run, SearchResult(req(out=date(2026, 12, day), ret=date(2027, 1, 1)),
+                                         Provider.SERPAPI, [offer(5000)]), NOW)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(8400)]), NOW)
+    last = [d for d in detect_for_run(db, run, cfg, NOW) if d.search.outbound_date == date(2026, 12, 19)][0]
+    assert last.median == 10000 and DealReason.BELOW_MEDIAN in last.reasons
+
+
+def test_a_single_earlier_observation_is_no_new_low(config_dir):
+    """Run 2 of a fresh database: one prior price is not enough to call anything a record."""
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    seed_history(db, (10000,))
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(8000)]), NOW)
+    assert detect_for_run(db, run, cfg, NOW) == []
+
+    run2 = db.start_run(NOW, 1)                     # a third and fourth observation later on
+    db.save_result(run2, SearchResult(req(), Provider.SERPAPI, [offer(9000)]), NOW)
+    run3 = db.start_run(NOW, 1)
+    db.save_result(run3, SearchResult(req(), Provider.SERPAPI, [offer(7500)]), NOW)
+    assert DealReason.NEW_LOW in detect_for_run(db, run3, cfg, NOW)[0].reasons
+
+
+def test_one_earlier_run_with_three_pairs_is_one_history_point(config_dir):
+    """`min_history_points` counts weekly scans: one run's three date pairs are one week."""
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    old = db.start_run(NOW, 3)
+    for day in (19, 20, 21):
+        db.save_result(old, SearchResult(req(out=date(2026, 12, day), ret=date(2027, 1, 1)),
+                                         Provider.SERPAPI, [offer(10000)]), NOW)
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(out=date(2026, 12, 19), ret=date(2027, 1, 1)),
+                                     Provider.SERPAPI, [offer(8000)]), NOW)
+    assert detect_for_run(db, run, cfg, NOW) == []
+
+
+def test_three_earlier_runs_make_the_price_rules_live(config_dir):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    for _ in range(3):
+        week = db.start_run(NOW, 1)
+        db.save_result(week, SearchResult(req(), Provider.SERPAPI, [offer(10000)]), NOW)
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(8000)]), NOW)
+    deal = detect_for_run(db, run, cfg, NOW)[0]
+    assert deal.reasons == [DealReason.BELOW_MEDIAN, DealReason.NEW_LOW] and deal.median == 10000

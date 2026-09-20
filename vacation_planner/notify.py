@@ -223,9 +223,13 @@ def _block(slot: Slot, window: Window, routes: list[RouteSummary]) -> _Block:
     return _Block(heading, [_row(r) for r in routes])
 
 
-def _subject(data: ReportData, deals: list[NewDeal]) -> str:
-    n = len(deals)
-    head = f"{n} new deal{'' if n == 1 else 's'}" if n else "weekly update"
+def _subject(data: ReportData, cards: int) -> str:
+    """`cards`, not the raw deal count: the subject must match what the mail shows.
+
+    Several date pairs of one route share a card, so counting deal rows promised
+    "8 new deals" above four cards.
+    """
+    head = f"{cards} new deal{'' if cards == 1 else 's'}" if cards else "weekly update"
     subject = f"Vacation Planner · {head}"
     for slot, _window, routes in data.slots:
         if routes:
@@ -251,17 +255,20 @@ def _not_searched(data: ReportData, config: Config) -> list[str]:
     lines: list[str] = []
     later: list[Slot] = []
     for slot, _window, _routes in data.slots:
-        searched = data.searched.get(slot.id, set())
+        priced = data.searched.get(slot.id, set())
+        # "Did anything run for this slot" is a different question from "did anything
+        # come back with a price": a scan that found no itineraries at all still ran.
+        attempted = data.attempted.get(slot.id, set())
         if not slot.targets:
             if slot.start <= horizon:
                 lines.append(f"{slot.name} — no targets configured")
             else:
                 later.append(slot)
             continue
-        missing = [t for t in slot.targets if t not in searched]
+        missing = [t for t in slot.targets if t not in priced]
         if not missing:
             continue
-        if not searched:
+        if not attempted:
             if slot.start <= horizon:
                 lines.append(f"{slot.name} — not searched in this run")
         else:
@@ -277,13 +284,14 @@ def _prepare(data: ReportData, deals: list[NewDeal], config: Config, report_url:
     # Best first, and among equals the one that costs the least per person -- the deal
     # ordering belongs to the digest, so every caller gets the same mail.
     ranked = sorted(deals, key=lambda n: (-n.deal.score, n.offer.per_person))
+    cards = [_deal_card(group, data, config) for group in _grouped(ranked)]
     d = data.generated_at
     return _Digest(
-        subject=_subject(data, deals),
+        subject=_subject(data, len(cards)),
         date=f"{d.day} {MONTHS_FULL[d.month - 1]} {d.year}",
         status=_status_line(data, config),
         budget=_budget_line(data),
-        deals=[_deal_card(group, data, config) for group in _grouped(ranked)],
+        deals=cards,
         blocks=blocks, not_searched=_not_searched(data, config), report_url=report_url,
         test_data=_uses_fake_data(data, deals))
 
@@ -317,6 +325,8 @@ def _link(url: str, label: str) -> str:
 HTML_COLUMNS = (("Destination", False), ("From", False), ("Dates", False), ("Price", True),
                 ("vs last week", True), ("Lowest seen", True), ("", False))
 SUB = "color:#666666;font-size:12px;"
+#: Wrapper around each holiday table, so a narrow viewport scrolls it instead of squeezing it.
+SCROLL = "overflow-x:auto;-webkit-overflow-scrolling:touch"
 
 
 def _sub(text: str) -> str:
@@ -335,8 +345,10 @@ def _html_rows(block: _Block) -> str:
             f'<td style="{TD}{NUM}{COLOURS.get(r.change_class, "")}">{_e(r.change)}</td>'
             f'<td style="{TD}{NUM}">{_e(r.lowest)}</td>'
             f'<td style="{TD}">{_link(r.url, "Book")}</td></tr>')
-    return (f'<table style="width:100%;border-collapse:collapse;font-size:13px;"><tr>{head}</tr>'
-            + "".join(body) + "</table>")
+    # Six columns plus a link do not always fit a phone; let the reader push the table
+    # sideways rather than squeeze every price into two characters.
+    return (f'<div style="{SCROLL}"><table style="width:100%;border-collapse:collapse;font-size:13px;">'
+            f'<tr>{head}</tr>' + "".join(body) + "</table></div>")
 
 
 #: Outlook and friends are happier with a whole document than with a bare fragment.

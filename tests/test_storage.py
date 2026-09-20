@@ -85,13 +85,36 @@ def test_last_observed_and_provider_count(db: Storage):
     assert db.searches_in_run(run, status="error")[0].error == "boom"
 
 
-def test_prior_prices_exclude_current_and_other_slots(db: Storage):
-    run = db.start_run(NOW, 3)
-    a = db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(6000)]), NOW)
-    b = db.save_result(run, SearchResult(req(slot_id="sommer-2027"), Provider.SERPAPI, [offer(7000)]), NOW)
-    c = db.save_result(run, SearchResult(req(), Provider.FAST_FLIGHTS, [offer(5000)]), NOW)
-    assert db.prior_cheapest_prices("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS, before_search_id=c) == [6000]
-    assert sorted(db.prior_route_prices("HAM", "BKK", SeatClass.BUSINESS, before_search_id=c)) == [6000, 7000]
+def test_prior_prices_come_from_earlier_runs_and_exclude_other_slots(db: Storage):
+    old = db.start_run(NOW, 2)
+    db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(6000)]), NOW)
+    db.save_result(old, SearchResult(req(slot_id="sommer-2027"), Provider.SERPAPI, [offer(7000)]), NOW)
+    run = db.start_run(NOW, 2)
+    # Both of these belong to the run being judged: another date pair of the same route,
+    # searched minutes earlier, is not history.
+    db.save_result(run, SearchResult(req(), Provider.FAST_FLIGHTS, [offer(5000)]), NOW)
+    db.save_result(run, SearchResult(req(outbound_date=date(2026, 10, 18)), Provider.SERPAPI, [offer(4000)]), NOW)
+    assert db.prior_cheapest_prices("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS, before_run_id=run) == [6000]
+    assert sorted(db.prior_route_prices("HAM", "BKK", SeatClass.BUSINESS, before_run_id=run)) == [6000, 7000]
+
+
+def test_prior_run_counts_count_distinct_earlier_runs(db: Storage):
+    first = db.start_run(NOW, 4)
+    for d in (17, 18, 19):     # three date pairs of one weekly scan
+        db.save_result(first, SearchResult(req(outbound_date=date(2026, 10, d)), Provider.SERPAPI, [offer(6000)]), NOW)
+    db.save_result(first, SearchResult(req(slot_id="sommer-2027"), Provider.SERPAPI, [offer(7000)]), NOW)
+    second = db.start_run(NOW, 2)
+    db.save_result(second, SearchResult(req(), Provider.SERPAPI, [offer(5000)]), NOW)
+    db.save_result(second, SearchResult(req(destination="DXB"), Provider.SERPAPI, []), NOW)   # ok, no offers
+    current = db.start_run(NOW, 1)
+    db.save_result(current, SearchResult(req(), Provider.SERPAPI, [offer(4000)]), NOW)
+
+    args = ("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS)
+    assert db.prior_run_count(*args, before_run_id=current) == 2
+    assert db.prior_run_count(*args, before_run_id=first) == 0
+    assert db.prior_route_run_count("HAM", "BKK", SeatClass.BUSINESS, before_run_id=current) == 2
+    # a search that came back empty is no observation at all
+    assert db.prior_run_count("herbst-2026", "HAM", "DXB", SeatClass.BUSINESS, before_run_id=current) == 0
 
 
 def test_best_price_for_uses_the_newest_observation_per_pair(db: Storage):

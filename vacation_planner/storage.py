@@ -271,19 +271,49 @@ class Storage:
         return OfferRow.from_row(r) if r else None
 
     def prior_cheapest_prices(self, slot_id: str, origin: str, destination: str, seat: SeatClass,
-                              before_search_id: int) -> list[float]:
+                              before_run_id: int) -> list[float]:
+        """Every earlier *run's* cheapest price for this (slot, origin, destination, seat).
+
+        Run-based, not search-based: a route is searched once per date pair per run, so
+        "every search before this one" would count the other pairs of the same scan as
+        history and make each cheaper pair look like a fresh record within one run.
+        """
         rows = self.conn.execute(
             """SELECT c.price_total FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
-               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=? AND s.id<?""",
-            (slot_id, origin, destination, seat.value, before_search_id))
+               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (slot_id, origin, destination, seat.value, before_run_id))
         return [r["price_total"] for r in rows]
 
-    def prior_route_prices(self, origin: str, destination: str, seat: SeatClass, before_search_id: int) -> list[float]:
+    def prior_route_prices(self, origin: str, destination: str, seat: SeatClass, before_run_id: int) -> list[float]:
+        """The same, across every slot: the fallback history when one slot is too young."""
         rows = self.conn.execute(
             """SELECT c.price_total FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
-               WHERE s.status='ok' AND s.origin=? AND s.destination=? AND s.seat=? AND s.id<?""",
-            (origin, destination, seat.value, before_search_id))
+               WHERE s.status='ok' AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (origin, destination, seat.value, before_run_id))
         return [r["price_total"] for r in rows]
+
+    def prior_run_count(self, slot_id: str, origin: str, destination: str, seat: SeatClass,
+                        before_run_id: int) -> int:
+        """How many earlier *runs* priced this (slot, origin, destination, seat).
+
+        This, not the number of observations, is what `min_history_points` counts: a run
+        searches several date pairs of a route at once, so one weekly scan can leave three
+        prices behind while it is still a single week of history.
+        """
+        r = self.conn.execute(
+            """SELECT COUNT(DISTINCT s.run_id) AS n FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
+               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (slot_id, origin, destination, seat.value, before_run_id)).fetchone()
+        return r["n"]
+
+    def prior_route_run_count(self, origin: str, destination: str, seat: SeatClass,
+                              before_run_id: int) -> int:
+        """The same count across every slot, for the median rule's route-level fallback."""
+        r = self.conn.execute(
+            """SELECT COUNT(DISTINCT s.run_id) AS n FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
+               WHERE s.status='ok' AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (origin, destination, seat.value, before_run_id)).fetchone()
+        return r["n"]
 
     def best_price_for(self, slot_id: str, origin: str, destination: str, seat: SeatClass) -> float | None:
         """Cheapest current price on a route: the newest observation per date pair, minimised."""
