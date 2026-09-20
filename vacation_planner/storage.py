@@ -21,6 +21,21 @@ def _dt(s: str | None) -> datetime | None:
 
 
 @dataclass
+class RunRow:
+    id: int
+    started_at: datetime
+    finished_at: datetime | None
+    planned: int
+    executed: int
+    status: str
+
+    @staticmethod
+    def from_row(r: sqlite3.Row) -> "RunRow":
+        return RunRow(id=r["id"], started_at=_dt(r["started_at"]), finished_at=_dt(r["finished_at"]),
+                      planned=r["planned"], executed=r["executed"], status=r["status"])
+
+
+@dataclass
 class SearchRow:
     id: int
     run_id: int
@@ -159,6 +174,31 @@ class Storage:
     def last_run_id(self) -> int | None:
         return self.conn.execute("SELECT MAX(id) AS id FROM runs").fetchone()["id"]
 
+    def run_info(self, run_id: int | None) -> RunRow | None:
+        if run_id is None:
+            return None
+        r = self.conn.execute(
+            "SELECT id, started_at, finished_at, planned, executed, status FROM runs WHERE id=?",
+            (run_id,)).fetchone()
+        return RunRow.from_row(r) if r else None
+
+    def search_counts(self, run_id: int | None) -> dict[str, int]:
+        """How many searches of a run ended in each status ('ok', 'error', 'skipped', ...)."""
+        if run_id is None:
+            return {}
+        rows = self.conn.execute(
+            "SELECT status, COUNT(*) AS n FROM searches WHERE run_id=? GROUP BY status", (run_id,))
+        return {r["status"]: r["n"] for r in rows}
+
+    def provider_counts(self, run_id: int | None) -> dict[Provider, int]:
+        """How many successful searches of a run went to each provider."""
+        if run_id is None:
+            return {}
+        rows = self.conn.execute(
+            "SELECT provider, COUNT(*) AS n FROM searches WHERE run_id=? AND status='ok' GROUP BY provider",
+            (run_id,))
+        return {Provider(r["provider"]): r["n"] for r in rows}
+
     # ---- searches / offers ----
     def _insert_search(self, run_id: int, req: SearchRequest, provider: Provider, status: str,
                        now: datetime, error: str | None = None, raw_path: str | None = None) -> int:
@@ -257,6 +297,25 @@ class Storage:
                      AND s2.outbound_date=s.outbound_date AND s2.return_date=s.return_date
                    ORDER BY s2.requested_at DESC, s2.id DESC LIMIT 1)""",
             (slot_id, origin, destination, seat.value)).fetchone()
+        return r["p"]
+
+    def previous_best_price(self, slot_id: str, origin: str, destination: str, seat: SeatClass,
+                            before_run_id: int | None) -> float | None:
+        """The route's cheapest price in the most recent *earlier* run that observed it.
+
+        Runs that only produced errors for this route are skipped, so "last week" means
+        the last week with data, not a blank line after a failed scan.
+        """
+        if before_run_id is None:
+            return None
+        r = self.conn.execute(
+            """SELECT MIN(c.price_total) AS p FROM searches s JOIN cheapest_per_search c ON c.search_id=s.id
+               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=?
+                 AND s.run_id = (
+                   SELECT MAX(s2.run_id) FROM searches s2 JOIN cheapest_per_search c2 ON c2.search_id=s2.id
+                   WHERE s2.status='ok' AND s2.slot_id=s.slot_id AND s2.origin=s.origin
+                     AND s2.destination=s.destination AND s2.seat=s.seat AND s2.run_id < ?)""",
+            (slot_id, origin, destination, seat.value, before_run_id)).fetchone()
         return r["p"]
 
     # ---- deals ----

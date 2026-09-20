@@ -10,7 +10,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 from .calendar import Window, free_window
 from .config import Config
 from .models import Cabin, Destination, Provider, SeatClass, Slot
-from .storage import DealRow, Observation, OfferRow, SearchRow, Storage
+from .storage import DealRow, Observation, OfferRow, RunRow, SearchRow, Storage
 
 
 @dataclass
@@ -25,6 +25,10 @@ class RouteSummary:
     ratio: float | None
     is_deal: bool
     page: str
+    #: cheapest price for this route in the most recent earlier run that observed it
+    previous: float | None = None
+    #: cheapest price ever observed on this route
+    lowest_ever: float | None = None
     #: (origin, its best observation, saving against `best` as a ratio) per alternate origin
     alternates: list[tuple[str, Observation, float | None]] = field(default_factory=list)
 
@@ -46,6 +50,9 @@ class ReportData:
     new_deals: list[NewDeal]
     slots: list[tuple[Slot, Window, list[RouteSummary]]]
     usage: list[tuple[Provider, int, int]]   # provider, searches this month, monthly budget
+    run: RunRow | None = None                # the run the report was built from
+    counts: dict[str, int] = field(default_factory=dict)        # searches of that run by status
+    providers: dict[Provider, int] = field(default_factory=dict)  # ok searches of that run by provider
 
 
 def route_page_name(slot_id: str, origin: str, destination: str, seat: SeatClass) -> str:
@@ -54,6 +61,16 @@ def route_page_name(slot_id: str, origin: str, destination: str, seat: SeatClass
 
 def money(v: float) -> str:
     return f"{v:,.0f} €"
+
+
+def change(previous: float | None, price: float) -> tuple[str, str]:
+    """Week-over-week move as (label, css class): '▼ 12 %' down, '▲ 5 %' up, '–' unknown."""
+    if not previous:
+        return "–", ""
+    pct = round(abs(price - previous) / previous * 100)
+    if pct == 0:
+        return "0 %", ""
+    return (f"▼ {pct} %", "down") if price < previous else (f"▲ {pct} %", "up")
 
 
 def _saving(reference: float, price: float) -> float | None:
@@ -97,14 +114,16 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
             alternates = [(origin, obs, _saving(best.offer.price_total, obs.offer.price_total))
                           for origin, obs in sorted(cheapest.items(), key=lambda kv: kv[1].offer.price_total)
                           if origin != best.search.origin]
-            _, med = _route_median(storage, slot.id, best.search.origin, dest, seat,
-                                   config.settings.deals.min_history_points)
+            obs, med = _route_median(storage, slot.id, best.search.origin, dest, seat,
+                                     config.settings.deals.min_history_points)
             destination = config.destinations.get(dest) or Destination(dest, dest, Cabin.ANY)  # removed from catalogue but still in history
             routes.append(RouteSummary(
                 slot=slot, destination=destination, seat=seat, best=best, median=med,
                 ratio=(best.offer.price_total / med) if med else None,
                 is_deal=any(o.offer.id in deal_offer_ids for o in cheapest.values()),
                 page=route_page_name(slot.id, best.search.origin, dest, seat),
+                previous=storage.previous_best_price(slot.id, best.search.origin, dest, seat, last_run_id),
+                lowest_ever=min((o.offer.price_total for o in obs), default=None),
                 alternates=alternates))
         routes.sort(key=lambda r: r.best.offer.price_total)
         slots.append((slot, window, routes))
@@ -112,12 +131,15 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     usage = [(e.name, storage.searches_by_provider_since(e.name, month_start), e.monthly_budget)
              for e in config.settings.providers.budgeted()]
-    return ReportData(now, new_deals, slots, usage)
+    return ReportData(now, new_deals, slots, usage, run=storage.run_info(last_run_id),
+                      counts=storage.search_counts(last_run_id),
+                      providers=storage.provider_counts(last_run_id))
 
 
 def _env() -> Environment:
     env = Environment(loader=PackageLoader("vacation_planner", "templates"), autoescape=select_autoescape(["html"]))
     env.globals["money"] = money
+    env.globals["change"] = change
     return env
 
 

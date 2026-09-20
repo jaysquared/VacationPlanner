@@ -33,7 +33,7 @@
 <p class="muted">Not searched yet.</p>
 {% else %}
 <div class="wrap"><table>
-<tr><th>Destination</th><th>From</th><th>Dates</th><th class="num">Total</th><th class="num">Per person</th><th>Other origins</th><th class="num">vs median</th><th>Level</th><th>Airlines</th><th>Searched</th><th></th></tr>
+<tr><th>Destination</th><th>From</th><th>Dates</th><th class="num">Total</th><th class="num">Per person</th><th class="num">vs last week</th><th class="num">Lowest seen</th><th>Other origins</th><th class="num">vs median</th><th>Level</th><th>Airlines</th><th>Searched</th><th></th></tr>
 {% for r in routes %}
 <tr class="{{ 'deal' if r.is_deal else '' }}">
   <td>{{ r.destination.name }} ({{ r.destination.code }}) <span class="badge">{{ r.seat.value }}</span>{% if r.is_deal %} <span class="badge deal">deal</span>{% endif %}</td>
@@ -41,6 +41,9 @@
   <td>{{ r.best.search.outbound_date }} – {{ r.best.search.return_date }}</td>
   <td class="num">{{ money(r.best.offer.price_total) }}</td>
   <td class="num">{{ money(r.best.offer.per_person) }}</td>
+  {% set label, cls = change(r.previous, r.best.offer.price_total) %}
+  <td class="num{{ ' ' + cls if cls }}">{{ label }}</td>
+  <td class="num">{% if r.lowest_ever %}{{ money(r.lowest_ever) }}{% else %}–{% endif %}</td>
   <td>{% for origin, obs, saving in r.alternates %}<a href="{{ route_page_name(slot.id, origin, r.destination.code, r.seat) }}">{{ origin }} {{ money(obs.offer.price_total) }}{% set pct = (saving * 100)|round|int if saving is not none else 0 %}{% if pct %} ({{ '−' if pct > 0 else '+' }}{{ pct|abs }} %){% endif %}</a>{% if not loop.last %} · {% endif %}{% else %}–{% endfor %}</td>
   <td class="num">{% if r.ratio %}{{ '%+.0f%%'|format((r.ratio - 1) * 100) }}{% else %}–{% endif %}</td>
   <td class="level-{{ r.best.offer.price_level or 'none' }}">{{ r.best.offer.price_level or '–' }}</td>
