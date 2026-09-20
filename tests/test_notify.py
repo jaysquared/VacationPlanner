@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime, timezone
 
 from vacation_planner.config import load_config
@@ -75,12 +76,12 @@ def test_missing_smtp_config_is_noop(config_dir):
 
 def test_mode_never_and_always(config_dir):
     st = config_dir / "settings.yaml"
-    st.write_text(st.read_text().replace("mode: deals_only", "mode: never"))
+    st.write_text(re.sub(r"mode: \w+", "mode: never", st.read_text()))
     cfg, db = with_deal(config_dir)
     FakeSMTP.instances.clear()
     assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP) == 0 and FakeSMTP.instances == []
 
-    st.write_text(st.read_text().replace("mode: never", "mode: always"))
+    st.write_text(re.sub(r"mode: \w+", "mode: always", st.read_text()))
     cfg = load_config(config_dir, env=ENV)
     assert send_pending(Storage(":memory:"), cfg, NOW, smtp_factory=FakeSMTP) == 0
     assert "No new deals" in FakeSMTP.instances[0].sent[0]["Subject"]
