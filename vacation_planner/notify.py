@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING, Callable
 from .calendar import Window
 from .config import Config
 from .explain import explain
-from .models import Cabin, Destination, Slot
+from .models import Cabin, Destination, Provider, Slot
 from .report import NewDeal, ReportData, RouteSummary, build_report, change, money
 from .storage import SearchRow, Storage
 
@@ -37,6 +37,8 @@ CITIES = {"HAM": "Hamburg", "FRA": "Frankfurt", "BER": "Berlin", "HAJ": "Hannove
 
 FOOTER_NOTE = ("Prices are totals for 2 adults + 1 child. The layover rule is checked on the "
                "outbound legs only — verify the return on Google Flights.")
+#: Shown when anything in the digest came from the fake provider (`scan --fake`).
+TEST_DATA_WARNING = "TEST DATA — fake provider"
 
 
 # ---- small formatting helpers ----
@@ -83,6 +85,18 @@ def _route_for(data: ReportData, search: SearchRow) -> RouteSummary | None:
     return None
 
 
+def _uses_fake_data(data: ReportData, deals: list[NewDeal]) -> bool:
+    """True when any price in this digest came from the fake provider, not a real search."""
+    if Provider.FAKE in data.providers:
+        return True
+    offers = [d.offer for d in deals]
+    for _slot, _window, routes in data.slots:
+        for r in routes:
+            offers.append(r.best.offer)
+            offers += [obs.offer for _origin, obs, _saving in r.alternates]
+    return any(o.provider is Provider.FAKE for o in offers)
+
+
 # ---- the digest, as plain data both renderers walk ----
 
 @dataclass
@@ -125,6 +139,7 @@ class _Digest:
     blocks: list[_Block]
     not_searched: list[str]
     report_url: str | None
+    test_data: bool = False
 
 
 def _status_line(data: ReportData, config: Config) -> str:
@@ -219,7 +234,8 @@ def _prepare(data: ReportData, deals: list[NewDeal], config: Config, report_url:
         status=_status_line(data, config),
         budget=_budget_line(data),
         deals=[_deal_card(x, data, config) for x in deals],
-        blocks=blocks, not_searched=not_searched, report_url=report_url)
+        blocks=blocks, not_searched=not_searched, report_url=report_url,
+        test_data=_uses_fake_data(data, deals))
 
 
 # ---- HTML ----
@@ -235,6 +251,7 @@ CARD = ("border:1px solid #e3e3e3;border-left:3px solid #0a7d32;border-radius:4p
 TH = "text-align:left;padding:4px 6px;border-bottom:1px solid #e3e3e3;color:#666666;font-weight:600;"
 TD = "padding:4px 6px;border-bottom:1px solid #f0f0f0;vertical-align:top;"
 NUM = "text-align:right;white-space:nowrap;"
+WARNING = "margin:0 0 2px;color:#b42318;font-weight:700;font-size:13px;"
 COLOURS = {"down": "color:#0a7d32;", "up": "color:#b42318;", "": ""}
 
 
@@ -277,6 +294,8 @@ def _html(d: _Digest) -> str:
              f'<h1 style="{H1}">Vacation Planner</h1>',
              f'<p style="{MUTED}">{_e(d.date)}</p>',
              f'<p style="{MUTED}">{_e(d.status)}</p>']
+    if d.test_data:
+        parts.append(f'<p style="{WARNING}">{_e(TEST_DATA_WARNING)}</p>')
     if d.budget:
         parts.append(f'<p style="{MUTED}">{_e(d.budget)}</p>')
 
@@ -338,6 +357,8 @@ def _heading(text: str) -> list[str]:
 
 def _text(d: _Digest) -> str:
     lines = ["Vacation Planner", d.date, d.status]
+    if d.test_data:
+        lines.append(f"*** {TEST_DATA_WARNING} ***")
     if d.budget:
         lines.append(d.budget)
 
@@ -409,6 +430,7 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
     msg["Subject"], msg["From"], msg["To"] = subject, sec.mail_from, ", ".join(sec.mail_to)
     msg.set_content(text)
     msg.add_alternative(html, subtype="html")
+    log.info("sending %r to %s via %s:%s", subject, ", ".join(sec.mail_to), sec.smtp_host, sec.smtp_port)
     implicit_tls = sec.smtp_port == 465   # 465 is TLS from the first byte; 587 upgrades with STARTTLS
     factory = smtp_ssl_factory if implicit_tls else smtp_factory
     try:

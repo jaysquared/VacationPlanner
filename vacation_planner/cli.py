@@ -197,5 +197,9 @@ def run(ctx: typer.Context, limit: Optional[int] = typer.Option(None, "--limit")
         out = c.config.root / out
     written = render(storage, c.config, out, c.now, last_run_id=summary.run_id)
     typer.echo(f"wrote {len(written)} files to {out}")
+    if fake:
+        # --fake invents prices. Mailing them to a real inbox would look like real deals.
+        typer.echo("notified 0 deals (fake run, email suppressed)")
+        return
     n = _notify.send_pending(storage, c.config, c.now, report_url, summary)
     typer.echo(f"notified {n} deals")

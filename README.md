@@ -61,6 +61,13 @@ Deals are marked as notified only after the mail is out, so a failed send keeps
 them pending for the next run; a send failure never fails the run. SMTP comes
 from the environment (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`,
 `MAIL_FROM`, `MAIL_TO`); port 465 is implicit TLS, anything else uses STARTTLS.
+Every send logs the subject and the recipients at INFO, so the job log shows
+exactly what left the machine.
+
+**Synthetic prices never reach the inbox.** `run --fake` invents prices, so it
+skips the mail entirely and prints `notified 0 deals (fake run, email
+suppressed)`. If fake data does end up in the database anyway, every digest
+built from it carries a red `TEST DATA — fake provider` line under the header.
 
 ## GitHub Actions
 

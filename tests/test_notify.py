@@ -1,3 +1,4 @@
+import logging
 import re
 from datetime import date, datetime, timezone
 
@@ -32,8 +33,9 @@ class FailingSMTP(FakeSMTP):
     def send_message(self, msg): raise OSError("smtp down")
 
 
-def offer(price, level=None, airlines=("SWISS", "Bangkok Airways"), stops=2, url="https://g/1"):
-    return Offer(Provider.SERPAPI, price, "EUR", price / 3, list(airlines), stops, 900,
+def offer(price, level=None, airlines=("SWISS", "Bangkok Airways"), stops=2, url="https://g/1",
+          provider=Provider.SERPAPI):
+    return Offer(provider, price, "EUR", price / 3, list(airlines), stops, 900,
                  "2026-12-19 10:35", "2026-12-20 06:10", level, None, None, url, {})
 
 
@@ -101,6 +103,7 @@ def test_digest_html_has_every_section(config_dir):
     assert "Prices are totals for 2 adults + 1 child." in html
     assert "layover rule is checked on the outbound legs only" in html
     assert "<script" not in html and "<img" not in html
+    assert "TEST DATA" not in html   # real provider data carries no warning
 
 
 def test_digest_text_has_the_same_content_without_tags(config_dir):
@@ -253,3 +256,23 @@ def test_port_587_still_starts_tls(config_dir):
     FakeSMTP.instances.clear()
     assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP, smtp_ssl_factory=FakeSMTPSSL) == 1
     assert FakeSMTPSSL.instances == [] and FakeSMTP.instances[0].tls is True
+
+
+def test_send_pending_logs_the_recipients_and_the_subject(config_dir, caplog):
+    """Every real send leaves a line in the job log naming who got what."""
+    cfg, db, _run = seeded(config_dir)
+    FakeSMTP.instances.clear()
+    with caplog.at_level(logging.INFO, logger="vacation_planner.notify"):
+        assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP) == 1
+    assert "me@test" in caplog.text and "1 new deal" in caplog.text
+
+
+def test_fake_provider_data_is_flagged_as_test_data(config_dir):
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(), Provider.FAKE, [offer(9000, provider=Provider.FAKE)]), NOW)
+    db.finish_run(run, 1, "ok", NOW)
+    _subject, text, html = digest(cfg, db)
+    assert "TEST DATA — fake provider" in html and "TEST DATA — fake provider" in text
+    assert "color:#b42318" in html          # red, so it cannot be mistaken for a real price

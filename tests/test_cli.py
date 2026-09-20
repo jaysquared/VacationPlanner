@@ -7,6 +7,7 @@ from typer.testing import CliRunner
 from vacation_planner.cli import app, build_clients
 from vacation_planner.config import load_config
 from vacation_planner.models import Provider
+from vacation_planner.providers.fake import FakeFlightClient
 from vacation_planner.storage import Storage
 
 runner = CliRunner()
@@ -94,6 +95,13 @@ def test_http_client_loggers_are_quiet(config_dir, tmp_path):
     assert logging.getLogger("httpcore").level == logging.WARNING
 
 
+def fake_clients(config, fake):
+    """A real run (no --fake) whose one provider is the offline fake client."""
+    client = FakeFlightClient()
+    client.provider = Provider.SERPAPI
+    return {Provider.SERPAPI: client}
+
+
 def test_run_hands_the_execution_summary_and_report_url_to_notify(config_dir, tmp_path, monkeypatch):
     out = tmp_path / "site"
     st = config_dir / "settings.yaml"
@@ -105,8 +113,28 @@ def test_run_hands_the_execution_summary_and_report_url_to_notify(config_dir, tm
         return 0
 
     monkeypatch.setattr("vacation_planner.notify.send_pending", fake_send)
+    # a real (non---fake) run, so notify is reached; only the provider client is faked
+    monkeypatch.setattr("vacation_planner.cli.build_clients", fake_clients)
     r = runner.invoke(app, common(config_dir, tmp_path)
-                      + ["run", "--fake", "--limit", "3", "--report-url", "https://x/r"])
+                      + ["run", "--limit", "3", "--report-url", "https://x/r"])
     assert r.exit_code == 0, r.output
     assert seen["report_url"] == "https://x/r"
     assert seen["summary"] is not None and seen["summary"].ok == 3 and seen["summary"].run_id == 1
+
+
+def test_a_fake_run_never_sends_email(config_dir, tmp_path, monkeypatch):
+    """--fake writes synthetic prices; mailing them to a real inbox is never wanted."""
+    out = tmp_path / "site"
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("output_dir: docs/site", f"output_dir: {out}"))
+    for key, value in {"SMTP_HOST": "smtp.test", "SMTP_PORT": "2525",
+                       "MAIL_FROM": "planner@test", "MAIL_TO": "me@test"}.items():
+        monkeypatch.setenv(key, value)
+
+    def boom(*a, **kw):
+        raise AssertionError("a --fake run must not reach send_pending")
+
+    monkeypatch.setattr("vacation_planner.notify.send_pending", boom)
+    r = runner.invoke(app, common(config_dir, tmp_path) + ["run", "--fake", "--limit", "3"])
+    assert r.exit_code == 0, r.output
+    assert "notified 0 deals (fake run, email suppressed)" in r.output

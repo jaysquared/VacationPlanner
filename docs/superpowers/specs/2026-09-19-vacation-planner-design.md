@@ -452,8 +452,14 @@ from a `ReportData` and the notifiable deals. The subject is
 
 `send_pending` obeys `email.mode` (3.4), takes the just-finished run's
 `ExecutionSummary` when `run` calls it and falls back to storage otherwise.
-Failures are logged and never fail the run. Deals are marked `notified_at`
-only after a successful send.
+It logs the subject and the recipients at INFO before connecting, so every real
+send is visible in the job log. Failures are logged and never fail the run.
+Deals are marked `notified_at` only after a successful send.
+
+Synthetic data never gets mailed as if it were real: `run --fake` skips
+`send_pending` altogether ("notified 0 deals (fake run, email suppressed)"), and
+a digest that contains any offer or search from `Provider.FAKE` prints
+"TEST DATA — fake provider" in red under the header.
 
 ### 5.9 `cli`
 
@@ -463,7 +469,8 @@ Entry point `vacation-planner` (typer):
 - `scan` — plan, execute, store, detect deals. `--limit N` caps searches.
 - `report` — render HTML from storage.
 - `notify` — send the weekly digest email.
-- `run` — scan, report, notify in sequence (what CI calls).
+- `run` — scan, report, notify in sequence (what CI calls). With `--fake`
+  the notify step is skipped so invented prices are never emailed.
 - `holidays` — list slots with their free windows and target counts.
 
 ## 6. Runtime
