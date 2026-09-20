@@ -14,8 +14,53 @@ Weekly flight deal scanner for Hamburg school holidays. See
     uv run vacation-planner plan       # what the next run would search (no API calls)
     uv run vacation-planner scan       # execute searches, store results
     uv run vacation-planner report     # render docs/site
-    uv run vacation-planner notify     # email pending deals
+    uv run vacation-planner notify     # send the weekly digest email
     uv run vacation-planner run        # scan + report + notify (what CI runs)
+
+## The weekly digest email
+
+Every run sends one mail — plain text and HTML, English, prices as `6,900 €` —
+with the same five sections in both bodies:
+
+1. **Header** — the date, the run in one line (`111 searches · 108 ok · 3 failed
+   · providers: serpapi 62, searchapi 25, fast_flights 21`) and how much of each
+   API budget this calendar month has used.
+2. **New deals** — one card per deal that has not been mailed yet:
+   `Phuket (HKT) from Hamburg · 19–29 Dec · Business`, the price line
+   (`6,900 € total · 2,300 € per person · SWISS + Bangkok Airways · 2 stops`),
+   why it counts as a deal in plain words (`21 % below the usual price for this
+   route (median 8,900 €); lowest price seen so far for this trip`) and a Google
+   Flights link. `No new deals this week.` when nothing is new.
+3. **One table per searched holiday** — every destination with data, cheapest
+   first: total, per person, **vs last week** (`▼ 12 %` against the cheapest
+   price of the last run that saw the route), **lowest seen** (the cheapest
+   price ever recorded for it), Google's price level, the flight, and a Book
+   link. Frankfurt sits under the Hamburg origin as `FRA 9,000 € (−25 %)`.
+4. **Not searched this run** — holidays with targets that produced no data, and
+   holidays without targets (`Herbstferien 2026 — no targets configured`).
+5. **Footer** — the link to the full report and the reminder that prices are
+   totals for the whole family and that the layover rule only checks the
+   outbound legs.
+
+The subject says it all at a glance:
+`Vacation Planner · 2 new deals · cheapest Weihnachten: Phuket 11,785 €`, or
+`Vacation Planner · weekly update` when nothing is new.
+
+### Email modes
+
+```yaml
+email:
+  mode: digest                    # digest | deals_only | never
+```
+
+- `digest` (default) — one mail per run, even a run that found nothing.
+- `deals_only` — the same digest, but only when there are new deals to report.
+- `never` — no mail at all. (`always` is still accepted and means `digest`.)
+
+Deals are marked as notified only after the mail is out, so a failed send keeps
+them pending for the next run; a send failure never fails the run. SMTP comes
+from the environment (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`,
+`MAIL_FROM`, `MAIL_TO`); port 465 is implicit TLS, anything else uses STARTTLS.
 
 ## GitHub Actions
 
