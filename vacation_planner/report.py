@@ -9,6 +9,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 from .calendar import Window, free_window
 from .config import Config
+from .deals import median_for
 from .models import Cabin, Destination, Provider, SeatClass, Slot
 from .storage import DealRow, Observation, OfferRow, RunRow, SearchRow, Storage
 
@@ -38,6 +39,8 @@ class NewDeal:
     deal: DealRow
     search: SearchRow
     offer: OfferRow
+    #: the reference price BELOW_MEDIAN was judged against, for *this* origin
+    median: float | None = None
 
     @property
     def reasons(self):
@@ -51,8 +54,29 @@ class ReportData:
     slots: list[tuple[Slot, Window, list[RouteSummary]]]
     usage: list[tuple[Provider, int, int]]   # provider, searches this month, monthly budget
     run: RunRow | None = None                # the run the report was built from
+    #: slot id -> destinations with at least one ok search in that run
+    searched: dict[str, set[str]] = field(default_factory=dict)
     counts: dict[str, int] = field(default_factory=dict)        # searches of that run by status
     providers: dict[Provider, int] = field(default_factory=dict)  # ok searches of that run by provider
+
+
+def deal_median(storage: Storage, config: Config, search: SearchRow) -> float | None:
+    """The median `deals.evaluate` weighed this search against: earlier searches only.
+
+    Per (slot, origin, destination, seat) — an alternate origin has its own price level,
+    so quoting the home origin's median would name a number that decided nothing.
+    """
+    return median_for(
+        storage.prior_cheapest_prices(search.slot_id, search.origin, search.destination,
+                                      search.seat, search.id),
+        storage.prior_route_prices(search.origin, search.destination, search.seat, search.id),
+        config.settings.deals)
+
+
+def new_deal(storage: Storage, config: Config, row: DealRow) -> NewDeal:
+    search = storage.search_by_id(row.search_id)
+    return NewDeal(row, search, storage.offer_by_id(row.offer_id),
+                   median=deal_median(storage, config, search))
 
 
 def route_page_name(slot_id: str, origin: str, destination: str, seat: SeatClass) -> str:
@@ -91,7 +115,7 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
     if last_run_id is not None:
         for d in storage.deals_in_run(last_run_id):
             deal_offer_ids.add(d.offer_id)
-            new_deals.append(NewDeal(d, storage.search_by_id(d.search_id), storage.offer_by_id(d.offer_id)))
+            new_deals.append(new_deal(storage, config, d))
         new_deals.sort(key=lambda n: -n.deal.score)
 
     bd = config.settings.bridge_days
@@ -131,7 +155,11 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     usage = [(e.name, storage.searches_by_provider_since(e.name, month_start), e.monthly_budget)
              for e in config.settings.providers.budgeted()]
+    searched: dict[str, set[str]] = {}
+    for s in (storage.searches_in_run(last_run_id, "ok") if last_run_id is not None else []):
+        searched.setdefault(s.slot_id, set()).add(s.destination)
     return ReportData(now, new_deals, slots, usage, run=storage.run_info(last_run_id),
+                      searched=searched,
                       counts=storage.search_counts(last_run_id),
                       providers=storage.provider_counts(last_run_id))
 

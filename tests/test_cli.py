@@ -7,6 +7,7 @@ from typer.testing import CliRunner
 from vacation_planner.cli import app, build_clients
 from vacation_planner.config import load_config
 from vacation_planner.models import Provider
+from vacation_planner.notify import SendResult
 from vacation_planner.providers.fake import FakeFlightClient
 from vacation_planner.storage import Storage
 
@@ -110,7 +111,7 @@ def test_run_hands_the_execution_summary_and_report_url_to_notify(config_dir, tm
 
     def fake_send(storage, config, now, report_url=None, summary=None, **kw):
         seen.update(report_url=report_url, summary=summary)
-        return 0
+        return SendResult(sent=True, deals=0)
 
     monkeypatch.setattr("vacation_planner.notify.send_pending", fake_send)
     # a real (non---fake) run, so notify is reached; only the provider client is faked
@@ -120,6 +121,8 @@ def test_run_hands_the_execution_summary_and_report_url_to_notify(config_dir, tm
     assert r.exit_code == 0, r.output
     assert seen["report_url"] == "https://x/r"
     assert seen["summary"] is not None and seen["summary"].ok == 3 and seen["summary"].run_id == 1
+    # a digest went out with nothing new in it -- say so instead of "notified 0 deals"
+    assert "sent digest (0 new deals)" in r.output
 
 
 def test_a_fake_run_never_sends_email(config_dir, tmp_path, monkeypatch):
@@ -135,6 +138,8 @@ def test_a_fake_run_never_sends_email(config_dir, tmp_path, monkeypatch):
         raise AssertionError("a --fake run must not reach send_pending")
 
     monkeypatch.setattr("vacation_planner.notify.send_pending", boom)
+    monkeypatch.setattr("smtplib.SMTP", boom)          # and nothing may reach a socket either
+    monkeypatch.setattr("smtplib.SMTP_SSL", boom)
     r = runner.invoke(app, common(config_dir, tmp_path) + ["run", "--fake", "--limit", "3"])
     assert r.exit_code == 0, r.output
     assert "notified 0 deals (fake run, email suppressed)" in r.output

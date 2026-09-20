@@ -68,7 +68,7 @@ def test_new_low():
 
 def test_cheaper_than_home_uses_the_home_price_on_the_row():
     assert explain([DealReason.CHEAPER_THAN_HOME], offer(5250), route(best_price=7000), HKT) \
-        == "cheaper than the best Hamburg fare by 25 %"
+        == "cheaper than the best Hamburg fare (7,000 €) by 25 %"
 
 
 def test_cheaper_than_home_without_a_home_price():

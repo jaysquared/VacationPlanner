@@ -7,7 +7,7 @@ from vacation_planner.deals import detect_for_run
 from vacation_planner.models import Offer, Provider, SearchRequest, SearchResult, SeatClass
 from vacation_planner.notify import compose, compose_digest, send_pending
 from vacation_planner.providers.executor import ExecutionSummary
-from vacation_planner.report import NewDeal, build_report
+from vacation_planner.report import build_report, new_deal
 from vacation_planner.storage import Storage
 
 NOW = datetime(2026, 9, 21, tzinfo=timezone.utc)
@@ -63,8 +63,7 @@ def seeded(config_dir, env=ENV, fra_level=None):
 
 def digest(cfg, db, report_url="https://x/report"):
     data = build_report(db, cfg, NOW, db.last_run_id())
-    deals = [NewDeal(d, db.search_by_id(d.search_id), db.offer_by_id(d.offer_id))
-             for d in db.pending_deals()]
+    deals = [new_deal(db, cfg, d) for d in db.pending_deals()]
     return compose_digest(data, deals, cfg, report_url)
 
 
@@ -126,8 +125,8 @@ def test_a_frankfurt_deal_is_explained_against_the_hamburg_fare(config_dir):
     subject, text, html = digest(cfg, db)
     assert subject.startswith("Vacation Planner · 2 new deals · ")
     assert "Phuket (HKT) from Frankfurt · 19–29 Dec · Business" in html
-    assert "cheaper than the best Hamburg fare by 22 %" in html   # 9,000 → 7,000
-    assert "cheaper than the best Hamburg fare by 22 %" in text
+    assert "cheaper than the best Hamburg fare (9,000 €) by 22 %" in html   # 9,000 → 7,000
+    assert "cheaper than the best Hamburg fare (9,000 €) by 22 %" in text
 
 
 def test_digest_without_data_still_renders(config_dir):
@@ -149,8 +148,8 @@ def test_compose_is_an_alias_of_compose_digest():
 def test_send_pending_sends_the_digest_and_marks_the_deals(config_dir):
     cfg, db, _run = seeded(config_dir)
     FakeSMTP.instances.clear()
-    n = send_pending(db, cfg, NOW, "https://x/report", smtp_factory=FakeSMTP)
-    assert n == 1 and db.pending_deals() == []
+    result = send_pending(db, cfg, NOW, "https://x/report", smtp_factory=FakeSMTP)
+    assert (result.sent, result.deals) == (True, 1) and db.pending_deals() == []
     smtp = FakeSMTP.instances[0]
     assert (smtp.host, smtp.port, smtp.tls, smtp.logged_in) == ("smtp.test", 2525, True, ("u", "p"))
     msg = smtp.sent[0]
@@ -171,14 +170,15 @@ def test_send_pending_uses_the_execution_summary_when_given(config_dir):
 
 def test_send_failure_keeps_deals_pending(config_dir):
     cfg, db, _run = seeded(config_dir)
-    assert send_pending(db, cfg, NOW, smtp_factory=FailingSMTP) == 0
+    result = send_pending(db, cfg, NOW, smtp_factory=FailingSMTP)
+    assert (result.sent, result.deals) == (False, 0)
     assert len(db.pending_deals()) == 1
 
 
 def test_missing_smtp_config_is_noop(config_dir):
     cfg, db, _run = seeded(config_dir, env={})
     FakeSMTP.instances.clear()
-    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP) == 0
+    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP).sent is False
     assert FakeSMTP.instances == [] and len(db.pending_deals()) == 1
 
 
@@ -191,7 +191,8 @@ def test_mode_digest_mails_even_without_deals(config_dir):
     set_mode(config_dir, "digest")
     cfg = load_config(config_dir, env=ENV)
     FakeSMTP.instances.clear()
-    assert send_pending(Storage(":memory:"), cfg, NOW, smtp_factory=FakeSMTP) == 0
+    result = send_pending(Storage(":memory:"), cfg, NOW, smtp_factory=FakeSMTP)
+    assert (result.sent, result.deals) == (True, 0)
     assert FakeSMTP.instances[0].sent[0]["Subject"] == "Vacation Planner · weekly update"
 
 
@@ -207,7 +208,7 @@ def test_mode_deals_only_stays_quiet_without_deals(config_dir):
     set_mode(config_dir, "deals_only")
     cfg = load_config(config_dir, env=ENV)
     FakeSMTP.instances.clear()
-    assert send_pending(Storage(":memory:"), cfg, NOW, smtp_factory=FakeSMTP) == 0
+    assert send_pending(Storage(":memory:"), cfg, NOW, smtp_factory=FakeSMTP).sent is False
     assert FakeSMTP.instances == []
 
 
@@ -215,7 +216,7 @@ def test_mode_deals_only_sends_the_digest_when_there_are_deals(config_dir):
     set_mode(config_dir, "deals_only")
     cfg, db, _run = seeded(config_dir)
     FakeSMTP.instances.clear()
-    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP) == 1
+    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP).deals == 1
     assert "Weihnachtsferien" in FakeSMTP.instances[0].sent[0].get_body("html").get_content()
 
 
@@ -223,7 +224,7 @@ def test_mode_never_sends_nothing(config_dir):
     set_mode(config_dir, "never")
     cfg, db, _run = seeded(config_dir)
     FakeSMTP.instances.clear()
-    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP) == 0
+    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP).sent is False
     assert FakeSMTP.instances == [] and len(db.pending_deals()) == 1
 
 
@@ -242,8 +243,8 @@ def test_port_465_uses_implicit_tls(config_dir):
     cfg, db, _run = seeded(config_dir, env=dict(ENV, SMTP_PORT="465"))
     FakeSMTP.instances.clear()
     FakeSMTPSSL.instances.clear()
-    n = send_pending(db, cfg, NOW, smtp_factory=FakeSMTP, smtp_ssl_factory=FakeSMTPSSL)
-    assert n == 1 and db.pending_deals() == []
+    result = send_pending(db, cfg, NOW, smtp_factory=FakeSMTP, smtp_ssl_factory=FakeSMTPSSL)
+    assert result.deals == 1 and db.pending_deals() == []
     assert FakeSMTP.instances == [FakeSMTPSSL.instances[0]]   # only the SSL factory was used
     smtp = FakeSMTPSSL.instances[0]
     assert (smtp.host, smtp.port, smtp.tls, smtp.logged_in) == ("smtp.test", 465, False, ("u", "p"))
@@ -254,7 +255,7 @@ def test_port_587_still_starts_tls(config_dir):
     cfg, db, _run = seeded(config_dir)
     FakeSMTPSSL.instances.clear()
     FakeSMTP.instances.clear()
-    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP, smtp_ssl_factory=FakeSMTPSSL) == 1
+    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP, smtp_ssl_factory=FakeSMTPSSL).deals == 1
     assert FakeSMTPSSL.instances == [] and FakeSMTP.instances[0].tls is True
 
 
@@ -263,7 +264,7 @@ def test_send_pending_logs_the_recipients_and_the_subject(config_dir, caplog):
     cfg, db, _run = seeded(config_dir)
     FakeSMTP.instances.clear()
     with caplog.at_level(logging.INFO, logger="vacation_planner.notify"):
-        assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP) == 1
+        assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP).deals == 1
     assert "me@test" in caplog.text and "1 new deal" in caplog.text
 
 
@@ -276,3 +277,97 @@ def test_fake_provider_data_is_flagged_as_test_data(config_dir):
     _subject, text, html = digest(cfg, db)
     assert "TEST DATA — fake provider" in html and "TEST DATA — fake provider" in text
     assert "color:#b42318" in html          # red, so it cannot be mistaken for a real price
+
+
+def test_the_cheapest_per_person_deal_wins_a_tie_however_it_was_inserted(config_dir):
+    """Ordering is the digest's job, not the caller's: same score, cheaper per person first."""
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    old = db.start_run(NOW, 2)
+    db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
+    db.save_result(old, SearchResult(req(dest="CUN"), Provider.SERPAPI, [offer(9000)]), NOW)
+    run = db.start_run(NOW, 2)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(9000, "low")]), NOW)
+    # inserted last, so it is last in pending_deals(), but it is the cheaper trip per person
+    db.save_result(run, SearchResult(req(dest="CUN"), Provider.SERPAPI, [offer(7800, "low")]), NOW)
+    db.finish_run(run, 2, "ok", NOW)
+    detect_for_run(db, run, cfg, NOW)
+
+    pending = db.pending_deals()
+    assert [d.score for d in pending] == [2.0, 2.0]          # a genuine tie on score
+    _subject, text, html = digest(cfg, db)
+    assert html.index("Cancún") < html.index("Phuket")
+    assert text.index("Cancún") < text.index("Phuket")
+
+
+def test_a_frankfurt_deal_quotes_the_frankfurt_median(config_dir):
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    old = db.start_run(NOW, 7)
+    for price in (12000, 11500, 12500):
+        db.save_result(old, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(price)]), NOW)
+    for _ in range(3):
+        db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(20000)]), NOW)
+    run = db.start_run(NOW, 2)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(20000)]), NOW)
+    db.save_result(run, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(9000)]), NOW)
+    db.finish_run(run, 2, "ok", NOW)
+    detect_for_run(db, run, cfg, NOW)
+
+    _subject, text, html = digest(cfg, db)
+    # the Frankfurt history is 12,000 / 11,500 / 12,500 -- not the 20,000 € Hamburg row
+    assert "25 % below the usual price for this route (median 12,000 €)" in html
+    assert "median 20,000 €" not in html
+    assert "cheaper than the best Hamburg fare (20,000 €) by 55 %" in text
+
+
+def test_two_deals_on_one_route_share_a_card(config_dir):
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    old = db.start_run(NOW, 1)
+    db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
+    run = db.start_run(NOW, 2)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(9000, "low")]), NOW)
+    db.save_result(run, SearchResult(req(out=date(2026, 12, 20), ret=date(2027, 1, 1)),
+                                     Provider.SERPAPI, [offer(7493, "low")]), NOW)
+    db.finish_run(run, 2, "ok", NOW)
+    detect_for_run(db, run, cfg, NOW)
+    assert len(db.pending_deals()) == 2
+
+    subject, text, html = digest(cfg, db)
+    assert "2 new deals" in subject
+    assert html.count("Book on Google Flights") == 1          # one card, not two
+    assert "Phuket (HKT) from Hamburg · 20 Dec – 1 Jan · Business" in html   # the cheaper one
+    assert "also 19–29 Dec 9,000 €" in html and "also 19–29 Dec 9,000 €" in text
+
+
+def test_lowest_seen_is_blank_when_it_is_this_weeks_price(config_dir):
+    cfg, db, _run = seeded(config_dir)          # HKT: 12,000 then 9,000, so 9,000 is both
+    _subject, text, html = digest(cfg, db)
+    assert "Lowest seen" in html and "Lowest seen" in text
+    assert html.count("9,000 €") == 2           # the deal card's total and the table's total
+    assert "13,000 €" in html                   # MLE, likewise its own lowest
+
+
+def test_lowest_seen_shows_the_old_price_after_a_rise(config_dir):
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    old = db.start_run(NOW, 1)
+    db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7350)]), NOW)
+    db.finish_run(run, 1, "ok", NOW)
+    _subject, text, html = digest(cfg, db)
+    assert "▲ 5 %" in html and "7,000 €" in html
+
+
+def test_not_searched_names_missing_targets_and_collapses_the_far_future(config_dir):
+    cfg, db, _run = seeded(config_dir)
+    _subject, text, html = digest(cfg, db)
+    # HKT and MLE were searched, CMB only errored, the rest of the 17 targets not at all
+    assert "Weihnachtsferien 2026/27 — searched but no result: BKK, CMB, CUN, PUJ, BGI, SIN, MRU, CPT and 7 more" in html
+    assert "Himmelfahrt/Pfingsten 2027 — not searched in this run" in html
+    assert "Herbstferien 2026 — no targets configured" in html
+    assert "15 later holidays have no targets configured (Herbstferien 2027 – Sommerferien 2030)" in html
+    assert "Weihnachtsferien 2029/30" not in html        # collapsed away
+    assert "15 later holidays have no targets configured (Herbstferien 2027 – Sommerferien 2030)" in text

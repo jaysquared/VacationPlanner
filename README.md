@@ -25,19 +25,25 @@ with the same five sections in both bodies:
 1. **Header** — the date, the run in one line (`111 searches · 108 ok · 3 failed
    · providers: serpapi 62, searchapi 25, fast_flights 21`) and how much of each
    API budget this calendar month has used.
-2. **New deals** — one card per deal that has not been mailed yet:
+2. **New deals** — one card per route that has not been mailed yet, the
+   strongest first (ties go to the cheaper trip per person):
    `Phuket (HKT) from Hamburg · 19–29 Dec · Business`, the price line
    (`6,900 € total · 2,300 € per person · SWISS + Bangkok Airways · 2 stops`),
    why it counts as a deal in plain words (`21 % below the usual price for this
    route (median 8,900 €); lowest price seen so far for this trip`) and a Google
-   Flights link. `No new deals this week.` when nothing is new.
+   Flights link. Other dates on the same route hang under the card as
+   `also 19–31 Dec 7,493 €`. `No new deals this week.` when nothing is new.
 3. **One table per searched holiday** — every destination with data, cheapest
-   first: total, per person, **vs last week** (`▼ 12 %` against the cheapest
-   price of the last run that saw the route), **lowest seen** (the cheapest
-   price ever recorded for it), Google's price level, the flight, and a Book
-   link. Frankfurt sits under the Hamburg origin as `FRA 9,000 € (−25 %)`.
-4. **Not searched this run** — holidays with targets that produced no data, and
-   holidays without targets (`Herbstferien 2026 — no targets configured`).
+   first, in six columns that fit a phone: destination (with `level · airlines ·
+   stops` underneath), origin (with `FRA 9,000 € (−25 %)` underneath), dates,
+   price (with the per-person price underneath), **vs last week** (`▼ 12 %`
+   against the cheapest price of the last run that saw the route) and **lowest
+   seen** (the cheapest price ever recorded for it — blank when that is this
+   week's price), plus a Book link.
+4. **Not searched this run** — per holiday: `no targets configured`, `not
+   searched in this run`, or `searched but no result: LGK, KUL` for the targets
+   that came back empty. Holidays further out than `deals.lookahead_days`
+   collapse into one line (`15 later holidays have no targets configured …`).
 5. **Footer** — the link to the full report and the reminder that prices are
    totals for the whole family and that the layover rule only checks the
    outbound legs.

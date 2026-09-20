@@ -427,23 +427,34 @@ column, max 640 px, inline CSS, no images or scripts) with the same sections:
    ("111 searches · 108 ok · 3 failed · providers: serpapi 62, searchapi 25,
    fast_flights 21") and "API budget used this month: serpapi 124 / 250 ·
    searchapi 25 / 100".
-2. **New deals** — one card per notifiable deal: "Phuket (HKT) from Hamburg ·
-   19–29 Dec · Business", the price line ("6,900 € total · 2,300 € per person ·
-   SWISS + Bangkok Airways · 2 stops"), why it is a deal in plain words, and a
-   Google Flights link. "No new deals this week." when there are none.
+2. **New deals** — one card per route (slot, origin, destination, seat),
+   best score first and, among equals, the cheaper per person: "Phuket (HKT)
+   from Hamburg · 19–29 Dec · Business", the price line ("6,900 € total ·
+   2,300 € per person · SWISS + Bangkok Airways · 2 stops"), why it is a deal
+   in plain words, "also 19–31 Dec 7,493 €" for the other date pairs of the
+   same route, and a Google Flights link. "No new deals this week." when there
+   are none. The ordering lives in the digest, not in its callers.
 3. **One table per searched slot** — heading "Weihnachtsferien 2026/27 · free
-   19 Dec – 3 Jan", rows sorted by total: destination, origin (with the
-   alternate origins under it, "FRA 9,000 € (−25 %)"), dates, total, per
-   person, vs last week, lowest seen, price level, flight, Book link.
-4. **Not searched this run** — slots with targets but no data, and slots
-   without targets ("Herbstferien 2026 — no targets configured").
+   19 Dec – 3 Jan", rows sorted by total. Six columns fit 640 px: destination
+   (with "level · airlines · stops" beneath it), origin (with the alternate
+   origins beneath it, "FRA 9,000 € (−25 %)"), dates, price (total, with the
+   per-person price beneath it), vs last week, lowest seen — then the Book
+   link. "Lowest seen" is blank when this week *is* the lowest.
+4. **Not searched this run** — per slot, either "no targets configured", or
+   "not searched in this run" (nothing of it ran), or "searched but no result:
+   LGK, KUL" (the targets with no successful search this run). Only slots
+   starting within `deals.lookahead_days` get their own line; the rest collapse
+   into "15 later holidays have no targets configured (first – last)".
 5. **Footer** — the link to the Pages report and the reminder that prices are
    totals for the whole family and that the layover rule only covers the
    outbound legs.
 
 The reasons of 5.6 are turned into sentences by `explain.py`
 ("21 % below the usual price for this route (median 8,900 €)", "lowest price
-seen so far for this trip", "cheaper than the best Hamburg fare by 25 %", ...).
+seen so far for this trip", "cheaper than the best Hamburg fare (22,443 €) by
+25 %", ...). The median quoted is the one that judged *this* offer
+(`report.deal_median`: prior searches for the same slot, origin, destination and
+seat), so a Frankfurt deal is not explained with Hamburg's price level.
 
 `compose_digest(data, deals, config, report_url)` builds (subject, text, html)
 from a `ReportData` and the notifiable deals. The subject is
@@ -451,7 +462,9 @@ from a `ReportData` and the notifiable deals. The subject is
 "Vacation Planner · weekly update" when nothing is new.
 
 `send_pending` obeys `email.mode` (3.4), takes the just-finished run's
-`ExecutionSummary` when `run` calls it and falls back to storage otherwise.
+`ExecutionSummary` when `run` calls it and falls back to storage otherwise. It
+returns a `SendResult(sent, deals)`, so the CLI can say "sent digest (0 new
+deals)" rather than pretending nothing happened.
 It logs the subject and the recipients at INFO before connecting, so every real
 send is visible in the job log. Failures are logged and never fail the run.
 Deals are marked `notified_at` only after a successful send.
@@ -538,10 +551,13 @@ pytest, no live API in tests.
 - `report`: renders index and route page from a seeded DB without error and
   contains expected strings.
 - `notify`: digest composition (every section, both bodies, the subject
-  line and each `email.mode`); SMTP stubbed.
+  line, deal ordering and grouping, and each `email.mode`); SMTP stubbed.
 - `explain`: one test per deal reason, plus the missing-median fallback.
-- End-to-end: `run` with a fake client over a seeded config produces a DB,
-  HTML and one notification.
+- End-to-end: `run` over a seeded config produces a DB and HTML; with an
+  injected fake *client* it also notifies, while `run --fake` sends nothing at
+  all (no `send_pending`, no SMTP socket). A test-wide fixture strips SMTP and
+  API-key variables from the environment and makes `smtplib` refuse to connect,
+  so no test can reach a real inbox.
 
 ## 9. Project layout
 

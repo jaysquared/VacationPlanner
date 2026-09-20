@@ -126,6 +126,15 @@ def _print_summary(summary: ExecutionSummary, deals: list[DetectedDeal]) -> None
                    f"{d.offer.price_total:,.0f} EUR [{', '.join(r.value for r in d.reasons)}]")
 
 
+def _echo_send(result) -> None:
+    if result.deals:
+        typer.echo(f"notified {result.deals} deals")
+    elif result.sent:
+        typer.echo("sent digest (0 new deals)")   # the mail went out, it just had no news
+    else:
+        typer.echo("notified 0 deals")
+
+
 @app.command()
 def holidays(ctx: typer.Context):
     """List slots with their school-free windows and targets."""
@@ -179,8 +188,7 @@ def report_cmd(ctx: typer.Context):
 def notify_cmd(ctx: typer.Context, report_url: Optional[str] = typer.Option(None, "--report-url")):
     """Send the weekly digest email (per settings email.mode)."""
     c: Ctx = ctx.obj
-    n = _notify.send_pending(_storage(c), c.config, c.now, report_url)
-    typer.echo(f"notified {n} deals")
+    _echo_send(_notify.send_pending(_storage(c), c.config, c.now, report_url))
 
 
 @app.command()
@@ -201,5 +209,4 @@ def run(ctx: typer.Context, limit: Optional[int] = typer.Option(None, "--limit")
         # --fake invents prices. Mailing them to a real inbox would look like real deals.
         typer.echo("notified 0 deals (fake run, email suppressed)")
         return
-    n = _notify.send_pending(storage, c.config, c.now, report_url, summary)
-    typer.echo(f"notified {n} deals")
+    _echo_send(_notify.send_pending(storage, c.config, c.now, report_url, summary))

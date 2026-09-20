@@ -20,14 +20,20 @@ class DetectedDeal:
     notifiable: bool
 
 
+def median_for(history: list[float], route_history: list[float],
+               settings: DealSettings) -> float | None:
+    """The reference price for BELOW_MEDIAN: this route's history, else the route across slots."""
+    if len(history) >= settings.min_history_points:
+        return float(_median(history))
+    if len(route_history) >= settings.min_history_points:
+        return float(_median(route_history))
+    return None
+
+
 def evaluate(price_total: float, per_person: float, price_level: str | None, history: list[float],
              route_history: list[float], max_pp: float | None, settings: DealSettings) -> tuple[list[DealReason], float | None]:
     reasons: list[DealReason] = []
-    median: float | None = None
-    if len(history) >= settings.min_history_points:
-        median = float(_median(history))
-    elif len(route_history) >= settings.min_history_points:
-        median = float(_median(route_history))
+    median = median_for(history, route_history, settings)
     if median is not None and price_total <= settings.median_ratio * median:
         reasons.append(DealReason.BELOW_MEDIAN)
     if price_level == "low":

@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import logging
 import smtplib
-from dataclasses import dataclass
-from datetime import date, datetime
+from dataclasses import dataclass, field
+from datetime import date, datetime, timedelta
 from email.message import EmailMessage
 from html import escape
 from typing import TYPE_CHECKING, Callable
@@ -20,7 +20,7 @@ from .calendar import Window
 from .config import Config
 from .explain import explain
 from .models import Cabin, Destination, Provider, Slot
-from .report import NewDeal, ReportData, RouteSummary, build_report, change, money
+from .report import NewDeal, ReportData, RouteSummary, build_report, change, money, new_deal
 from .storage import SearchRow, Storage
 
 if TYPE_CHECKING:   # only for the annotation; the provider layer is heavy to import
@@ -105,6 +105,8 @@ class _Deal:
     price: str
     why: str
     url: str
+    #: other date pairs on the same route that are deals too ("also 19–31 Dec 7,493 €")
+    also: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -117,8 +119,8 @@ class _Row:
     change: str
     change_class: str
     lowest: str
-    level: str
-    flight: str
+    #: "low · SWISS + Bangkok Airways · 2 stops", the second line under the destination
+    details: str
     url: str
     alternates: str
 
@@ -165,14 +167,27 @@ def _budget_line(data: ReportData) -> str:
         f"{p.value} {used} / {budget}" for p, used, budget in data.usage)
 
 
-def _deal_card(deal: NewDeal, data: ReportData, config: Config) -> _Deal:
-    s, o = deal.search, deal.offer
+def _deal_card(group: list[NewDeal], data: ReportData, config: Config) -> _Deal:
+    """One card per route: the cheapest fare, with the other date pairs as "also" lines."""
+    best, *rest = sorted(group, key=lambda n: n.offer.price_total)
+    s, o = best.search, best.offer
     destination = _destination(config, s.destination)
-    route = _route_for(data, s)
     title = (f"{destination.name} ({s.destination}) from {city(s.origin)} · "
              f"{_dates(s.outbound_date, s.return_date)} · {s.seat.value.capitalize()}")
     price = f"{money(o.price_total)} total · {money(o.per_person)} per person · {_flight(o)}"
-    return _Deal(title, price, explain(deal.reasons, o, route, destination), o.google_url)
+    why = explain(best.reasons, o, _route_for(data, s), destination, best.median)
+    also = [f"also {_dates(n.search.outbound_date, n.search.return_date)} {money(n.offer.price_total)}"
+            for n in rest]
+    return _Deal(title, price, why, o.google_url, also)
+
+
+def _grouped(deals: list[NewDeal]) -> list[list[NewDeal]]:
+    """Deals bundled per (slot, origin, destination, seat), best-ranked route first."""
+    groups: dict[tuple, list[NewDeal]] = {}
+    for d in deals:
+        key = (d.search.slot_id, d.search.origin, d.search.destination, d.search.seat)
+        groups.setdefault(key, []).append(d)
+    return list(groups.values())
 
 
 def _alternate(origin: str, price: float, saving: float | None) -> str:
@@ -184,19 +199,21 @@ def _alternate(origin: str, price: float, saving: float | None) -> str:
 
 
 def _row(r: RouteSummary) -> _Row:
-    label, cls = change(r.previous, r.best.offer.price_total)
+    price = r.best.offer.price_total
+    label, cls = change(r.previous, price)
     alternates = " · ".join(_alternate(origin, obs.offer.price_total, saving)
                             for origin, obs, saving in r.alternates)
+    level = r.best.offer.price_level
     return _Row(
         destination=f"{r.destination.name} ({r.destination.code})",
         origin=r.best.search.origin,
         dates=_dates(r.best.search.outbound_date, r.best.search.return_date),
-        total=money(r.best.offer.price_total),
+        total=money(price),
         per_person=money(r.best.offer.per_person),
         change=label, change_class=cls,
-        lowest=money(r.lowest_ever) if r.lowest_ever else "–",
-        level=r.best.offer.price_level or "–",
-        flight=_flight(r.best.offer),
+        # "lowest ever" that is this week's price says nothing; the price itself is right there
+        lowest=money(r.lowest_ever) if r.lowest_ever and r.lowest_ever != price else "–",
+        details=f"{level} · {_flight(r.best.offer)}" if level else _flight(r.best.offer),
         url=r.best.offer.google_url,
         alternates=alternates)
 
@@ -218,23 +235,56 @@ def _subject(data: ReportData, deals: list[NewDeal]) -> str:
     return subject
 
 
-def _prepare(data: ReportData, deals: list[NewDeal], config: Config, report_url: str | None) -> _Digest:
-    blocks, not_searched = [], []
-    for slot, window, routes in data.slots:
-        if routes:
-            blocks.append(_block(slot, window, routes))
-        elif not slot.targets:
-            not_searched.append(f"{slot.name} — no targets configured")
+#: How many destination codes a "searched but no result" line spells out before it counts.
+MAX_CODES = 8
+
+
+def _codes(codes: list[str]) -> str:
+    if len(codes) <= MAX_CODES:
+        return ", ".join(codes)
+    return ", ".join(codes[:MAX_CODES]) + f" and {len(codes) - MAX_CODES} more"
+
+
+def _not_searched(data: ReportData, config: Config) -> list[str]:
+    """What this run did not cover, with the far future collapsed into one line."""
+    horizon = data.generated_at.date() + timedelta(days=config.settings.deals.lookahead_days)
+    lines: list[str] = []
+    later: list[Slot] = []
+    for slot, _window, _routes in data.slots:
+        searched = data.searched.get(slot.id, set())
+        if not slot.targets:
+            if slot.start <= horizon:
+                lines.append(f"{slot.name} — no targets configured")
+            else:
+                later.append(slot)
+            continue
+        missing = [t for t in slot.targets if t not in searched]
+        if not missing:
+            continue
+        if not searched:
+            if slot.start <= horizon:
+                lines.append(f"{slot.name} — not searched in this run")
         else:
-            not_searched.append(f"{slot.name} — not searched in this run")
+            lines.append(f"{slot.name} — searched but no result: {_codes(missing)}")
+    if later:
+        lines.append(f"{len(later)} later holidays have no targets configured "
+                     f"({later[0].name} – {later[-1].name})")
+    return lines
+
+
+def _prepare(data: ReportData, deals: list[NewDeal], config: Config, report_url: str | None) -> _Digest:
+    blocks = [_block(slot, window, routes) for slot, window, routes in data.slots if routes]
+    # Best first, and among equals the one that costs the least per person -- the deal
+    # ordering belongs to the digest, so every caller gets the same mail.
+    ranked = sorted(deals, key=lambda n: (-n.deal.score, n.offer.per_person))
     d = data.generated_at
     return _Digest(
         subject=_subject(data, deals),
         date=f"{d.day} {MONTHS_FULL[d.month - 1]} {d.year}",
         status=_status_line(data, config),
         budget=_budget_line(data),
-        deals=[_deal_card(x, data, config) for x in deals],
-        blocks=blocks, not_searched=not_searched, report_url=report_url,
+        deals=[_deal_card(group, data, config) for group in _grouped(ranked)],
+        blocks=blocks, not_searched=_not_searched(data, config), report_url=report_url,
         test_data=_uses_fake_data(data, deals))
 
 
@@ -263,21 +313,28 @@ def _link(url: str, label: str) -> str:
     return f'<a href="{escape(url, quote=True)}" style="color:#0a52a8;">{_e(label)}</a>'
 
 
+#: The table has to fit 640 px, so detail lives on a second line inside its cell.
+HTML_COLUMNS = (("Destination", False), ("From", False), ("Dates", False), ("Price", True),
+                ("vs last week", True), ("Lowest seen", True), ("", False))
+SUB = "color:#666666;font-size:12px;"
+
+
+def _sub(text: str) -> str:
+    return f'<br><span style="{SUB}">{_e(text)}</span>' if text else ""
+
+
 def _html_rows(block: _Block) -> str:
-    head = "".join(f'<th style="{TH}{NUM if n in ("Total", "Per person", "vs last week", "Lowest seen") else ""}">{n}</th>'
-                   for n in ("Destination", "From", "Dates", "Total", "Per person", "vs last week",
-                             "Lowest seen", "Level", "Flight", ""))
+    head = "".join(f'<th style="{TH}{NUM if right else ""}">{name}</th>' for name, right in HTML_COLUMNS)
     body = []
     for r in block.rows:
-        origin = _e(r.origin) + (f'<br><span style="color:#666666;font-size:12px;">{_e(r.alternates)}</span>'
-                                 if r.alternates else "")
         body.append(
-            f'<tr><td style="{TD}">{_e(r.destination)}</td><td style="{TD}">{origin}</td>'
+            f'<tr><td style="{TD}">{_e(r.destination)}{_sub(r.details)}</td>'
+            f'<td style="{TD}">{_e(r.origin)}{_sub(r.alternates)}</td>'
             f'<td style="{TD}white-space:nowrap;">{_e(r.dates)}</td>'
-            f'<td style="{TD}{NUM}">{_e(r.total)}</td><td style="{TD}{NUM}">{_e(r.per_person)}</td>'
+            f'<td style="{TD}{NUM}">{_e(r.total)}{_sub(r.per_person + " p.p.")}</td>'
             f'<td style="{TD}{NUM}{COLOURS.get(r.change_class, "")}">{_e(r.change)}</td>'
-            f'<td style="{TD}{NUM}">{_e(r.lowest)}</td><td style="{TD}">{_e(r.level)}</td>'
-            f'<td style="{TD}">{_e(r.flight)}</td><td style="{TD}">{_link(r.url, "Book")}</td></tr>')
+            f'<td style="{TD}{NUM}">{_e(r.lowest)}</td>'
+            f'<td style="{TD}">{_link(r.url, "Book")}</td></tr>')
     return (f'<table style="width:100%;border-collapse:collapse;font-size:13px;"><tr>{head}</tr>'
             + "".join(body) + "</table>")
 
@@ -306,6 +363,7 @@ def _html(d: _Digest) -> str:
                 f'<div style="{CARD}"><div style="font-weight:600;">{_e(deal.title)}</div>'
                 f'<div>{_e(deal.price)}</div>'
                 + (f'<div style="color:#666666;font-size:13px;">{_e(deal.why)}</div>' if deal.why else "")
+                + "".join(f'<div style="{SUB}">{_e(line)}</div>' for line in deal.also)
                 + f'<div style="margin-top:4px;">{_link(deal.url, "Book on Google Flights")}</div></div>')
     else:
         parts.append(f'<p style="{MUTED}">No new deals this week.</p>')
@@ -328,23 +386,27 @@ def _html(d: _Digest) -> str:
 
 # ---- plain text ----
 
-TEXT_COLUMNS = (("destination", "Destination", 24, False), ("origin", "From", 4, False),
-                ("dates", "Dates", 13, False), ("total", "Total", 11, True),
-                ("per_person", "Per person", 11, True), ("change", "vs last week", 12, True),
-                ("lowest", "Lowest seen", 11, True), ("level", "Level", 6, False),
-                ("flight", "Flight", 0, False))
+TEXT_COLUMNS = (("destination", "Destination", False), ("origin", "From", False),
+                ("dates", "Dates", False), ("total", "Total", True),
+                ("per_person", "Per person", True), ("change", "vs last week", True),
+                ("lowest", "Lowest seen", True))
 
 
 def _text_row(values: list[tuple[str, int, bool]]) -> str:
-    cells = [v.rjust(w) if right else (v.ljust(w) if w else v) for v, w, right in values]
-    return "  ".join(cells).rstrip()
+    return "  ".join(v.rjust(w) if right else v.ljust(w) for v, w, right in values).rstrip()
 
 
 def _text_table(block: _Block) -> list[str]:
-    lines = [_text_row([(head, width, right) for _f, head, width, right in TEXT_COLUMNS])]
-    lines.append("-" * len(lines[0]))
+    # Each block sizes its own columns: a narrow week should not inherit a wide one's padding.
+    widths = [max([len(head)] + [len(getattr(r, f)) for r in block.rows])
+              for f, head, _right in TEXT_COLUMNS]
+    header = _text_row([(head, w, right) for (_f, head, right), w in zip(TEXT_COLUMNS, widths)])
+    lines = [header, "-" * len(header)]
     for r in block.rows:
-        lines.append(_text_row([(getattr(r, f), width, right) for f, _h, width, right in TEXT_COLUMNS]))
+        lines.append(_text_row([(getattr(r, f), w, right)
+                                for (f, _h, right), w in zip(TEXT_COLUMNS, widths)]))
+        if r.details:
+            lines.append(f"    {r.details}")
         if r.alternates:
             lines.append(f"    also {r.alternates}")
         lines.append(f"    book: {r.url}")
@@ -369,6 +431,7 @@ def _text(d: _Digest) -> str:
             lines.append(f"  {deal.price}")
             if deal.why:
                 lines.append(f"  {deal.why}")
+            lines += [f"  {line}" for line in deal.also]
             lines.append(f"  book: {deal.url}")
             lines.append("")
     else:
@@ -386,6 +449,14 @@ def _text(d: _Digest) -> str:
     return "\n".join(lines)
 
 
+@dataclass
+class SendResult:
+    """Whether a mail went out, and how many deals it reported."""
+
+    sent: bool = False
+    deals: int = 0
+
+
 def compose_digest(data: ReportData, deals: list[NewDeal], config: Config,
                    report_url: str | None) -> tuple[str, str, str]:
     """(subject, text body, html body) for one weekly digest."""
@@ -399,31 +470,30 @@ compose = compose_digest
 
 def send_pending(storage: Storage, config: Config, now: datetime, report_url: str | None = None,
                  summary: ExecutionSummary | None = None,
-                 smtp_factory: Callable[[str, int], smtplib.SMTP] = smtplib.SMTP,
-                 smtp_ssl_factory: Callable[[str, int], smtplib.SMTP] = smtplib.SMTP_SSL) -> int:
-    """Send the digest per `email.mode` and return how many deals it reported.
+                 smtp_factory: Callable[[str, int], smtplib.SMTP] | None = None,
+                 smtp_ssl_factory: Callable[[str, int], smtplib.SMTP] | None = None) -> "SendResult":
+    """Send the digest per `email.mode` and report whether it went out, with how many deals.
 
     `summary` is the just-finished run's `ExecutionSummary`; without it the run's
     numbers come from storage, which is what `notify` on its own has.
     """
     mode = config.settings.email.mode
     if mode == "never":
-        return 0
+        return SendResult()
     pending = storage.pending_deals()
     if mode == "deals_only" and not pending:
-        return 0
+        return SendResult()
     sec = config.secrets
     if not (sec.smtp_host and sec.mail_from and sec.mail_to):
         log.warning("email not configured (SMTP_HOST, MAIL_FROM, MAIL_TO); %d deals stay pending", len(pending))
-        return 0
+        return SendResult()
 
     data = build_report(storage, config, now, storage.last_run_id())
     if summary is not None:
         # A skipped search leaves no row behind, so only the summary can report it;
         # storage counts what was written.
         data.counts = {"ok": summary.ok, "error": summary.errors, "skipped": summary.skipped}
-    deals = [NewDeal(d, storage.search_by_id(d.search_id), storage.offer_by_id(d.offer_id)) for d in pending]
-    deals.sort(key=lambda n: -n.deal.score)
+    deals = [new_deal(storage, config, d) for d in pending]   # the digest ranks them
     subject, text, html = compose_digest(data, deals, config, report_url)
 
     msg = EmailMessage()
@@ -432,7 +502,9 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
     msg.add_alternative(html, subtype="html")
     log.info("sending %r to %s via %s:%s", subject, ", ".join(sec.mail_to), sec.smtp_host, sec.smtp_port)
     implicit_tls = sec.smtp_port == 465   # 465 is TLS from the first byte; 587 upgrades with STARTTLS
-    factory = smtp_ssl_factory if implicit_tls else smtp_factory
+    # Resolved here, not in the signature's defaults, so patching `smtplib` really does
+    # cut the connection off (a default bound at import time would sail past the patch).
+    factory = (smtp_ssl_factory or smtplib.SMTP_SSL) if implicit_tls else (smtp_factory or smtplib.SMTP)
     try:
         with factory(sec.smtp_host, sec.smtp_port) as smtp:
             if not implicit_tls:
@@ -442,7 +514,7 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
             smtp.send_message(msg)
     except (smtplib.SMTPException, OSError) as e:
         log.error("email failed: %s", e)
-        return 0
+        return SendResult()
     if deals:
         storage.mark_notified([d.deal.id for d in deals], now)
-    return len(deals)
+    return SendResult(sent=True, deals=len(deals))

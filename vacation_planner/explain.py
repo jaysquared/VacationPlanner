@@ -12,8 +12,7 @@ from .report import RouteSummary, money
 from .storage import OfferRow
 
 
-def _below_median(offer: OfferRow, route: RouteSummary | None) -> str:
-    median = route.median if route else None
+def _below_median(offer: OfferRow, median: float | None) -> str:
     if not median:
         return "below the usual price for this route"
     pct = round((median - offer.price_total) / median * 100)
@@ -33,16 +32,22 @@ def _cheaper_than_home(offer: OfferRow, route: RouteSummary | None) -> str:
     if not home or home <= offer.price_total:
         return "clearly cheaper than from Hamburg"
     pct = round((home - offer.price_total) / home * 100)
-    return f"cheaper than the best Hamburg fare by {pct} %"
+    return f"cheaper than the best Hamburg fare ({money(home)}) by {pct} %"
 
 
 def explain(reasons: list[DealReason], offer: OfferRow, route: RouteSummary | None,
-            destination: Destination) -> str:
-    """One sentence per reason, in the order they were recorded, joined by "; "."""
+            destination: Destination, median: float | None = None) -> str:
+    """One sentence per reason, in the order they were recorded, joined by "; ".
+
+    `median` is the reference price this offer was judged against (`report.deal_median`);
+    without one the row's median is quoted, which is the home origin's.
+    """
+    if median is None and route is not None:
+        median = route.median
     parts: list[str] = []
     for reason in reasons:
         if reason is DealReason.BELOW_MEDIAN:
-            parts.append(_below_median(offer, route))
+            parts.append(_below_median(offer, median))
         elif reason is DealReason.GOOGLE_LOW:
             parts.append("Google rates this fare as low for these dates")
         elif reason is DealReason.UNDER_MAX:
