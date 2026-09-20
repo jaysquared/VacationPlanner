@@ -40,7 +40,8 @@ def test_route_page_name():
 def test_build_report_summarises_best_and_median(config_dir):
     cfg, db, run = seeded(config_dir)
     data = build_report(db, cfg, NOW, last_run_id=run)
-    assert len(data.new_deals) == 1
+    # both date pairs of this run beat the earlier run's 9,000 / 8,800 / 9,100
+    assert len(data.new_deals) == 2
     weihnachten = next(routes for slot, window, routes in data.slots if slot.id == "weihnachten-2026")
     r = weihnachten[0]
     assert r.destination.code == "BKK" and r.best.offer.price_total == 7000

@@ -371,13 +371,21 @@ One transaction per search so a crash leaves consistent data.
 
 For each new search's cheapest offer, compute:
 
-- `BELOW_MEDIAN`: price ≤ `median_ratio` × median of prior cheapest prices
-  for the same (slot, route, cabin). If fewer than `min_history_points`,
-  use the median across all slots for (route, cabin). If still too few, skip
-  this rule.
+History = observations from *earlier runs only* (`run_id < the run being
+detected`, `Storage.prior_cheapest_prices` / `prior_route_prices`). A run
+searches every date pair of a route within minutes of each other, so counting
+the pairs above as "history" would make every cheaper pair of the same scan a
+fresh record and let the price rules fire on the very first week.
+
+- `BELOW_MEDIAN`: price ≤ `median_ratio` × median of the earlier runs' cheapest
+  prices for the same (slot, route, cabin). If fewer than
+  `min_history_points`, use the median across all slots for (route, cabin).
+  If still too few, skip this rule.
 - `GOOGLE_LOW`: `price_level == "low"`.
 - `UNDER_MAX`: per_person ≤ destination's `max_price_per_person`.
-- `NEW_LOW`: lowest price ever recorded for (slot, route, cabin).
+- `NEW_LOW`: lower than every earlier run's price for (slot, route, cabin),
+  and only once there are at least `min_history_points` of them — a first or
+  second observation is the start of a record, not a break of one.
 
 An offer with at least one reason becomes a `Deal`. Score = number of
 reasons, tie-broken by ratio to median. Notification dedup: a deal is marked
@@ -453,8 +461,9 @@ The reasons of 5.6 are turned into sentences by `explain.py`
 ("21 % below the usual price for this route (median 8,900 €)", "lowest price
 seen so far for this trip", "cheaper than the best Hamburg fare (22,443 €) by
 25 %", ...). The median quoted is the one that judged *this* offer
-(`report.deal_median`: prior searches for the same slot, origin, destination and
-seat), so a Frankfurt deal is not explained with Hamburg's price level.
+(`report.deal_median`: earlier runs' searches for the same slot, origin,
+destination and seat — the rule's own history of 5.6), so a Frankfurt deal is
+not explained with Hamburg's price level, nor with a median the rule never saw.
 
 `compose_digest(data, deals, config, report_url)` builds (subject, text, html)
 from a `ReportData` and the notifiable deals. The subject is

@@ -45,12 +45,17 @@ def req(dest="HKT", origin="HAM", out=date(2026, 12, 19), ret=date(2026, 12, 29)
 
 
 def seeded(config_dir, env=ENV, fra_level=None):
-    """Two runs on HAM→HKT (12,000 then 9,000 'low'), one MLE route seen once, FRA at 7,000."""
+    """Two runs on HAM→HKT (12,000 then 9,000 'low'), one MLE route seen once, FRA at 7,000.
+
+    The first run carries `min_history_points` observations, so the second run's fare has
+    a history to be a new low against.
+    """
     cfg = load_config(config_dir, env=env)
     db = Storage(":memory:")
-    r1 = db.start_run(NOW, 1)
-    db.save_result(r1, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
-    db.finish_run(r1, 1, "ok", NOW)
+    r1 = db.start_run(NOW, 3)
+    for _ in range(3):
+        db.save_result(r1, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
+    db.finish_run(r1, 3, "ok", NOW)
     r2 = db.start_run(NOW, 4)
     db.save_result(r2, SearchResult(req(), Provider.SERPAPI, [offer(9000, "low")]), NOW)
     db.save_result(r2, SearchResult(req(dest="MLE"), Provider.SEARCHAPI, [offer(13000)]), NOW)
@@ -80,7 +85,7 @@ def test_digest_html_has_every_section(config_dir):
     # 1. header, run status and budget
     assert "4 searches · 3 ok · 1 failed" in html
     assert "providers: serpapi 2, searchapi 1" in html
-    assert "API budget used this month: serpapi 3 / 250 · searchapi 1 / 100" in html
+    assert "API budget used this month: serpapi 5 / 250 · searchapi 1 / 100" in html
     # 2. new deals, in plain words
     assert "Phuket (HKT) from Hamburg · 19–29 Dec · Business" in html
     assert "9,000 € total · 3,000 € per person · SWISS + Bangkok Airways · 2 stops" in html
@@ -109,7 +114,7 @@ def test_digest_text_has_the_same_content_without_tags(config_dir):
     cfg, db, _run = seeded(config_dir)
     _subject, text, _html = digest(cfg, db)
     for expected in ["4 searches · 3 ok · 1 failed",
-                     "API budget used this month: serpapi 3 / 250 · searchapi 1 / 100",
+                     "API budget used this month: serpapi 5 / 250 · searchapi 1 / 100",
                      "Phuket (HKT) from Hamburg · 19–29 Dec · Business",
                      "lowest price seen so far for this trip",
                      "Weihnachtsferien 2026/27 · free 19 Dec – 3 Jan",
@@ -283,9 +288,10 @@ def test_the_cheapest_per_person_deal_wins_a_tie_however_it_was_inserted(config_
     """Ordering is the digest's job, not the caller's: same score, cheaper per person first."""
     cfg = load_config(config_dir, env=ENV)
     db = Storage(":memory:")
-    old = db.start_run(NOW, 2)
-    db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
-    db.save_result(old, SearchResult(req(dest="CUN"), Provider.SERPAPI, [offer(9000)]), NOW)
+    old = db.start_run(NOW, 6)
+    for _ in range(3):   # both routes at 25 % above what this run finds, so the scores tie
+        db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
+        db.save_result(old, SearchResult(req(dest="CUN"), Provider.SERPAPI, [offer(10400)]), NOW)
     run = db.start_run(NOW, 2)
     db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(9000, "low")]), NOW)
     # inserted last, so it is last in pending_deals(), but it is the cheaper trip per person
@@ -294,7 +300,7 @@ def test_the_cheapest_per_person_deal_wins_a_tie_however_it_was_inserted(config_
     detect_for_run(db, run, cfg, NOW)
 
     pending = db.pending_deals()
-    assert [d.score for d in pending] == [2.0, 2.0]          # a genuine tie on score
+    assert [d.score for d in pending] == [3.25, 3.25]          # a genuine tie on score
     _subject, text, html = digest(cfg, db)
     assert html.index("Cancún") < html.index("Phuket")
     assert text.index("Cancún") < text.index("Phuket")

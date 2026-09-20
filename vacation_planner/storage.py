@@ -271,18 +271,25 @@ class Storage:
         return OfferRow.from_row(r) if r else None
 
     def prior_cheapest_prices(self, slot_id: str, origin: str, destination: str, seat: SeatClass,
-                              before_search_id: int) -> list[float]:
+                              before_run_id: int) -> list[float]:
+        """Every earlier *run's* cheapest price for this (slot, origin, destination, seat).
+
+        Run-based, not search-based: a route is searched once per date pair per run, so
+        "every search before this one" would count the other pairs of the same scan as
+        history and make each cheaper pair look like a fresh record within one run.
+        """
         rows = self.conn.execute(
             """SELECT c.price_total FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
-               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=? AND s.id<?""",
-            (slot_id, origin, destination, seat.value, before_search_id))
+               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (slot_id, origin, destination, seat.value, before_run_id))
         return [r["price_total"] for r in rows]
 
-    def prior_route_prices(self, origin: str, destination: str, seat: SeatClass, before_search_id: int) -> list[float]:
+    def prior_route_prices(self, origin: str, destination: str, seat: SeatClass, before_run_id: int) -> list[float]:
+        """The same, across every slot: the fallback history when one slot is too young."""
         rows = self.conn.execute(
             """SELECT c.price_total FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
-               WHERE s.status='ok' AND s.origin=? AND s.destination=? AND s.seat=? AND s.id<?""",
-            (origin, destination, seat.value, before_search_id))
+               WHERE s.status='ok' AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (origin, destination, seat.value, before_run_id))
         return [r["price_total"] for r in rows]
 
     def best_price_for(self, slot_id: str, origin: str, destination: str, seat: SeatClass) -> float | None:

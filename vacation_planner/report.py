@@ -61,15 +61,17 @@ class ReportData:
 
 
 def deal_median(storage: Storage, config: Config, search: SearchRow) -> float | None:
-    """The median `deals.evaluate` weighed this search against: earlier searches only.
+    """The median `deals.evaluate` weighed this search against: earlier runs only.
 
     Per (slot, origin, destination, seat) — an alternate origin has its own price level,
-    so quoting the home origin's median would name a number that decided nothing.
+    so quoting the home origin's median would name a number that decided nothing. The
+    history source is the rule's (`Storage.prior_*`, run-based), so the digest quotes the
+    number that actually fired `BELOW_MEDIAN`, not a differently-cut one.
     """
     return median_for(
         storage.prior_cheapest_prices(search.slot_id, search.origin, search.destination,
-                                      search.seat, search.id),
-        storage.prior_route_prices(search.origin, search.destination, search.seat, search.id),
+                                      search.seat, search.run_id),
+        storage.prior_route_prices(search.origin, search.destination, search.seat, search.run_id),
         config.settings.deals)
 
 

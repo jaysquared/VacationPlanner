@@ -40,7 +40,9 @@ def evaluate(price_total: float, per_person: float, price_level: str | None, his
         reasons.append(DealReason.GOOGLE_LOW)
     if max_pp is not None and per_person <= max_pp:
         reasons.append(DealReason.UNDER_MAX)
-    if history and price_total < min(history):
+    # A record needs a field to beat: with one or two earlier observations "lowest ever"
+    # says nothing, so NEW_LOW waits for the same history the median rule wants.
+    if len(history) >= settings.min_history_points and price_total < min(history):
         reasons.append(DealReason.NEW_LOW)
     return reasons, median
 
@@ -62,8 +64,9 @@ def detect_for_run(storage: Storage, run_id: int, config: Config, now: datetime)
                 if not alt.beats_home(offer.price_total, home_price):
                     continue
                 beats_home = True
-        history = storage.prior_cheapest_prices(search.slot_id, search.origin, search.destination, search.seat, search.id)
-        route_history = storage.prior_route_prices(search.origin, search.destination, search.seat, search.id)
+        # Earlier runs only: the other date pairs of this same scan are today's prices, not history.
+        history = storage.prior_cheapest_prices(search.slot_id, search.origin, search.destination, search.seat, run_id)
+        route_history = storage.prior_route_prices(search.origin, search.destination, search.seat, run_id)
         max_pp = config.destination(search.destination).max_price_per_person if search.destination in config.destinations else None
         reasons, median = evaluate(offer.price_total, offer.per_person, offer.price_level, history, route_history, max_pp, s)
         if not reasons:
