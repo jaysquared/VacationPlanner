@@ -292,6 +292,29 @@ class Storage:
             (origin, destination, seat.value, before_run_id))
         return [r["price_total"] for r in rows]
 
+    def prior_run_count(self, slot_id: str, origin: str, destination: str, seat: SeatClass,
+                        before_run_id: int) -> int:
+        """How many earlier *runs* priced this (slot, origin, destination, seat).
+
+        This, not the number of observations, is what `min_history_points` counts: a run
+        searches several date pairs of a route at once, so one weekly scan can leave three
+        prices behind while it is still a single week of history.
+        """
+        r = self.conn.execute(
+            """SELECT COUNT(DISTINCT s.run_id) AS n FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
+               WHERE s.status='ok' AND s.slot_id=? AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (slot_id, origin, destination, seat.value, before_run_id)).fetchone()
+        return r["n"]
+
+    def prior_route_run_count(self, origin: str, destination: str, seat: SeatClass,
+                              before_run_id: int) -> int:
+        """The same count across every slot, for the median rule's route-level fallback."""
+        r = self.conn.execute(
+            """SELECT COUNT(DISTINCT s.run_id) AS n FROM cheapest_per_search c JOIN searches s ON s.id=c.search_id
+               WHERE s.status='ok' AND s.origin=? AND s.destination=? AND s.seat=? AND s.run_id<?""",
+            (origin, destination, seat.value, before_run_id)).fetchone()
+        return r["n"]
+
     def best_price_for(self, slot_id: str, origin: str, destination: str, seat: SeatClass) -> float | None:
         """Cheapest current price on a route: the newest observation per date pair, minimised."""
         r = self.conn.execute(

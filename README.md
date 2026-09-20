@@ -102,7 +102,7 @@ A listed provider whose key is missing is skipped with a warning; if none is usa
 
 `fast-flights` sends a `SOCS=CAI` consent cookie with its requests so it works from EU networks, where Google would otherwise return a consent interstitial instead of the flights page.
 
-When the Google page holds no matching itineraries at all — no Business fare on the route, say — the scraper's parser has nothing to index into. That is **not** counted as a failed search: `fast-flights` records an ok search with no offers and notes it at INFO, so the run keeps its `ok` status and the destination shows up under `searched but no result` in the digest instead of as an error.
+When the Google page holds no matching itineraries at all — no Business fare on the route, say — the scraper's parser either has nothing to index into or hands back an empty list. Neither is counted as a failed search: `fast-flights` records an ok search with no offers and notes it at INFO, so the run keeps its `ok` status and the destination shows up under `searched but no result` in the digest instead of as an error. (This is safe only because `fast-flights` is last in `providers.order` — a returned result ends the fallback chain.)
 
 ## First live run
 

@@ -60,22 +60,23 @@ def test_search_wraps_failures(settings):
     with pytest.raises(ProviderError, match="RuntimeError"):
         FastFlightsClient(settings, fetch=boom, sleep=lambda s: None).search(REQ)
 
-    def empty(q):
-        return build().__class__()
 
-    with pytest.raises(ProviderError):
-        FastFlightsClient(settings, fetch=empty, sleep=lambda s: None).search(REQ)
-
-
-@pytest.mark.parametrize("error", [FlightsNotFound("none"), TypeError("'NoneType' object is not subscriptable"),
-                                   IndexError("list index out of range")])
-def test_a_page_without_itineraries_is_an_empty_result_not_an_error(settings, error, caplog):
-    """No Business fare for PQC is a search with nothing to report, not a failed search."""
-    def no_itineraries(q):
+def raising(error):
+    def fetch(q):
         raise error
+    return fetch
 
+
+@pytest.mark.parametrize("fetch", [
+    raising(FlightsNotFound("none")),
+    raising(TypeError("'NoneType' object is not subscriptable")),
+    raising(IndexError("list index out of range")),
+    lambda q: build().__class__(),          # the parser simply found nothing to return
+], ids=["not_found", "type_error", "index_error", "empty_list"])
+def test_a_page_without_itineraries_is_an_empty_result_not_an_error(settings, fetch, caplog):
+    """No Business fare for PQC is a search with nothing to report, not a failed search."""
     with caplog.at_level("INFO", logger="vacation_planner.providers.fast_flights"):
-        res = FastFlightsClient(settings, fetch=no_itineraries, sleep=lambda s: None).search(REQ)
+        res = FastFlightsClient(settings, fetch=fetch, sleep=lambda s: None).search(REQ)
     assert res.offers == [] and res.provider is Provider.FAST_FLIGHTS and res.request is REQ
     assert "no itineraries" in caplog.text and "BKK" in caplog.text
 
@@ -143,19 +144,29 @@ def test_excluded_airline_is_dropped_by_name_too(settings):
     assert all("Air India" not in o.airlines and "AI" not in o.airlines for o in res.offers)
 
 
-def test_unmapped_airline_name_keeps_the_raw_name(caplog):
+def test_unmapped_airline_name_warns_once_a_run_and_keeps_the_raw_name(settings, caplog):
     rl = build()
     rl.metadata.airlines = [a for a in rl.metadata.airlines if a.name != "Emirates"]
+    FastFlightsClient(settings, fetch=lambda q: build(), sleep=lambda s: None)   # a fresh run
     with caplog.at_level("DEBUG", logger="vacation_planner.providers.fast_flights"):
         offers = parse_results(rl, REQ, "https://g/url", price_is_total=True)
+        parse_results(rl, REQ, "https://g/url", price_is_total=True)
     assert ["Emirates"] in [o.airlines for o in offers]
     assert "Emirates" in caplog.text
-    # A missing code is routine on Google's pages; it is a note, not a warning.
-    assert [r.levelname for r in caplog.records] == ["DEBUG"]
+    # The first sighting is worth a warning -- an excluded airline the metadata does not
+    # name slips through the filter -- but 100 searches must not repeat it 100 times.
+    assert [r.levelname for r in caplog.records] == ["WARNING", "DEBUG"]
+
+    FastFlightsClient(settings, fetch=lambda q: build(), sleep=lambda s: None)   # next run
+    caplog.clear()
+    with caplog.at_level("DEBUG", logger="vacation_planner.providers.fast_flights"):
+        parse_results(rl, REQ, "https://g/url", price_is_total=True)
+    assert [r.levelname for r in caplog.records] == ["WARNING"]
 
 
-def test_a_known_airline_keeps_its_code_when_the_metadata_omits_it(caplog):
+def test_a_known_airline_keeps_its_code_when_the_metadata_omits_it(settings, caplog):
     """The page metadata regularly drops Edelweiss, Discover, LH City and Transavia."""
+    FastFlightsClient(settings, fetch=lambda q: build(), sleep=lambda s: None)   # a fresh run
     rl = build()
     rl[2].airlines = ["Edelweiss Air"]
     rl.metadata.airlines = [a for a in rl.metadata.airlines if a.name != "Emirates"]

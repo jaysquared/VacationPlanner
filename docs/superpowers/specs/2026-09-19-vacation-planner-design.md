@@ -311,18 +311,23 @@ implementations plus a fake for tests.
 - `providers/fast_flights.py`: builds the equivalent `fast-flights` query,
   filters out itineraries with excluded airlines, maps results to `Offer`
   with `typical_low/high` empty and a constructed Google Flights URL. Sleeps
-  its entry's `pause_seconds` before each call. Raises `ProviderError` on
-  parse failure or empty response. "No results" is not a failure: a Google page
-  with no matching itineraries (no Business fare on the route, say) makes the
-  library's parser raise `FlightsNotFound`, `TypeError` or `IndexError`, and the
-  client turns all three into an ok `SearchResult` with no offers, logged at
-  INFO. Every other exception stays a `ProviderError`. Airline names the page's
-  metadata gives no code for fall back to `KNOWN_AIRLINE_CODES` (Edelweiss,
-  Discover, Lufthansa City, Transavia, Condor, Eurowings) and otherwise keep the
-  raw name with a DEBUG note.
+  its entry's `pause_seconds` before each call. Raises `ProviderError` on parse
+  failure. "No results" is not a failure: a Google page with no matching
+  itineraries (no Business fare on the route, say) makes the library's parser
+  raise `FlightsNotFound`, `TypeError` or `IndexError`, or simply return an empty
+  `ResultList`. All four cases become an ok `SearchResult` with no offers, logged
+  at INFO before the airline-metadata guard. Every other exception stays a
+  `ProviderError`. The executor stops the fallback chain on a returned result, so
+  this is only correct while `fast_flights` is last in `providers.order`.
+  Airline names the page's metadata gives no code for fall back to
+  `KNOWN_AIRLINE_CODES` (Edelweiss, Discover, Lufthansa City, Transavia, Condor,
+  Eurowings); a name that is in neither keeps its raw form and is logged once per
+  run at WARNING (DEBUG for the repeats), because `excluded_airlines` holds IATA
+  codes and an excluded carrier the metadata does not name would pass the filter.
   A search with no offers counts as "searched but no result" in the report and
-  the digest (`ReportData.searched` holds the destinations that came back with a
-  price), so an empty result is visible rather than silently absent.
+  the digest: `ReportData.searched` holds the destinations that came back with a
+  price and `ReportData.attempted` those that were searched at all, so an empty
+  result is visible rather than silently absent.
 - `providers/searchapi.py`: the same for SearchApi.io (2.2), reusing the
   SerpApi airline-code helper; 401/403 raise `AuthError`.
 - `providers/executor.py`: walks the plan, tries the providers per 2.5,
@@ -387,15 +392,23 @@ searches every date pair of a route within minutes of each other, so counting
 the pairs above as "history" would make every cheaper pair of the same scan a
 fresh record and let the price rules fire on the very first week.
 
+A **history point is one earlier run**, i.e. one weekly scan — not one
+observation. A run leaves one price per date pair behind, so three pairs of a
+single scan are one history point, not three
+(`Storage.prior_run_count` / `prior_route_run_count` count
+`DISTINCT run_id` over ok searches with a cheapest offer). Both price rules are
+gated on that count against `min_history_points`.
+
 - `BELOW_MEDIAN`: price ≤ `median_ratio` × median of the earlier runs' cheapest
-  prices for the same (slot, route, cabin). If fewer than
-  `min_history_points`, use the median across all slots for (route, cabin).
-  If still too few, skip this rule.
+  prices for the same (slot, route, cabin), once at least `min_history_points`
+  earlier runs priced it. Otherwise use the median across all slots for
+  (route, cabin), under the same gate on that route's earlier-run count. If
+  neither reaches the gate, skip this rule.
 - `GOOGLE_LOW`: `price_level == "low"`.
 - `UNDER_MAX`: per_person ≤ destination's `max_price_per_person`.
 - `NEW_LOW`: lower than every earlier run's price for (slot, route, cabin),
-  and only once there are at least `min_history_points` of them — a first or
-  second observation is the start of a record, not a break of one.
+  and only once at least `min_history_points` earlier runs priced it — a first
+  or second week is the start of a record, not a break of one.
 
 An offer with at least one reason becomes a `Deal`. Score = number of
 reasons, tie-broken by ratio to median. Notification dedup: a deal is marked
@@ -461,8 +474,9 @@ column, max 640 px, inline CSS, no images or scripts) with the same sections:
    Each table sits in an `overflow-x:auto` wrapper, so a narrow phone scrolls it
    sideways instead of squeezing the columns; the 640 px container is unchanged.
 4. **Not searched this run** — per slot, either "no targets configured", or
-   "not searched in this run" (nothing of it ran), or "searched but no result:
-   LGK, KUL" (the targets with no successful search this run). Only slots
+   "not searched in this run" (nothing of it ran at all), or "searched but no
+   result: LGK, KUL" (the targets with no priced result this run — searched and
+   empty counts here, not as "not searched"). Only slots
    starting within `deals.lookahead_days` get their own line; the rest collapse
    into "15 later holidays have no targets configured (first – last)".
 5. **Footer** — the link to the Pages report and the reminder that prices are

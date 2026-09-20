@@ -47,15 +47,15 @@ def req(dest="HKT", origin="HAM", out=date(2026, 12, 19), ret=date(2026, 12, 29)
 def seeded(config_dir, env=ENV, fra_level=None):
     """Two runs on HAM→HKT (12,000 then 9,000 'low'), one MLE route seen once, FRA at 7,000.
 
-    The first run carries `min_history_points` observations, so the second run's fare has
-    a history to be a new low against.
+    `min_history_points` weekly scans come first, so the latest run's fare has a
+    history to be a new low against.
     """
     cfg = load_config(config_dir, env=env)
     db = Storage(":memory:")
-    r1 = db.start_run(NOW, 3)
     for _ in range(3):
+        r1 = db.start_run(NOW, 1)
         db.save_result(r1, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
-    db.finish_run(r1, 3, "ok", NOW)
+        db.finish_run(r1, 1, "ok", NOW)
     r2 = db.start_run(NOW, 4)
     db.save_result(r2, SearchResult(req(), Provider.SERPAPI, [offer(9000, "low")]), NOW)
     db.save_result(r2, SearchResult(req(dest="MLE"), Provider.SEARCHAPI, [offer(13000)]), NOW)
@@ -288,8 +288,8 @@ def test_the_cheapest_per_person_deal_wins_a_tie_however_it_was_inserted(config_
     """Ordering is the digest's job, not the caller's: same score, cheaper per person first."""
     cfg = load_config(config_dir, env=ENV)
     db = Storage(":memory:")
-    old = db.start_run(NOW, 6)
     for _ in range(3):   # both routes at 25 % above what this run finds, so the scores tie
+        old = db.start_run(NOW, 2)
         db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
         db.save_result(old, SearchResult(req(dest="CUN"), Provider.SERPAPI, [offer(10400)]), NOW)
     run = db.start_run(NOW, 2)
@@ -309,10 +309,9 @@ def test_the_cheapest_per_person_deal_wins_a_tie_however_it_was_inserted(config_
 def test_a_frankfurt_deal_quotes_the_frankfurt_median(config_dir):
     cfg = load_config(config_dir, env=ENV)
     db = Storage(":memory:")
-    old = db.start_run(NOW, 7)
-    for price in (12000, 11500, 12500):
+    for price in (12000, 11500, 12500):   # one weekly scan each, Hamburg beside Frankfurt
+        old = db.start_run(NOW, 2)
         db.save_result(old, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(price)]), NOW)
-    for _ in range(3):
         db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(20000)]), NOW)
     run = db.start_run(NOW, 2)
     db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(20000)]), NOW)
@@ -386,3 +385,17 @@ def test_each_holiday_table_scrolls_sideways_on_a_narrow_screen(config_dir):
     _subject, _text, html = digest(cfg, db)
     assert html.count('<div style="overflow-x:auto;-webkit-overflow-scrolling:touch">') == 1
     assert "max-width:640px" in html          # the container itself is unchanged
+
+
+def test_a_slot_whose_searches_all_came_back_empty_says_no_result(config_dir):
+    """fast-flights records "no itineraries" as an ok search: the slot *was* searched."""
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(dest="TFS", slot="pfingsten-2027"),
+                                     Provider.FAST_FLIGHTS, []), NOW)
+    db.finish_run(run, 1, "ok", NOW)
+    _subject, text, html = digest(cfg, db)
+    assert "Himmelfahrt/Pfingsten 2027 — searched but no result: TFS, LPA, FUE" in html
+    assert "Himmelfahrt/Pfingsten 2027 — not searched in this run" not in html
+    assert "Himmelfahrt/Pfingsten 2027 — searched but no result: TFS, LPA, FUE" in text

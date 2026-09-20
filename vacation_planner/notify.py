@@ -255,17 +255,20 @@ def _not_searched(data: ReportData, config: Config) -> list[str]:
     lines: list[str] = []
     later: list[Slot] = []
     for slot, _window, _routes in data.slots:
-        searched = data.searched.get(slot.id, set())
+        priced = data.searched.get(slot.id, set())
+        # "Did anything run for this slot" is a different question from "did anything
+        # come back with a price": a scan that found no itineraries at all still ran.
+        attempted = data.attempted.get(slot.id, set())
         if not slot.targets:
             if slot.start <= horizon:
                 lines.append(f"{slot.name} — no targets configured")
             else:
                 later.append(slot)
             continue
-        missing = [t for t in slot.targets if t not in searched]
+        missing = [t for t in slot.targets if t not in priced]
         if not missing:
             continue
-        if not searched:
+        if not attempted:
             if slot.start <= horizon:
                 lines.append(f"{slot.name} — not searched in this run")
         else:

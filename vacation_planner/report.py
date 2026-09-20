@@ -56,6 +56,8 @@ class ReportData:
     run: RunRow | None = None                # the run the report was built from
     #: slot id -> destinations that came back with a price in that run
     searched: dict[str, set[str]] = field(default_factory=dict)
+    #: slot id -> destinations with an ok search in that run, priced or not
+    attempted: dict[str, set[str]] = field(default_factory=dict)
     counts: dict[str, int] = field(default_factory=dict)        # searches of that run by status
     providers: dict[Provider, int] = field(default_factory=dict)  # ok searches of that run by provider
 
@@ -71,7 +73,10 @@ def deal_median(storage: Storage, config: Config, search: SearchRow) -> float | 
     return median_for(
         storage.prior_cheapest_prices(search.slot_id, search.origin, search.destination,
                                       search.seat, search.run_id),
+        storage.prior_run_count(search.slot_id, search.origin, search.destination,
+                                search.seat, search.run_id),
         storage.prior_route_prices(search.origin, search.destination, search.seat, search.run_id),
+        storage.prior_route_run_count(search.origin, search.destination, search.seat, search.run_id),
         config.settings.deals)
 
 
@@ -158,14 +163,16 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
     usage = [(e.name, storage.searches_by_provider_since(e.name, month_start), e.monthly_budget)
              for e in config.settings.providers.budgeted()]
     searched: dict[str, set[str]] = {}
+    attempted: dict[str, set[str]] = {}
     for s in (storage.searches_in_run(last_run_id, "ok") if last_run_id is not None else []):
         # An ok search with no offers is fast-flights' "no itineraries on the page":
-        # the destination was asked about and came back empty, which the digest
-        # reports as "searched but no result" rather than dropping in silence.
+        # the destination was asked about (`attempted`) and came back empty, which the
+        # digest reports as "searched but no result" rather than dropping in silence.
+        attempted.setdefault(s.slot_id, set()).add(s.destination)
         if storage.cheapest_offer(s.id) is not None:
             searched.setdefault(s.slot_id, set()).add(s.destination)
     return ReportData(now, new_deals, slots, usage, run=storage.run_info(last_run_id),
-                      searched=searched,
+                      searched=searched, attempted=attempted,
                       counts=storage.search_counts(last_run_id),
                       providers=storage.provider_counts(last_run_id))
 
