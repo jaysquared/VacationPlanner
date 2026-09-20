@@ -161,3 +161,37 @@ def test_timestamps_normalized_to_utc(db: Storage):
     stored = db.conn.execute("SELECT requested_at FROM searches LIMIT 1").fetchone()["requested_at"]
     assert stored.endswith("+00:00")
 
+
+
+def test_previous_best_price_uses_the_latest_earlier_run(db: Storage):
+    r1 = db.start_run(NOW, 2)
+    db.save_result(r1, SearchResult(req(), Provider.SERPAPI, [offer(12000)]), NOW)
+    db.save_result(r1, SearchResult(req(outbound_date=date(2026, 10, 18), return_date=date(2026, 11, 1)),
+                                    Provider.SERPAPI, [offer(11000)]), NOW)
+    r2 = db.start_run(NOW, 1)
+    db.record_search(r2, req(), Provider.SERPAPI, "error", NOW, error="boom")   # no price: run skipped
+    r3 = db.start_run(NOW, 1)
+    db.save_result(r3, SearchResult(req(), Provider.SERPAPI, [offer(9000)]), NOW)
+
+    args = ("herbst-2026", "HAM", "BKK", SeatClass.BUSINESS)
+    assert db.previous_best_price(*args, before_run_id=r3) == 11000   # cheapest of run 1
+    assert db.previous_best_price(*args, before_run_id=r1) is None    # nothing earlier
+    assert db.previous_best_price(*args, before_run_id=None) is None
+    assert db.previous_best_price("herbst-2026", "FRA", "BKK", SeatClass.BUSINESS, before_run_id=r3) is None
+
+
+def test_run_info_and_counts(db: Storage):
+    run = db.start_run(NOW, planned=3)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(6000)]), NOW)
+    db.save_result(run, SearchResult(req(destination="DXB"), Provider.FAST_FLIGHTS, [offer(3000)]), NOW)
+    db.record_search(run, req(destination="MLE"), Provider.SEARCHAPI, "error", NOW, error="boom")
+    db.record_search(run, req(destination="CMB"), Provider.SEARCHAPI, "skipped", NOW)
+    db.finish_run(run, executed=3, status="ok", now=NOW)
+
+    info = db.run_info(run)
+    assert (info.id, info.planned, info.executed, info.status) == (run, 3, 3, "ok")
+    assert info.started_at == NOW and info.finished_at == NOW
+    assert db.run_info(run + 99) is None
+    assert db.search_counts(run) == {"ok": 2, "error": 1, "skipped": 1}
+    assert db.provider_counts(run) == {Provider.SERPAPI: 1, Provider.FAST_FLIGHTS: 1}
+    assert db.search_counts(run + 99) == {} and db.provider_counts(run + 99) == {}

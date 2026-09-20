@@ -132,3 +132,47 @@ def test_route_median_honours_min_history_points(config_dir):
     data = build_report(db, cfg, NOW, last_run_id=run)
     weihnachten = next(routes for slot, window, routes in data.slots if slot.id == "weihnachten-2026")
     assert weihnachten[0].median is None and weihnachten[0].ratio is None
+
+
+def test_build_report_adds_previous_and_lowest_ever(config_dir):
+    cfg, db, run = seeded(config_dir)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    r = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")[0]
+    assert r.previous == 8800          # cheapest of the earlier run (9000, 8800, 9100)
+    assert r.lowest_ever == 7000       # min over every observation of the route
+    assert data.run is not None and data.run.id == run and data.run.status == "ok"
+    assert data.counts == {"ok": 2} and data.providers == {Provider.SERPAPI: 2}
+
+
+def test_build_report_without_an_earlier_run_has_no_previous(config_dir):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    r = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")[0]
+    assert r.previous is None and r.lowest_ever == 7000
+
+
+def test_index_shows_the_week_over_week_and_lowest_seen_columns(config_dir, tmp_path):
+    cfg, db, run = seeded(config_dir)
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    index = (tmp_path / "index.html").read_text()
+    assert "vs last week" in index and "Lowest seen" in index
+    assert "▼ 20 %" in index                       # 8,800 → 7,000
+    assert '<td class="num down">▼ 20 %</td>' in index
+    assert "7,000 €" in index
+
+
+def test_index_marks_a_rise_and_an_unknown_previous_price(config_dir, tmp_path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    old = db.start_run(NOW, 1)
+    db.save_result(old, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)
+    run = db.start_run(NOW, 2)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7350)]), NOW)
+    db.save_result(run, SearchResult(req(dest="MLE"), Provider.SERPAPI, [offer(5000)]), NOW)
+    render(db, cfg, tmp_path, NOW, last_run_id=run)
+    index = (tmp_path / "index.html").read_text()
+    assert '<td class="num up">▲ 5 %</td>' in index       # 7,000 → 7,350
+    assert '<td class="num">–</td>' in index              # MLE has no earlier run

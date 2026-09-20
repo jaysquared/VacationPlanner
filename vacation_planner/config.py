@@ -170,7 +170,14 @@ class ReportSettings(BaseModel):
 
 
 class EmailSettings(BaseModel):
-    mode: Literal["deals_only", "always", "never"] = "deals_only"
+    """`digest` mails every run, `deals_only` only when there are notifiable deals."""
+
+    mode: Literal["digest", "deals_only", "never"] = "digest"
+
+    @field_validator("mode", mode="before")
+    @classmethod
+    def _accept_legacy_always(cls, v: object) -> object:
+        return "digest" if v == "always" else v   # pre-digest spelling of "send every run"
 
 
 class Settings(BaseModel):

@@ -132,3 +132,21 @@ def test_empty_provider_order_is_rejected(config_dir: Path):
     st.write_text(re.sub(r"  order:\n(?:    - .*\n)+", "  order: []\n", st.read_text()))
     with pytest.raises(ConfigError, match="settings.yaml.*providers.order"):
         load_config(config_dir, env={})
+
+
+def test_email_mode_defaults_to_digest_and_accepts_the_legacy_alias(config_dir: Path):
+    st = config_dir / "settings.yaml"
+    assert load_config(config_dir, env={}).settings.email.mode == "digest"   # repo config
+
+    st.write_text(re.sub(r"mode: \w+", "mode: always", st.read_text()))      # legacy spelling
+    assert load_config(config_dir, env={}).settings.email.mode == "digest"
+
+    st.write_text(re.sub(r"mode: \w+", "mode: deals_only", st.read_text()))
+    assert load_config(config_dir, env={}).settings.email.mode == "deals_only"
+
+    st.write_text(re.sub(r"email:\n  mode: .*\n", "", st.read_text()))       # omitted altogether
+    assert load_config(config_dir, env={}).settings.email.mode == "digest"
+
+    st.write_text(st.read_text() + "email:\n  mode: sometimes\n")
+    with pytest.raises(ConfigError, match="email.mode"):
+        load_config(config_dir, env={})

@@ -8,7 +8,7 @@ Status: approved 2026-09-19
 A scheduled scanner that finds good flight deals for a Hamburg family
 (2 adults, 1 child born 2019-04-21) during Hamburg school holidays. It runs
 unattended on GitHub Actions, keeps a price history, flags deals, publishes an
-HTML report via GitHub Pages and emails a summary when new deals appear.
+HTML report via GitHub Pages and emails a weekly digest of what it found.
 
 Hard rules:
 
@@ -229,8 +229,12 @@ alternate_origins:
 report:
   output_dir: docs/site
 email:
-  mode: deals_only              # deals_only | always | never
+  mode: digest                  # digest | deals_only | never
 ```
+
+`email.mode` decides when the weekly digest (5.8) goes out: `digest` every run
+(even one that found nothing), `deals_only` only when there are notifiable
+deals, `never` not at all. `always` is accepted as an old spelling of `digest`.
 
 API keys (`SERPAPI_KEY`, `SEARCHAPI_KEY`), recipients and SMTP credentials are
 env vars, never config, so the repo contains no personal data even if it is
@@ -355,6 +359,11 @@ migration scripts applied on startup.
   notified_at)`
 - View: `cheapest_per_search`, plus the `route_observations` query method
   (cheapest per search for one slot, route and cabin, newest first).
+- For the digest: `run_info(run_id)` (the run row), `search_counts(run_id)`
+  (searches by status) and `provider_counts(run_id)` (ok searches by provider),
+  plus `previous_best_price(slot, origin, destination, seat, before_run_id)` —
+  the route's cheapest price in the most recent *earlier* run that observed it,
+  so a run that only errored on a route does not blank out "last week".
 
 One transaction per search so a crash leaves consistent data.
 
@@ -397,22 +406,73 @@ needed for v1.
 Index page:
 1. New deals since last run (empty state text if none).
 2. One section per upcoming slot: one row per (destination, seat) with the
-   best current price at the home origin, per-person price, airline(s),
-   stops, outbound/return dates, ratio to median, price level, Google
-   Flights link, deal badge — plus, in its own column, the best price at
-   each alternate origin and how much it saves ("FRA 9,000 € (−25 %)").
+   best current price at the home origin, per-person price, the move against
+   last week ("▼ 12 %" / "▲ 5 %" / "–"), the lowest price ever seen on the
+   route, airline(s), stops, outbound/return dates, ratio to median, price
+   level, Google Flights link, deal badge — plus, in its own column, the best
+   price at each alternate origin and how much it saves ("FRA 9,000 € (−25 %)").
 3. Footer: run time, searches executed, budget used this month.
 
 Route page: one per (slot, origin, destination, seat), with every observation
 (date searched, dates flown, price, airline, level) newest first.
 
-### 5.8 `notify` — email
+### 5.8 `notify` — the weekly digest email
 
 SMTP via env (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`,
-`MAIL_FROM`, `MAIL_TO`). Sends a plain-text plus HTML email listing notifiable deals and
-linking to the Pages report. Mode `deals_only` sends nothing when there are
-none. Failures are logged and never fail the run. Marks deals `notified_at`
-only after a successful send.
+`MAIL_FROM`, `MAIL_TO`; port 465 is implicit TLS, everything else STARTTLS).
+One mail per run, in English, prices as "6,900 €", plain text and HTML (single
+column, max 640 px, inline CSS, no images or scripts) with the same sections:
+
+1. **Header** — "Vacation Planner", the date, the run in one line
+   ("111 searches · 108 ok · 3 failed · providers: serpapi 62, searchapi 25,
+   fast_flights 21") and "API budget used this month: serpapi 124 / 250 ·
+   searchapi 25 / 100".
+2. **New deals** — one card per route (slot, origin, destination, seat),
+   best score first and, among equals, the cheaper per person: "Phuket (HKT)
+   from Hamburg · 19–29 Dec · Business", the price line ("6,900 € total ·
+   2,300 € per person · SWISS + Bangkok Airways · 2 stops"), why it is a deal
+   in plain words, "also 19–31 Dec 7,493 €" for the other date pairs of the
+   same route, and a Google Flights link. "No new deals this week." when there
+   are none. The ordering lives in the digest, not in its callers.
+3. **One table per searched slot** — heading "Weihnachtsferien 2026/27 · free
+   19 Dec – 3 Jan", rows sorted by total. Six columns fit 640 px: destination
+   (with "level · airlines · stops" beneath it), origin (with the alternate
+   origins beneath it, "FRA 9,000 € (−25 %)"), dates, price (total, with the
+   per-person price beneath it), vs last week, lowest seen — then the Book
+   link. "Lowest seen" is blank when this week *is* the lowest.
+4. **Not searched this run** — per slot, either "no targets configured", or
+   "not searched in this run" (nothing of it ran), or "searched but no result:
+   LGK, KUL" (the targets with no successful search this run). Only slots
+   starting within `deals.lookahead_days` get their own line; the rest collapse
+   into "15 later holidays have no targets configured (first – last)".
+5. **Footer** — the link to the Pages report and the reminder that prices are
+   totals for the whole family and that the layover rule only covers the
+   outbound legs.
+
+The reasons of 5.6 are turned into sentences by `explain.py`
+("21 % below the usual price for this route (median 8,900 €)", "lowest price
+seen so far for this trip", "cheaper than the best Hamburg fare (22,443 €) by
+25 %", ...). The median quoted is the one that judged *this* offer
+(`report.deal_median`: prior searches for the same slot, origin, destination and
+seat), so a Frankfurt deal is not explained with Hamburg's price level.
+
+`compose_digest(data, deals, config, report_url)` builds (subject, text, html)
+from a `ReportData` and the notifiable deals. The subject is
+"Vacation Planner · 2 new deals · cheapest Weihnachten: Phuket 11,785 €", or
+"Vacation Planner · weekly update" when nothing is new.
+
+`send_pending` obeys `email.mode` (3.4), takes the just-finished run's
+`ExecutionSummary` when `run` calls it and falls back to storage otherwise. It
+returns a `SendResult(sent, deals)`, so the CLI can say "sent digest (0 new
+deals)" rather than pretending nothing happened.
+It logs the subject and the recipients at INFO before connecting, so every real
+send is visible in the job log. Failures are logged and never fail the run.
+Deals are marked `notified_at` only after a successful send.
+
+Synthetic data never gets mailed as if it were real: `run --fake` skips
+`send_pending` altogether ("notified 0 deals (fake run, email suppressed)"), and
+a digest that contains any offer or search from `Provider.FAKE` prints
+"TEST DATA — fake provider" in red under the header.
 
 ### 5.9 `cli`
 
@@ -421,8 +481,9 @@ Entry point `vacation-planner` (typer):
 - `plan` — print planned searches for a run, no API calls.
 - `scan` — plan, execute, store, detect deals. `--limit N` caps searches.
 - `report` — render HTML from storage.
-- `notify` — send pending deal notifications.
-- `run` — scan, report, notify in sequence (what CI calls).
+- `notify` — send the weekly digest email.
+- `run` — scan, report, notify in sequence (what CI calls). With `--fake`
+  the notify step is skipped so invented prices are never emailed.
 - `holidays` — list slots with their free windows and target counts.
 
 ## 6. Runtime
@@ -489,9 +550,14 @@ pytest, no live API in tests.
   median, dedup/renotify threshold.
 - `report`: renders index and route page from a seeded DB without error and
   contains expected strings.
-- `notify`: message composition; SMTP stubbed.
-- End-to-end: `run` with a fake client over a seeded config produces a DB,
-  HTML and one notification.
+- `notify`: digest composition (every section, both bodies, the subject
+  line, deal ordering and grouping, and each `email.mode`); SMTP stubbed.
+- `explain`: one test per deal reason, plus the missing-median fallback.
+- End-to-end: `run` over a seeded config produces a DB and HTML; with an
+  injected fake *client* it also notifies, while `run --fake` sends nothing at
+  all (no `send_pending`, no SMTP socket). A test-wide fixture strips SMTP and
+  API-key variables from the environment and makes `smtplib` refuse to connect,
+  so no test can reach a real inbox.
 
 ## 9. Project layout
 
@@ -501,7 +567,7 @@ data/              planner.sqlite (committed), raw/ (ignored)
 docs/site/         generated report (committed, served by Pages)
 docs/superpowers/  specs and plans
 vacation_planner/  config.py calendar.py planner.py storage.py deals.py
-                   report.py notify.py cli.py templates/ migrations/
+                   explain.py report.py notify.py cli.py templates/ migrations/
                    providers/ (base.py serpapi.py fast_flights.py executor.py)
 tests/             mirrors the package, fixtures/ holds recorded responses
 .github/workflows/scan.yml
