@@ -70,10 +70,9 @@ def test_render_writes_index_and_route_pages(config_dir, tmp_path):
 
 
 def with_frankfurt(config_dir):
-    cfg, db, run = seeded(config_dir)          # HAM best is 7,000
-    fra = db.start_run(NOW, 1)
-    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(5250)]), NOW)
-    db.save_result(fra, SearchResult(req(origin="FRA", out=date(2026, 12, 20), ret=date(2027, 1, 1)),
+    cfg, db, run = seeded(config_dir)          # HAM best is 7,000; FRA searched in the same run
+    db.save_result(run, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(5250)]), NOW)
+    db.save_result(run, SearchResult(req(origin="FRA", out=date(2026, 12, 20), ret=date(2027, 1, 1)),
                                      Provider.SERPAPI, [offer(6000)]), NOW)
     return cfg, db, run
 
@@ -101,8 +100,7 @@ def test_render_shows_the_frankfurt_price_and_its_saving(config_dir, tmp_path):
 
 def test_a_dearer_alternate_origin_is_shown_with_a_plus(config_dir, tmp_path):
     cfg, db, run = seeded(config_dir)          # HAM best is 7,000
-    fra = db.start_run(NOW, 1)
-    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7700)]), NOW)
+    db.save_result(run, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7700)]), NOW)
     data = build_report(db, cfg, NOW, last_run_id=run)
     routes = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")
     assert routes[0].best.search.origin == "HAM"
@@ -113,8 +111,7 @@ def test_a_dearer_alternate_origin_is_shown_with_a_plus(config_dir, tmp_path):
 
 def test_an_equally_priced_alternate_origin_shows_no_percentage(config_dir, tmp_path):
     cfg, db, run = seeded(config_dir)          # HAM best is 7,000
-    fra = db.start_run(NOW, 1)
-    db.save_result(fra, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7000)]), NOW)
+    db.save_result(run, SearchResult(req(origin="FRA"), Provider.SERPAPI, [offer(7000)]), NOW)
     render(db, cfg, tmp_path, NOW, last_run_id=run)
     index = (tmp_path / "index.html").read_text()
     assert "FRA 7,000 €<" in index and "−0 %" not in index
@@ -193,3 +190,22 @@ def test_a_search_without_offers_does_not_count_as_searched(config_dir):
     data = build_report(db, cfg, NOW, last_run_id=run)
     assert data.searched == {"weihnachten-2026": {"BKK"}}
     assert data.counts == {"ok": 2}     # the search itself did happen
+
+
+def test_only_this_runs_prices_are_shown(config_dir):
+    """A date pair searched last week but not this week is gone from the tables.
+
+    Its price may have vanished long since; last week's 6,500 must not beat this
+    week's real 7,000 and send the reader hunting for a fare that is not there.
+    """
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    old = db.start_run(NOW, 2)
+    db.save_result(old, SearchResult(req(out=date(2026, 12, 20), ret=date(2027, 1, 1)), Provider.SERPAPI, [offer(6500)]), NOW)
+    db.save_result(old, SearchResult(req(dest="MLE"), Provider.SERPAPI, [offer(9000)]), NOW)
+    run = db.start_run(NOW, 1)
+    db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(7000)]), NOW)
+    data = build_report(db, cfg, NOW, last_run_id=run)
+    routes = next(routes for slot, _w, routes in data.slots if slot.id == "weihnachten-2026")
+    assert [(r.destination.code, r.best.offer.price_total) for r in routes] == [("BKK", 7000)]
+    assert routes[0].previous == 6500 and routes[0].lowest_ever == 6500   # history still counts

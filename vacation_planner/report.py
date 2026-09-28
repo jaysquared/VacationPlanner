@@ -133,7 +133,12 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
             continue
         window = free_window(slot, bd.before, bd.after)
         by_route: dict[tuple[str, SeatClass], dict[str, list[Observation]]] = {}
+        # This run's prices only: a date pair searched last week and not this week may
+        # be long gone, and an old low would beat every fare that really is on sale.
+        # History (median, previous, lowest ever) still reads every run.
         for o in storage.latest_per_pair(slot.id):
+            if o.search.run_id != last_run_id:
+                continue
             by_route.setdefault((o.search.destination, o.search.seat), {}) \
                     .setdefault(o.search.origin, []).append(o)
         routes = []

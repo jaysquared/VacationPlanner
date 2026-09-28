@@ -110,8 +110,8 @@ def test_parse_response_reads_both_lists_and_insights():
 
 def test_parse_response_reads_the_legs():
     o = parse_response(fixture(), REQ, price_is_total=True)[0]
-    assert o.legs == [Leg("HAM", "FRA", "2026-10-17 17:05", "2026-10-17 18:10"),
-                      Leg("FRA", "BKK", "2026-10-17 20:15", "2026-10-18 12:35")]
+    assert o.legs == [Leg("HAM", "FRA", "2026-10-17 17:05", "2026-10-17 18:10", "Business", 65),
+                      Leg("FRA", "BKK", "2026-10-17 20:15", "2026-10-18 12:35", "Business", 680)]
 
 
 def test_search_drops_itineraries_that_break_the_layover_rule(client, httpx_mock):

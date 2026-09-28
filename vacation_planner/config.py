@@ -142,6 +142,13 @@ class LayoverSettings(BaseModel):
         return v
 
 
+class CabinSettings(BaseModel):
+    """What a Business search accepts below Business (see `itinerary.passes_cabin_rule`)."""
+
+    #: longest Economy flight a Business fare may contain; None allows any
+    max_economy_leg_minutes: int | None = 120
+
+
 class DealSettings(BaseModel):
     median_ratio: float
     min_history_points: int
@@ -186,6 +193,7 @@ class Settings(BaseModel):
     bridge_days: BridgeDays = BridgeDays()
     max_stops: int = 1
     layovers: LayoverSettings = LayoverSettings()
+    cabin: CabinSettings = CabinSettings()
     excluded_airlines: list[str] = []
     providers: ProviderSettings
     budget: BudgetSettings

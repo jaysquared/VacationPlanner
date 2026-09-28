@@ -105,7 +105,7 @@ def test_digest_html_has_every_section(config_dir):
     # 5. footer
     assert "https://x/report" in html
     assert "Prices are totals for 2 adults + 1 child." in html
-    assert "layover rule is checked on the outbound legs only" in html
+    assert "layover and cabin rules are checked on the outbound legs only" in html
     assert "<script" not in html and "<img" not in html
     assert "TEST DATA" not in html   # real provider data carries no warning
 
@@ -120,7 +120,7 @@ def test_digest_text_has_the_same_content_without_tags(config_dir):
                      "Weihnachtsferien 2026/27 · free 19 Dec – 3 Jan",
                      "▼ 25 %", "Not searched this run",
                      "Full report: https://x/report",
-                     "layover rule is checked on the outbound legs only"]:
+                     "layover and cabin rules are checked on the outbound legs only"]:
         assert expected in text
     assert "<" not in text and "&amp;" not in text
 

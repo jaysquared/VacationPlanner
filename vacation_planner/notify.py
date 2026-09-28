@@ -35,8 +35,8 @@ MONTHS_FULL = ("January", "February", "March", "April", "May", "June", "July", "
 CITIES = {"HAM": "Hamburg", "FRA": "Frankfurt", "BER": "Berlin", "HAJ": "Hannover",
           "CPH": "Copenhagen", "AMS": "Amsterdam", "MUC": "Munich", "DUS": "Düsseldorf"}
 
-FOOTER_NOTE = ("Prices are totals for 2 adults + 1 child. The layover rule is checked on the "
-               "outbound legs only — verify the return on Google Flights.")
+FOOTER_NOTE = ("Prices are totals for 2 adults + 1 child. The layover and cabin rules are checked "
+               "on the outbound legs only — verify the return on Google Flights.")
 #: Shown when anything in the digest came from the fake provider (`scan --fake`).
 TEST_DATA_WARNING = "TEST DATA — fake provider"
 
