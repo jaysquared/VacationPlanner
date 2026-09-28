@@ -3,9 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Iterable, Protocol
 
-from ..config import LayoverSettings
-from ..itinerary import passes_layover_rule
-from ..models import Offer, Provider, SearchRequest, SearchResult
+from ..config import CabinSettings, LayoverSettings
+from ..itinerary import passes_cabin_rule, passes_layover_rule
+from ..models import Offer, Provider, SearchRequest, SearchResult, SeatClass
 
 
 class ProviderError(Exception):
@@ -46,6 +46,13 @@ def filter_layovers(offers: list[Offer], settings: LayoverSettings) -> list[Offe
     report is kept: the rule can only reject what it can see.
     """
     return [o for o in offers if not o.legs or passes_layover_rule(o.legs, settings)]
+
+
+def filter_cabins(offers: list[Offer], seat: SeatClass, settings: CabinSettings) -> list[Offer]:
+    """On a Business search, drop fares with a long Economy leg; Economy searches keep all."""
+    if seat is not SeatClass.BUSINESS:
+        return offers
+    return [o for o in offers if passes_cabin_rule(o.legs, settings)]
 
 
 def per_person(price: float, req: SearchRequest, price_is_total: bool) -> tuple[float, float]:

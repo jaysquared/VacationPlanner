@@ -77,8 +77,8 @@ def test_parse_response_reads_both_lists():
 
 def test_parse_response_reads_the_legs():
     o = parse_response(fixture(), REQ, price_is_total=True)[0]
-    assert o.legs == [Leg("HAM", "FRA", "2026-10-17 17:05", "2026-10-17 18:10"),
-                      Leg("FRA", "BKK", "2026-10-17 20:15", "2026-10-18 12:35")]
+    assert o.legs == [Leg("HAM", "FRA", "2026-10-17 17:05", "2026-10-17 18:10", "Business Class", 65),
+                      Leg("FRA", "BKK", "2026-10-17 20:15", "2026-10-18 12:35", "Business Class", 680)]
 
 
 def test_search_drops_itineraries_that_break_the_layover_rule(client, httpx_mock):
@@ -88,6 +88,35 @@ def test_search_drops_itineraries_that_break_the_layover_rule(client, httpx_mock
     res = client.search(REQ)
     assert [o.price_total for o in res.offers] == LEGAL_PRICES   # incl. the 125 min Condor stop in FRA
     assert 7000 not in [o.price_total for o in res.offers]
+
+
+def test_parse_response_reads_cabin_and_minutes_per_leg():
+    data = fixture()
+    data["best_flights"][0]["flights"][0]["travel_class"] = "Economy"
+    o = parse_response(data, REQ, price_is_total=True)[0]
+    assert (o.legs[0].cabin, o.legs[0].minutes) == ("Economy", data["best_flights"][0]["flights"][0]["duration"])
+
+
+def test_business_search_drops_a_fare_with_a_long_economy_leg(client, httpx_mock):
+    data = fixture()
+    long_economy = copy.deepcopy(data["best_flights"][0])       # the 13,830 fare
+    long_economy["flights"][-1]["travel_class"] = "Economy"     # its long FRA-BKK leg
+    long_economy["price"] = 9999
+    short_economy = copy.deepcopy(data["best_flights"][0])
+    short_economy["flights"][0]["travel_class"] = "Economy"     # only the 65 min HAM-FRA feeder
+    short_economy["price"] = 9888
+    data["other_flights"] += [long_economy, short_economy]
+    httpx_mock.add_response(json=data)
+    prices = [o.price_total for o in client.search(REQ).offers]
+    assert 9999 not in prices and 9888 in prices
+
+
+def test_economy_search_keeps_economy_legs(client, httpx_mock):
+    data = fixture()
+    data["best_flights"][0]["flights"][-1]["travel_class"] = "Economy"
+    httpx_mock.add_response(json=data)
+    economy = SearchRequest("herbst-2026", "HAM", "BKK", date(2026, 10, 17), date(2026, 10, 31), SeatClass.ECONOMY, 2, 1)
+    assert 13830 in [o.price_total for o in client.search(economy).offers]
 
 
 def test_parse_response_without_price_insights_has_no_level_or_range():

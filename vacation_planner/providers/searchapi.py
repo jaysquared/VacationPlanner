@@ -9,7 +9,7 @@ import httpx
 
 from ..config import Settings
 from ..models import Leg, Offer, Provider, SearchRequest, SearchResult, SeatClass
-from .base import (AuthError, ProviderError, QuotaExhausted, filter_excluded, filter_layovers,
+from .base import (AuthError, ProviderError, QuotaExhausted, filter_cabins, filter_excluded, filter_layovers,
                    per_person, redact)
 from .serpapi import airline_codes   # same `flight_number` shape on the legs
 
@@ -28,7 +28,8 @@ def _when(airport: dict) -> str:
 
 def itinerary_legs(flights: list[dict]) -> list[Leg]:
     return [Leg(f["departure_airport"]["id"], f["arrival_airport"]["id"],
-                _when(f["departure_airport"]), _when(f["arrival_airport"])) for f in flights]
+                _when(f["departure_airport"]), _when(f["arrival_airport"]),
+                f.get("travel_class"), f.get("duration")) for f in flights]
 
 
 def parse_response(data: dict, req: SearchRequest, price_is_total: bool) -> list[Offer]:
@@ -135,6 +136,7 @@ class SearchApiClient:
             offers = filter_excluded(parsed, self.settings.excluded_airlines)
             # Inside the try: an unparseable leg time is a layout change like any other.
             offers = filter_layovers(offers, self.settings.layovers)
+            offers = filter_cabins(offers, req.seat, self.settings.cabin)
         except Exception as e:   # layout change: the raw JSON above is kept for a fixture
             raise ProviderError(self._safe(f"searchapi: parse failed: {type(e).__name__}: {e}")) from e
         return SearchResult(req, self.provider, offers, raw_path)

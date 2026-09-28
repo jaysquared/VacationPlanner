@@ -2,8 +2,8 @@ from datetime import datetime
 
 import pytest
 
-from vacation_planner.config import LayoverSettings
-from vacation_planner.itinerary import Layover, layovers, passes_layover_rule
+from vacation_planner.config import CabinSettings, LayoverSettings
+from vacation_planner.itinerary import Layover, layovers, passes_cabin_rule, passes_layover_rule
 from vacation_planner.models import Leg
 
 RULE = LayoverSettings(max_minutes=180, forbidden_window=("23:00", "05:00"))
@@ -70,3 +70,30 @@ def test_every_stop_must_pass():
             Leg("DXB", "BKK", "2026-12-20 01:00", "2026-12-20 10:00")]    # 20:00 -> 01:00, night
     assert passes_layover_rule(legs, RULE) is False
     assert passes_layover_rule(legs[:2], RULE) is True
+
+
+# ---- cabin rule: a Business fare may not hide a long Economy leg ----
+
+def business_with(cabin: str | None, minutes: int | None) -> list[Leg]:
+    """FRA -> YUL in Business, then YUL -> PUJ in `cabin` for `minutes`."""
+    return [Leg("FRA", "YUL", "2026-12-20 09:45", "2026-12-20 12:00", "Business Class", 495),
+            Leg("YUL", "PUJ", "2026-12-20 13:00", "2026-12-20 18:45", cabin, minutes)]
+
+
+@pytest.mark.parametrize("cabin, minutes, ok", [
+    ("Economy", 285, False),          # the Air Canada Rouge leg to Punta Cana
+    ("Economy", 121, False),
+    ("Economy", 120, True),           # exactly 2 h is fine
+    ("Economy", 70, True),            # a HAM-FRA feeder
+    ("Premium Economy", 200, False),  # still not Business
+    ("Business", 285, True),
+    ("First", 285, True),
+    (None, 285, True),                # the provider did not say: the rule can only reject what it sees
+    ("Economy", None, True),
+])
+def test_cabin_rule(cabin, minutes, ok):
+    assert passes_cabin_rule(business_with(cabin, minutes), CabinSettings(max_economy_leg_minutes=120)) is ok
+
+
+def test_cabin_rule_off():
+    assert passes_cabin_rule(business_with("Economy", 600), CabinSettings(max_economy_leg_minutes=None)) is True

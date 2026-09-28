@@ -79,6 +79,10 @@ class Leg:
     destination: str
     departs_at: str
     arrives_at: str
+    #: the provider's cabin for this flight ("Business Class", "Economy"); None when unknown
+    cabin: str | None = None
+    #: flight time; the local clock times cannot give it across time zones
+    minutes: int | None = None
 
 
 @dataclass(frozen=True)

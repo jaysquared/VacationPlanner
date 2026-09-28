@@ -33,8 +33,9 @@ with the same five sections in both bodies:
    route (median 8,900 €); lowest price seen so far for this trip`) and a Google
    Flights link. Other dates on the same route hang under the card as
    `also 19–31 Dec 7,493 €`. `No new deals this week.` when nothing is new.
-3. **One table per searched holiday** — every destination with data, cheapest
-   first, in six columns that fit a phone: destination (with `level · airlines ·
+3. **One table per searched holiday** — every destination this run found a
+   price for, cheapest first (prices from earlier runs are not shown: a fare seen
+   last week may be gone; they still feed the median, vs last week and lowest seen), in six columns that fit a phone: destination (with `level · airlines ·
    stops` underneath), origin (with `FRA 9,000 € (−25 %)` underneath), dates,
    price (with the per-person price underneath), **vs last week** (`▼ 12 %`
    against the cheapest price of the last run that saw the route) and **lowest
@@ -47,8 +48,8 @@ with the same five sections in both bodies:
    that came back empty. Holidays further out than `deals.lookahead_days`
    collapse into one line (`15 later holidays have no targets configured …`).
 5. **Footer** — the link to the full report and the reminder that prices are
-   totals for the whole family and that the layover rule only checks the
-   outbound legs.
+   totals for the whole family and that the layover and cabin rules only check
+   the outbound legs.
 
 The subject says it all at a glance:
 `Vacation Planner · 2 new deals · cheapest Weihnachten: Phuket 11,785 €`, or
@@ -153,6 +154,22 @@ request that this scanner never makes. So: the rule is evaluated on the outbound
 legs the providers report; return-leg stops are not visible without a second paid
 request and are not checked. Verify the return itinerary on the Google Flights link
 before booking.
+
+### Business means Business
+
+Google Flights sells "Business" fares whose connecting flight is Economy (Air
+Canada Rouge from Montréal to Punta Cana, Johannesburg–Cape Town). On a Business
+search, a fare with an Economy (or Premium Economy) flight longer than the limit
+is dropped; a short feeder such as Hamburg–Frankfurt is fine:
+
+```yaml
+cabin:
+  max_economy_leg_minutes: 120    # null allows any Economy leg
+```
+
+SerpApi and SearchApi report the cabin per flight; fast-flights does not, so its
+fares are never rejected by this rule. Like the layover rule, it sees the outbound
+flights only.
 
 ### Frankfurt has to be worth the trip
 

@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, time, timedelta
 from typing import Sequence
 
-from .config import LayoverSettings
+from .config import CabinSettings, LayoverSettings
 from .models import Leg
 
 TIME_FORMAT = "%Y-%m-%d %H:%M"
@@ -84,3 +84,22 @@ def passes_layover_rule(legs: Sequence[Leg], settings: LayoverSettings) -> bool:
                 layover.starts_at, layover.ends_at, settings.forbidden_window):
             return False
     return True
+
+
+def _below_business(cabin: str) -> bool:
+    return "economy" in cabin.lower()   # "Economy", "Premium Economy"
+
+
+def passes_cabin_rule(legs: Sequence[Leg], settings: CabinSettings) -> bool:
+    """True unless a leg flies Economy for longer than the limit.
+
+    Google Flights sells a "Business" fare whose connecting flight is Economy (Air
+    Canada Rouge to the Caribbean, a regional hop in Asia). A short feeder is fine; a
+    four-hour Economy flight is not what a Business fare is bought for. A leg whose
+    cabin or flight time the provider did not report passes.
+    """
+    limit = settings.max_economy_leg_minutes
+    if limit is None:
+        return True
+    return not any(leg.cabin and leg.minutes is not None and _below_business(leg.cabin)
+                   and leg.minutes > limit for leg in legs)
