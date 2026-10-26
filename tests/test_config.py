@@ -6,9 +6,16 @@ import pytest
 
 from vacation_planner.config import ConfigError, ProviderEntry, ProviderSettings, load_config
 from vacation_planner.models import Cabin, Nights, Provider
+from tests.conftest import REPO_CONFIG
 
 
-def test_loads_repo_config(config_dir: Path):
+def test_the_live_repo_config_loads():
+    """The trip focus in `config/` changes over time; it only has to be valid."""
+    cfg = load_config(REPO_CONFIG, env={})
+    assert any(s.targets for s in cfg.slots)
+
+
+def test_loads_test_config(config_dir: Path):
     cfg = load_config(config_dir, env={})
     assert cfg.travellers.adults == 2
     assert cfg.travellers.children[0].birthdate == date(2019, 4, 21)

@@ -8,7 +8,7 @@ from vacation_planner.config import load_config
 from vacation_planner.models import Leg, Provider, SearchRequest, SeatClass
 from vacation_planner.providers.base import ProviderError
 from vacation_planner.providers.fast_flights import FastFlightsClient, parse_results
-from tests.conftest import REPO_CONFIG
+from tests.conftest import TEST_CONFIG
 from tests.fixtures.fast_flights_result import build
 
 REQ = SearchRequest("herbst-2026", "HAM", "BKK", date(2026, 10, 17), date(2026, 10, 31), SeatClass.BUSINESS, 2, 1)
@@ -95,7 +95,7 @@ def test_consent_fetch_sends_cookie_and_returns_text():
             calls["url"], calls["params"] = url, params
             return FakeResp()
 
-    q = FastFlightsClient(load_config(REPO_CONFIG, env={}).settings).build_query(REQ)
+    q = FastFlightsClient(load_config(TEST_CONFIG, env={}).settings).build_query(REQ)
     html = ConsentFetch(client_factory=FakeClient).fetch_html(q)
     assert html == "<html>ok</html>"
     assert calls["kw"]["headers"] == {"Cookie": CONSENT_COOKIE}
