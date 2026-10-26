@@ -21,8 +21,8 @@ def test_candidate_pairs_empty_when_window_too_short():
 
 
 def load_config_dir(config_dir=None):
-    from tests.conftest import REPO_CONFIG
-    return load_config(config_dir or REPO_CONFIG, env={})
+    from tests.conftest import TEST_CONFIG
+    return load_config(config_dir or TEST_CONFIG, env={})
 
 
 def set_order(config_dir, order_yaml: str) -> None:

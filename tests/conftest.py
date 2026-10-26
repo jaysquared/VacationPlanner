@@ -4,6 +4,8 @@ from pathlib import Path
 import pytest
 
 REPO_CONFIG = Path(__file__).resolve().parents[1] / "config"
+#: A frozen snapshot of the config, so changing the trip focus in `config/` never breaks tests.
+TEST_CONFIG = Path(__file__).resolve().parent / "fixtures" / "config"
 
 #: Anything that could make a test talk to the outside world or mail a real inbox.
 SECRET_ENV = ("SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASSWORD", "MAIL_FROM", "MAIL_TO",
@@ -34,9 +36,9 @@ def no_real_smtp(monkeypatch):
 
 @pytest.fixture
 def config_dir(tmp_path: Path) -> Path:
-    """Copy of the repo config so tests can edit files freely."""
+    """Copy of the test config so tests can edit files freely."""
     dst = tmp_path / "config"
     dst.mkdir()
-    for f in REPO_CONFIG.glob("*.yaml"):
+    for f in TEST_CONFIG.glob("*.yaml"):
         (dst / f.name).write_text(f.read_text())
     return dst
