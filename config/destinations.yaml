@@ -5,6 +5,7 @@ destinations:
   - { code: FUE, name: Fuerteventura, cabin: any }
   - { code: PMI, name: Palma de Mallorca, cabin: any }
   - { code: LIS, name: Lisbon, cabin: any }
+  - { code: CTA, name: Catania (Sicily), cabin: any }
   # Long haul: Business only, Hamburg or Frankfurt (FRA must beat HAM by the configured margin)
   - { code: HKT, name: Phuket, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
   - { code: BKK, name: Bangkok, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
