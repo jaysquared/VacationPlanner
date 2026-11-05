@@ -88,6 +88,19 @@ def booking_url(base: str, stay: HotelStay) -> str:
     return f"{base}?{urlencode(q)}{ages}"
 
 
+def _booking_total(o: dict) -> float | None:
+    """The payable total of one Booking.com option.
+
+    On a discounted option (early-booker "10% sparen") `price` is the struck-through
+    pre-discount price; what the guest pays is `displayedPrice` + `excludedTaxesPrice`
+    (equal to `discount.discountedPrice`). Undiscounted options have the same sum in `price`.
+    """
+    shown = o.get("displayedPrice")
+    if shown:
+        return round(float(shown) + float(o.get("excludedTaxesPrice") or 0), 2)
+    return round(float(o["price"]), 2) if o.get("price") else None
+
+
 def parse_booking(items: list[dict], stay: HotelStay) -> HotelResult:
     if not items:
         return _no_rates(stay, "Booking.com returned no hotel")
@@ -97,11 +110,12 @@ def parse_booking(items: list[dict], stay: HotelStay) -> HotelResult:
     rates = []
     for room in h.get("rooms") or []:
         for o in room.get("options") or []:
-            if not o.get("price") or o.get("currency") not in _EUR_CURRENCIES:
+            total = _booking_total(o)
+            if not total or o.get("currency") not in _EUR_CURRENCIES:
                 continue
             name = ", ".join(o.get("yourChoices") or []) or None
             rates.append(HotelRate(
-                "booking", "cash", total=round(float(o["price"]), 2), room=room.get("roomType"),
+                "booking", "cash", total=total, room=room.get("roomType"),
                 rate_name=name, refundable=_refundable(bool(o.get("freeCancellation")), name), url=h.get("url")))
     return HotelResult(stay, "ok", rates) if rates else _no_rates(stay, "Booking.com: no room available")
 

@@ -43,9 +43,24 @@ def test_parse_booking_returns_every_room_with_its_refundability():
     garden = [r for r in res.rates if r.room == "Junior Suite mit eigenem Garten"]
     assert len(garden) == 1
     g = garden[0]
-    assert (g.channel, g.kind, round(g.total, 2), g.refundable) == ("booking", "cash", 6897.96, True)
+    # the payable early-booker price (displayedPrice + excludedTaxesPrice), not the struck-through `price`
+    assert (g.channel, g.kind, g.total, g.refundable) == ("booking", "cash", 6273.60, True)
     assert "Kostenlose Stornierung vor dem 7. April 2027" in g.rate_name
     assert len(res.rates) == 17
+
+
+def test_parse_booking_undiscounted_option_total_is_displayed_plus_excluded_taxes():
+    res = parse_booking(load("booking_ikos.json"), IKOS)
+    deluxe = [r for r in res.rates if r.room and r.room.startswith("Deluxe Junior Suite mit teilweise")]
+    assert [r.total for r in deluxe] == [6881.10]
+
+
+def test_parse_booking_falls_back_to_price_without_displayed_price():
+    items = load("booking_ikos.json")
+    opt = items[0]["rooms"][0]["options"][0]
+    del opt["displayedPrice"]
+    opt["excludedTaxesPrice"] = None
+    assert parse_booking(items, IKOS).rates[0].total == 6503.58
 
 
 def test_parse_booking_rejects_other_dates():
