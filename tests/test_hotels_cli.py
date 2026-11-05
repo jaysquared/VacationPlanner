@@ -22,3 +22,23 @@ def test_fake_run_skips_hotels(config_dir: Path, tmp_path: Path):
                             "--today", "2026-11-16", "run", "--fake"])
     assert r.exit_code == 0, r.output
     assert "hotels: skipped (fake run)" in r.output
+
+
+def test_a_crashing_hotel_check_still_writes_the_report(config_dir: Path, tmp_path: Path, monkeypatch):
+    import vacation_planner.cli as cli
+
+    out = tmp_path / "site"
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("output_dir: docs/site", f"output_dir: {out}"))
+    real_build = cli.build_clients
+    monkeypatch.setattr(cli, "build_clients", lambda config, fake: real_build(config, True))   # no network flights
+
+    def boom(*args, **kwargs):
+        raise RuntimeError("hotel bug")
+
+    monkeypatch.setattr(cli, "check_hotels", boom)
+    r = runner.invoke(app, ["--config-dir", str(config_dir), "--db", str(tmp_path / "db.sqlite"),
+                            "--today", "2026-11-16", "run", "--limit", "2"])
+    assert r.exit_code == 0, r.output
+    assert "hotels: failed (RuntimeError: hotel bug)" in r.output
+    assert (out / "index.html").exists()

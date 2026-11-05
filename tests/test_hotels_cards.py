@@ -111,3 +111,16 @@ def test_card_detail_keeps_refund_text_when_the_rate_name_lacks_it(config_dir: P
     cfg, db = seeded(config_dir)
     card = next(c for c in build_hotel_cards(db, cfg, NOW.date()) if c.watch_id == "ikos-pfingsten-2027")
     assert card.rows[0].detail == f"{GARDEN} · free cancellation"
+
+
+def test_a_crashing_hotel_card_build_leaves_the_report_without_hotels(config_dir, monkeypatch):
+    import vacation_planner.hotels.cards as cards
+    from vacation_planner.report import build_report
+
+    def boom(*args, **kwargs):
+        raise KeyError("hotel bug")
+
+    monkeypatch.setattr(cards, "build_hotel_cards", boom)
+    cfg = load_config(config_dir, env={})
+    data = build_report(Storage(":memory:"), cfg, datetime(2026, 11, 9, 5, 0, tzinfo=timezone.utc), None)
+    assert data.hotels == []

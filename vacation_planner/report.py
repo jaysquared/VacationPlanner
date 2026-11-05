@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
@@ -12,6 +13,8 @@ from .config import Config
 from .deals import median_for
 from .models import Cabin, Destination, Provider, SeatClass, Slot
 from .storage import DealRow, Observation, OfferRow, RunRow, SearchRow, Storage
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -192,7 +195,11 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
         if storage.cheapest_offer(s.id) is not None:
             searched.setdefault(s.slot_id, set()).add(s.destination)
     from .hotels.cards import build_hotel_cards   # local: hotels.cards imports this module
-    hotels = build_hotel_cards(storage, config, now.date())
+    try:
+        hotels = build_hotel_cards(storage, config, now.date())
+    except Exception:   # a hotel bug must not cost the flight report and the mail
+        log.exception("hotel cards failed; the report goes out without them")
+        hotels = []
     return ReportData(now, new_deals, slots, usage, run=storage.run_info(last_run_id),
                       searched=searched, attempted=attempted,
                       counts=storage.search_counts(last_run_id),
