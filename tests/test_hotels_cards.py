@@ -17,6 +17,11 @@ def ikos_stay(source=HotelSource.BOOKING, mode="rates"):
     return HotelStay("ikos-pfingsten-2027", source, "u", mode, date(2027, 5, 7), date(2027, 5, 14), 2, (8,))
 
 
+def waldorf_stay(source=HotelSource.HILTON, mode="parity"):
+    from datetime import date
+    return HotelStay("waldorf-herbst-2027", source, "u", mode, date(2027, 10, 10), date(2027, 10, 15), 2, (8,))
+
+
 def seeded(config_dir, totals=(7100.0, 6898.0)):
     cfg = load_config(config_dir, env={})
     db = Storage(":memory:")
@@ -70,3 +75,39 @@ def test_quiet_digest_still_lists_the_hotel_verdict(config_dir: Path):
     subject, text, _ = compose_digest(build_report(db, cfg, NOW, None), [], cfg, None)
     assert "Hotel alerts" not in text
     assert "Keep your booking: cheapest Junior Suite mit eigenem Garten 6,898 € on booking" in text
+
+
+def test_problem_does_not_repeat_the_source_when_the_note_already_names_it(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    db.save_hotel_result(NOW.isoformat(), HotelResult(ikos_stay(HotelSource.GOOGLE, "rates"), "no_rates", [],
+                                                       "Google Hotels: no price"), NOW)
+    card = next(c for c in build_hotel_cards(db, cfg, NOW.date()) if c.watch_id == "ikos-pfingsten-2027")
+    assert card.problems == ["Google Hotels: no price"]
+
+
+def test_problem_keeps_the_source_prefix_when_the_note_does_not_repeat_it(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    db.save_hotel_result(NOW.isoformat(), HotelResult(ikos_stay(HotelSource.GOOGLE, "rates"), "no_rates", [],
+                                                       "Google priced other dates (795 total vs 795 per night)"), NOW)
+    card = next(c for c in build_hotel_cards(db, cfg, NOW.date()) if c.watch_id == "ikos-pfingsten-2027")
+    assert card.problems == ["Google Hotels: Google priced other dates (795 total vs 795 per night)"]
+
+
+def test_card_detail_does_not_repeat_refundability_already_in_the_rate_name(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    db.save_hotel_result(NOW.isoformat(), HotelResult(waldorf_stay(), "ok", [
+        HotelRate("booking", "cash", total=1234.0,
+                  rate_name="One-Bedroom Hawksbill Garden Villa with Pool - Non-refundable · "
+                            "non-refundable · pay at property", refundable=False)]), NOW)
+    card = next(c for c in build_hotel_cards(db, cfg, NOW.date()) if c.watch_id == "waldorf-herbst-2027")
+    assert card.rows[0].detail == ("One-Bedroom Hawksbill Garden Villa with Pool - Non-refundable · "
+                                   "non-refundable · pay at property")
+
+
+def test_card_detail_keeps_refund_text_when_the_rate_name_lacks_it(config_dir: Path):
+    cfg, db = seeded(config_dir)
+    card = next(c for c in build_hotel_cards(db, cfg, NOW.date()) if c.watch_id == "ikos-pfingsten-2027")
+    assert card.rows[0].detail == f"{GARDEN} · free cancellation"

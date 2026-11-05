@@ -68,9 +68,10 @@ def _points_cost(watch: HotelWatch, rates: list[HotelRate], point_value: float |
 def _problem(c: HotelCheckRow) -> str:
     src = SOURCES.get(c.source.value, c.source.value)
     label = src if c.mode in ("rates", "rooms") else f"{src} {c.mode}"
-    if c.status == "skipped":
-        return f"{label}: skipped ({c.error})"
-    return f"{label}: {c.error or c.status}"
+    text = f"skipped ({c.error})" if c.status == "skipped" else (c.error or c.status)
+    if text.lower().startswith(label.lower()):
+        return text
+    return f"{label}: {text}"
 
 
 def _card(storage: Storage, config: Config, watch: HotelWatch, today: date) -> HotelCard | None:
@@ -85,7 +86,10 @@ def _card(storage: Storage, config: Config, watch: HotelWatch, today: date) -> H
     for channel, r in sorted(_relevant_cash(watch, rates).items(), key=lambda kv: kv[1].total):
         prev = previous.get(channel)
         label, cls = change(prev.total if prev else None, r.total)
-        detail = " · ".join(x for x in (r.room or r.rate_name, _refund_text(r)) if x)
+        room = r.room or r.rate_name
+        refund = _refund_text(r)
+        has_refund_text = room and any(t in room.lower() for t in ("non-refundable", "free cancellation"))
+        detail = " · ".join(x for x in (room, None if has_refund_text else refund) if x)
         rows.append(HotelRow(CHANNELS.get(channel, channel), detail, money(r.total), label, cls, r.url))
     points = _points_cost(watch, rates, config.point_value_eur)
     if points:
