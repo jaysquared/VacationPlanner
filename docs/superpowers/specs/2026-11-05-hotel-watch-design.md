@@ -1,7 +1,7 @@
 # Hotel Watch — Design Spec
 
 Date: 2026-11-05
-Status: draft, awaiting review
+Status: approved 2026-11-05
 
 ## 1. Purpose
 
@@ -102,7 +102,7 @@ hotel_watches:
     rule:
       type: points
       points_adults: 2
-      surcharge: 0                 # to confirm with the hotel
+      surcharge: 0                 # confirmed: no cost for the son
       until: 2027-10-14
 
 hilton:
