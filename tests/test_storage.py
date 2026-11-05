@@ -53,11 +53,13 @@ def test_migration_upgrades_a_database_created_by_an_earlier_version(tmp_path):
     conn.executescript(resources.files("vacation_planner.migrations").joinpath("001_initial.sql").read_text())
     conn.close()
 
-    db = Storage(path)   # applies 002 on top of the v1 database
+    db = Storage(path)   # applies every later migration (002, 003, ...) on top of the v1 database
     run = db.start_run(NOW, planned=1)
     sid = db.save_result(run, SearchResult(req(), Provider.SERPAPI, [offer(5000)]), NOW)
     assert db.cheapest_offer(sid).legs == LEGS
-    assert db.conn.execute("SELECT MAX(version) AS v FROM schema_version").fetchone()["v"] == 2
+    latest = max(int(p.name.split("_", 1)[0])
+                 for p in resources.files("vacation_planner.migrations").iterdir() if p.name.endswith(".sql"))
+    assert db.conn.execute("SELECT MAX(version) AS v FROM schema_version").fetchone()["v"] == latest
     db.close()
 
 

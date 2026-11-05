@@ -7,7 +7,10 @@ from datetime import date, datetime, timezone
 from importlib import resources
 from pathlib import Path
 
-from .models import DealReason, Leg, Offer, Provider, SearchRequest, SearchResult, SeatClass
+from .models import (
+    DealReason, HotelRate, HotelResult, HotelSource, HotelStay, Leg, Offer, Provider, SearchRequest,
+    SearchResult, SeatClass,
+)
 
 
 def _iso(dt: datetime) -> str:
@@ -120,6 +123,54 @@ class DealRow:
 class Observation:
     search: SearchRow
     offer: OfferRow
+
+
+@dataclass
+class HotelCheckRow:
+    id: int
+    batch: str
+    watch_id: str
+    source: HotelSource
+    mode: str
+    check_in: date
+    check_out: date
+    adults: int
+    child_ages: tuple[int, ...]
+    status: str
+    error: str | None
+
+    @staticmethod
+    def from_row(r: sqlite3.Row) -> "HotelCheckRow":
+        return HotelCheckRow(r["id"], r["batch"], r["watch_id"], HotelSource(r["source"]), r["mode"],
+                             date.fromisoformat(r["check_in"]), date.fromisoformat(r["check_out"]),
+                             r["adults"], tuple(json.loads(r["child_ages"])), r["status"], r["error"])
+
+
+@dataclass
+class StoredHotelRate:
+    check: HotelCheckRow
+    rate: HotelRate
+
+
+@dataclass
+class HotelAlertRow:
+    id: int
+    watch_id: str
+    batch: str
+    reason: str
+    value: float | None
+    threshold: float | None
+    headline: str
+    detected_at: datetime
+    notified_at: datetime | None
+
+    @staticmethod
+    def from_row(r: sqlite3.Row) -> "HotelAlertRow":
+        return HotelAlertRow(r["id"], r["watch_id"], r["batch"], r["reason"], r["value"], r["threshold"],
+                             r["headline"], _dt(r["detected_at"]), _dt(r["notified_at"]))
+
+
+_HOTEL_CHECK_COLS = "id, batch, watch_id, source, mode, check_in, check_out, adults, child_ages, status, error"
 
 
 _SEARCH_COLS = "id, run_id, slot_id, origin, destination, outbound_date, return_date, seat, adults, children, provider, requested_at, status, error"
@@ -250,7 +301,14 @@ class Storage:
         r = self.conn.execute(
             "SELECT COUNT(*) AS n FROM searches WHERE provider=? AND requested_at>=? AND status IN ('ok','error')",
             (provider.value, _iso(since))).fetchone()
-        return r["n"]
+        n = r["n"]
+        if provider is Provider.SERPAPI:
+            # Google Hotels queries go through the same SerpApi key and plan.
+            h = self.conn.execute(
+                """SELECT COUNT(*) AS n FROM hotel_checks WHERE source='google' AND requested_at>=?
+                   AND status IN ('ok','no_rates','error')""", (_iso(since),)).fetchone()
+            n += h["n"]
+        return n
 
     def searches_in_run(self, run_id: int, status: str = "ok") -> list[SearchRow]:
         rows = self.conn.execute(
@@ -379,6 +437,78 @@ class Storage:
     def mark_notified(self, deal_ids: list[int], now: datetime) -> None:
         with self.conn:
             self.conn.executemany("UPDATE deals SET notified_at=? WHERE id=?", [(_iso(now), i) for i in deal_ids])
+
+    # ---- hotels ----
+    def _insert_hotel_check(self, batch: str, stay: HotelStay, status: str, now: datetime,
+                            error: str | None) -> int:
+        cur = self.conn.execute(
+            """INSERT INTO hotel_checks (batch, watch_id, source, mode, check_in, check_out, adults,
+               child_ages, requested_at, status, error) VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
+            (batch, stay.watch_id, stay.source.value, stay.mode, stay.check_in.isoformat(),
+             stay.check_out.isoformat(), stay.adults, json.dumps(list(stay.child_ages)), _iso(now), status, error))
+        return cur.lastrowid
+
+    def record_hotel_check(self, batch: str, stay: HotelStay, status: str, now: datetime,
+                           error: str | None = None) -> int:
+        with self.conn:
+            return self._insert_hotel_check(batch, stay, status, now, error)
+
+    def save_hotel_result(self, batch: str, result: HotelResult, now: datetime) -> int:
+        with self.conn:   # the check and its rates commit together
+            cid = self._insert_hotel_check(batch, result.stay, result.status, now, result.note)
+            self.conn.executemany(
+                """INSERT INTO hotel_rates (check_id, channel, kind, total, points, room, rate_name,
+                   refundable, award_type, url) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                [(cid, r.channel, r.kind, r.total, r.points, r.room, r.rate_name,
+                  None if r.refundable is None else int(r.refundable), r.award_type, r.url)
+                 for r in result.rates])
+        return cid
+
+    def hotel_batches(self, watch_id: str) -> list[str]:
+        rows = self.conn.execute(
+            "SELECT DISTINCT batch FROM hotel_checks WHERE watch_id=? ORDER BY batch DESC", (watch_id,))
+        return [r["batch"] for r in rows]
+
+    def hotel_checks(self, watch_id: str, batch: str) -> list[HotelCheckRow]:
+        rows = self.conn.execute(
+            f"SELECT {_HOTEL_CHECK_COLS} FROM hotel_checks WHERE watch_id=? AND batch=? ORDER BY id",
+            (watch_id, batch))
+        return [HotelCheckRow.from_row(r) for r in rows]
+
+    def hotel_rates(self, watch_id: str, batch: str) -> list[StoredHotelRate]:
+        checks = {c.id: c for c in self.hotel_checks(watch_id, batch)}
+        if not checks:
+            return []
+        marks = ",".join("?" * len(checks))
+        rows = self.conn.execute(
+            f"""SELECT check_id, channel, kind, total, points, room, rate_name, refundable, award_type, url
+                FROM hotel_rates WHERE check_id IN ({marks}) ORDER BY id""", tuple(checks))
+        return [StoredHotelRate(checks[r["check_id"]], HotelRate(
+            r["channel"], r["kind"], r["total"], r["points"], r["room"], r["rate_name"],
+            None if r["refundable"] is None else bool(r["refundable"]), r["award_type"], r["url"]))
+            for r in rows]
+
+    def insert_hotel_alert(self, watch_id: str, batch: str, reason: str, value: float | None,
+                           threshold: float | None, headline: str, now: datetime) -> int:
+        with self.conn:
+            cur = self.conn.execute(
+                """INSERT INTO hotel_alerts (watch_id, batch, reason, value, threshold, headline, detected_at)
+                   VALUES (?,?,?,?,?,?,?)""", (watch_id, batch, reason, value, threshold, headline, _iso(now)))
+        return cur.lastrowid
+
+    def last_hotel_alert(self, watch_id: str, reason: str) -> HotelAlertRow | None:
+        r = self.conn.execute(
+            "SELECT * FROM hotel_alerts WHERE watch_id=? AND reason=? ORDER BY id DESC LIMIT 1",
+            (watch_id, reason)).fetchone()
+        return HotelAlertRow.from_row(r) if r else None
+
+    def pending_hotel_alerts(self) -> list[HotelAlertRow]:
+        rows = self.conn.execute("SELECT * FROM hotel_alerts WHERE notified_at IS NULL ORDER BY id")
+        return [HotelAlertRow.from_row(r) for r in rows]
+
+    def mark_hotel_alerts_notified(self, ids: list[int], now: datetime) -> None:
+        with self.conn:
+            self.conn.executemany("UPDATE hotel_alerts SET notified_at=? WHERE id=?", [(_iso(now), i) for i in ids])
 
     # ---- report ----
     def _observations(self, sql: str, params: tuple) -> list[Observation]:
