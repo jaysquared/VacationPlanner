@@ -24,6 +24,11 @@ def _refundable_cash(rates: list[HotelRate]) -> list[HotelRate]:
     return [r for r in rates if r.kind == "cash" and r.total and r.refundable is True]
 
 
+def _plan(r: HotelRate) -> str:
+    """`channel · rate name`: Hilton marks every plan refundable, so the family sees which one it is."""
+    return f"{r.channel} · {r.rate_name}" if r.rate_name else r.channel
+
+
 def evaluate_booked(watch: HotelWatch, rates: list[HotelRate]) -> Verdict:
     rule = watch.rule
     assert isinstance(rule, BookedRule)
@@ -65,9 +70,10 @@ def evaluate_points(watch: HotelWatch, rates: list[HotelRate], point_value: floa
                        threshold=cost)
     best = min(cash, key=lambda r: r.total)
     if best.total < cost:
-        return Verdict(watch.id, "alert", f"Pay cash: {money(best.total)} ({best.channel}) vs points {money(cost)} ({detail})",
+        return Verdict(watch.id, "alert", f"Pay cash: {money(best.total)} ({_plan(best)}) vs points {money(cost)} ({detail})",
                        "cash_beats_points", best.total, cost, best)
-    return Verdict(watch.id, "fine", f"Points still better: cash {money(best.total)} ({best.channel}) vs points {money(cost)} ({detail})",
+    return Verdict(watch.id, "fine", f"Points still better: cash {money(best.total)} ({_plan(best)}) "
+                   f"vs points {money(cost)} ({detail})",
                    None, best.total, cost, best)
 
 

@@ -45,14 +45,22 @@ def test_booked_without_the_room_is_no_rates():
 
 
 def test_points_cost_is_standard_points_times_value_plus_surcharge():
-    v = evaluate_points(WALDORF, [points(850000), points(3925000, "premium"), cash(7402.5, channel="direct")], 0.0044)
+    v = evaluate_points(WALDORF, [points(850000), points(3925000, "premium"),
+                                  cash(7402.5, channel="direct", rate_name="Honors Book Early and Save Breakfast Included")],
+                        0.0044)
     assert (v.state, v.threshold, v.value) == ("fine", 4090, 7402.5)
-    assert v.headline == "Points still better: cash 7,402 € (direct) vs points 4,090 € (850,000 pts + 350 €)"   # f"{7402.5:,.0f}" rounds half to even
+    assert v.headline == ("Points still better: cash 7,402 € (direct · Honors Book Early and Save Breakfast Included) "
+                          "vs points 4,090 € (850,000 pts + 350 €)")   # f"{7402.5:,.0f}" rounds half to even
 
 
 def test_points_alert_when_refundable_cash_is_cheaper():
-    v = evaluate_points(WALDORF, [points(850000), cash(4089, channel="agoda")], 0.0044)
+    v = evaluate_points(WALDORF, [points(850000), cash(4089, channel="agoda", rate_name="Flexible Rate")], 0.0044)
     assert (v.state, v.reason, v.value) == ("alert", "cash_beats_points", 4089)
+    assert v.headline == "Pay cash: 4,089 € (agoda · Flexible Rate) vs points 4,090 € (850,000 pts + 350 €)"
+
+
+def test_points_headline_without_a_rate_name_shows_only_the_channel():
+    v = evaluate_points(WALDORF, [points(850000), cash(4089, channel="agoda", rate_name=None)], 0.0044)
     assert v.headline == "Pay cash: 4,089 € (agoda) vs points 4,090 € (850,000 pts + 350 €)"
 
 
