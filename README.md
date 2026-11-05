@@ -190,3 +190,19 @@ A deal that clears both margins carries the extra reason `cheaper_than_home`.
 In the report, Hamburg and Frankfurt share one row per destination: the
 alternate origin shows up as `FRA 9,000 € (−25 %)` next to the Hamburg price,
 and each origin keeps its own history page.
+
+## Hotel watch
+
+`config/hotels.yaml` lists hotel stays the family has chosen. Every Monday run checks each one
+and the digest carries one verdict per hotel:
+
+- `booked` (Ikos Porto Petro): alerts when the same room type, refundable, costs at least
+  `min_saving_ratio` less than `paid_total` — rebook and cancel the old booking. Ends at `until`
+  (the free-cancellation deadline).
+- `points` (Waldorf Astoria, Mango House): alerts when refundable cash for the whole family is
+  cheaper than the Standard Room Reward for `points_adults` × `hilton.point_value_eur` + `surcharge`,
+  or when no Standard Room Reward is offered.
+
+Sources: Booking.com and Hilton (incl. Booking/Expedia/Hotels.com/Agoda prices for Hilton hotels)
+through Apify (`APIFY_TOKEN`), Google Hotels through SerpApi (`SERPAPI_KEY`, at most 8 nights).
+`vacation-planner plan` lists the checks; `vacation-planner hotels` runs them on their own.
