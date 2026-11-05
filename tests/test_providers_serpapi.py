@@ -90,6 +90,31 @@ def test_search_drops_itineraries_that_break_the_layover_rule(client, httpx_mock
     assert 7000 not in [o.price_total for o in res.offers]
 
 
+
+#: Turkish to Mahé: a 7h40 afternoon stop in Istanbul, clear of the night window.
+LONG_DAY_STOP_ITINERARY = {
+    "flights": [{"departure_airport": {"id": "HAM", "time": "2027-10-09 10:25"},
+                 "arrival_airport": {"id": "IST", "time": "2027-10-09 14:45"},
+                 "duration": 200, "airline": "Turkish", "flight_number": "TK 1662", "travel_class": "Business"},
+                {"departure_airport": {"id": "IST", "time": "2027-10-09 22:25"},
+                 "arrival_airport": {"id": "SEZ", "time": "2027-10-10 07:30"},
+                 "duration": 485, "airline": "Turkish", "flight_number": "TK 738", "travel_class": "Business"}],
+    "total_duration": 1145, "price": 9600,
+}
+
+
+def test_a_destination_override_lets_a_long_stop_through(config_dir, httpx_mock):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("  max_minutes: 180", "  max_minutes: 180\n  max_minutes_by_destination: { SEZ: 480 }"))
+    c = SerpApiClient("KEY", load_config(config_dir, env={}).settings, sleep=lambda s: None)
+    data = {"best_flights": [copy.deepcopy(LONG_DAY_STOP_ITINERARY)], "other_flights": []}
+    sez = SearchRequest("herbst-2027", "HAM", "SEZ", date(2027, 10, 9), date(2027, 10, 21), SeatClass.BUSINESS, 2, 1)
+    bkk = SearchRequest("herbst-2027", "HAM", "BKK", date(2027, 10, 9), date(2027, 10, 21), SeatClass.BUSINESS, 2, 1)
+    httpx_mock.add_response(json=data)
+    httpx_mock.add_response(json=data)
+    assert [o.price_total for o in c.search(sez).offers] == [9600]
+    assert c.search(bkk).offers == []   # everywhere else the 180 min limit stands
+
 def test_parse_response_reads_cabin_and_minutes_per_leg():
     data = fixture()
     data["best_flights"][0]["flights"][0]["travel_class"] = "Economy"

@@ -129,6 +129,12 @@ class LayoverSettings(BaseModel):
     max_minutes: int = 180
     #: Local-time window no stop may touch, e.g. ["23:00", "05:00"]. None disables the check.
     forbidden_window: tuple[str, str] | None = ("23:00", "05:00")
+    #: A longer stop limit for single destinations, e.g. {SEZ: 480}; the night window still applies.
+    max_minutes_by_destination: dict[str, int] = {}
+
+    def for_destination(self, code: str) -> "LayoverSettings":
+        limit = self.max_minutes_by_destination.get(code)
+        return self if limit is None else self.model_copy(update={"max_minutes": limit})
 
     @field_validator("forbidden_window")
     @classmethod

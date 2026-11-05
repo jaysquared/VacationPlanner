@@ -4,6 +4,7 @@ bridge_days: { before: 0, after: 0 }
 max_stops: 2
 layovers:
   max_minutes: 180                        # each individual stop
+  max_minutes_by_destination: { SEZ: 480 }   # Turkish via IST: a 7h40 afternoon stop (HAM 10:25 -> IST 14:45, on 22:25)
   forbidden_window: ["23:00", "05:00"]    # local time; a stop touching this window is rejected
 cabin:
   max_economy_leg_minutes: 120           # on a Business search; a longer Economy flight is rejected

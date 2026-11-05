@@ -52,6 +52,21 @@ def test_layovers_can_be_switched_off(config_dir: Path):
     assert cfg.settings.layovers.forbidden_window is None
 
 
+
+def test_a_destination_can_allow_longer_stops(config_dir: Path):
+    st = config_dir / "settings.yaml"
+    st.write_text(st.read_text().replace("  max_minutes: 180", "  max_minutes: 180\n  max_minutes_by_destination: { SEZ: 480 }"))
+    lay = load_config(config_dir, env={}).settings.layovers
+    assert lay.for_destination("SEZ").max_minutes == 480
+    assert lay.for_destination("SEZ").forbidden_window == ("23:00", "05:00")   # the night rule still holds
+    assert lay.for_destination("BKK").max_minutes == 180
+
+
+def test_stop_overrides_default_to_none(config_dir: Path):
+    lay = load_config(config_dir, env={}).settings.layovers
+    assert lay.max_minutes_by_destination == {}
+    assert lay.for_destination("SEZ") == lay
+
 def test_origins_default_to_none_and_are_read_per_destination(config_dir: Path):
     dst = config_dir / "destinations.yaml"
     dst.write_text("destinations:\n"
