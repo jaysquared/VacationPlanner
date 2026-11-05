@@ -25,6 +25,25 @@
 <p class="muted">No deals in the last run.</p>
 {% endif %}
 
+{% if data.hotels %}
+<h2>Hotels</h2>
+{% for h in data.hotels %}
+<h3>{{ h.name }} <span class="muted">· {{ h.dates }}</span></h3>
+<p class="{{ 'deal' if h.verdict.state == 'alert' else '' }}">{{ h.verdict.headline }}</p>
+{% if h.rows %}
+<div class="wrap"><table>
+<tr><th>Where</th><th>Room / rate</th><th class="num">Total</th><th class="num">vs last week</th><th></th></tr>
+{% for r in h.rows %}
+<tr><td>{{ r.label }}</td><td>{{ r.detail }}</td><td class="num">{{ r.price }}</td>
+<td class="num{{ ' ' + r.change_class if r.change_class }}">{{ r.change }}</td>
+<td>{% if r.url %}<a href="{{ r.url }}">Book</a>{% endif %}</td></tr>
+{% endfor %}
+</table></div>
+{% endif %}
+{% for p in h.problems %}<p class="muted">{{ p }}</p>{% endfor %}
+{% endfor %}
+{% endif %}
+
 {% for slot, window, routes in data.slots %}
 <h2>{{ slot.name }} <span class="muted">· free {{ window.start }} – {{ window.end }} ({{ window.days }} days)</span></h2>
 {% if not slot.targets %}

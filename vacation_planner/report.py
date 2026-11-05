@@ -60,6 +60,7 @@ class ReportData:
     attempted: dict[str, set[str]] = field(default_factory=dict)
     counts: dict[str, int] = field(default_factory=dict)        # searches of that run by status
     providers: dict[Provider, int] = field(default_factory=dict)  # ok searches of that run by provider
+    hotels: list = field(default_factory=list)   # HotelCard per watch
 
 
 def deal_median(storage: Storage, config: Config, search: SearchRow) -> float | None:
@@ -190,10 +191,12 @@ def build_report(storage: Storage, config: Config, now: datetime, last_run_id: i
         attempted.setdefault(s.slot_id, set()).add(s.destination)
         if storage.cheapest_offer(s.id) is not None:
             searched.setdefault(s.slot_id, set()).add(s.destination)
+    from .hotels.cards import build_hotel_cards   # local: hotels.cards imports this module
+    hotels = build_hotel_cards(storage, config, now.date())
     return ReportData(now, new_deals, slots, usage, run=storage.run_info(last_run_id),
                       searched=searched, attempted=attempted,
                       counts=storage.search_counts(last_run_id),
-                      providers=storage.provider_counts(last_run_id))
+                      providers=storage.provider_counts(last_run_id), hotels=hotels)
 
 
 def _env() -> Environment:

@@ -399,3 +399,15 @@ def test_a_slot_whose_searches_all_came_back_empty_says_no_result(config_dir):
     assert "Himmelfahrt/Pfingsten 2027 — searched but no result: TFS, LPA, FUE" in html
     assert "Himmelfahrt/Pfingsten 2027 — not searched in this run" not in html
     assert "Himmelfahrt/Pfingsten 2027 — searched but no result: TFS, LPA, FUE" in text
+
+
+def test_mode_deals_only_mails_for_a_hotel_alert_and_marks_it(config_dir):
+    set_mode(config_dir, "deals_only")
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    db.insert_hotel_alert("ikos-pfingsten-2027", NOW.isoformat(), "cheaper_room", 5000, 5076,
+                          "Rebook: Junior Suite mit eigenem Garten 5,000 € on booking", NOW)
+    FakeSMTP.instances.clear()
+    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP).sent is True
+    assert FakeSMTP.instances[0].sent[0]["Subject"].startswith("Vacation Planner · 1 hotel alert")
+    assert db.pending_hotel_alerts() == []

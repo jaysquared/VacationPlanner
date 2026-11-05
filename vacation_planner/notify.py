@@ -22,7 +22,7 @@ from .explain import explain
 from .models import Cabin, Destination, Provider, Slot
 from .report import MONTHS, NewDeal, ReportData, RouteSummary, build_report, change, money, new_deal
 from .report import date_range as _dates, day_label as _day  # noqa: F401  (_day: old name kept)
-from .storage import SearchRow, Storage
+from .storage import HotelAlertRow, SearchRow, Storage
 
 if TYPE_CHECKING:   # only for the annotation; the provider layer is heavy to import
     from .providers.executor import ExecutionSummary
@@ -131,6 +131,10 @@ class _Digest:
     not_searched: list[str]
     report_url: str | None
     test_data: bool = False
+    #: one card per pending hotel alert, shown above the flight deals
+    hotel_alerts: list[_Deal] = field(default_factory=list)
+    #: the report's `HotelCard`s, one per watch that has been checked
+    hotels: list = field(default_factory=list)
 
 
 def _status_line(data: ReportData, config: Config) -> str:
@@ -212,13 +216,19 @@ def _block(slot: Slot, window: Window, routes: list[RouteSummary]) -> _Block:
     return _Block(heading, [_row(r) for r in routes])
 
 
-def _subject(data: ReportData, cards: int) -> str:
+def _subject(data: ReportData, cards: int, hotel_alerts: int = 0) -> str:
     """`cards`, not the raw deal count: the subject must match what the mail shows.
 
     Several date pairs of one route share a card, so counting deal rows promised
-    "8 new deals" above four cards.
+    "8 new deals" above four cards. Hotel alerts lead, since they are the rarer news.
     """
-    head = f"{cards} new deal{'' if cards == 1 else 's'}" if cards else "weekly update"
+    deals = f"{cards} new deal{'' if cards == 1 else 's'}"
+    if hotel_alerts:
+        head = f"{hotel_alerts} hotel alert{'' if hotel_alerts == 1 else 's'}"
+        if cards:
+            head += f" · {deals}"
+    else:
+        head = deals if cards else "weekly update"
     subject = f"Vacation Planner · {head}"
     for slot, _window, routes in data.slots:
         if routes:
@@ -268,21 +278,36 @@ def _not_searched(data: ReportData, config: Config) -> list[str]:
     return lines
 
 
-def _prepare(data: ReportData, deals: list[NewDeal], config: Config, report_url: str | None) -> _Digest:
+def _hotel_alert_cards(data: ReportData, hotel_alerts: list[HotelAlertRow]) -> list[_Deal]:
+    """One card per pending hotel alert, titled by its watch's card when the report has one."""
+    by_id = {c.watch_id: c for c in data.hotels}
+    cards = []
+    for a in hotel_alerts:
+        card = by_id.get(a.watch_id)
+        title = f"{card.name} · {card.dates}" if card else a.watch_id
+        url = (card.verdict.best.url or "") if card and card.verdict.best else ""
+        cards.append(_Deal(title=title, price=a.headline, why="", url=url))
+    return cards
+
+
+def _prepare(data: ReportData, deals: list[NewDeal], config: Config, report_url: str | None,
+             hotel_alerts: list[HotelAlertRow] | None = None) -> _Digest:
     blocks = [_block(slot, window, routes) for slot, window, routes in data.slots if routes]
     # Best first, and among equals the one that costs the least per person -- the deal
     # ordering belongs to the digest, so every caller gets the same mail.
     ranked = sorted(deals, key=lambda n: (-n.deal.score, n.offer.per_person))
     cards = [_deal_card(group, data, config) for group in _grouped(ranked)]
+    alert_cards = _hotel_alert_cards(data, hotel_alerts or [])
     d = data.generated_at
     return _Digest(
-        subject=_subject(data, len(cards)),
+        subject=_subject(data, len(cards), len(alert_cards)),
         date=f"{d.day} {MONTHS_FULL[d.month - 1]} {d.year}",
         status=_status_line(data, config),
         budget=_budget_line(data),
         deals=cards,
         blocks=blocks, not_searched=_not_searched(data, config), report_url=report_url,
-        test_data=_uses_fake_data(data, deals))
+        test_data=_uses_fake_data(data, deals),
+        hotel_alerts=alert_cards, hotels=data.hotels)
 
 
 # ---- HTML ----
@@ -357,6 +382,15 @@ def _html(d: _Digest) -> str:
     if d.budget:
         parts.append(f'<p style="{MUTED}">{_e(d.budget)}</p>')
 
+    if d.hotel_alerts:
+        parts.append(f'<h2 style="{H2}">Hotel alerts</h2>')
+        for a in d.hotel_alerts:
+            parts.append(
+                f'<div style="{CARD}"><div style="font-weight:600;">{_e(a.title)}</div>'
+                f'<div>{_e(a.price)}</div>'
+                + (f'<div style="margin-top:4px;">{_link(a.url, "Book")}</div>' if a.url else "")
+                + "</div>")
+
     parts.append(f'<h2 style="{H2}">New deals</h2>')
     if d.deals:
         for deal in d.deals:
@@ -368,6 +402,15 @@ def _html(d: _Digest) -> str:
                 + f'<div style="margin-top:4px;">{_link(deal.url, "Book on Google Flights")}</div></div>')
     else:
         parts.append(f'<p style="{MUTED}">No new deals this week.</p>')
+
+    if d.hotels:
+        parts.append(f'<h2 style="{H2}">Hotels</h2>')
+        for h in d.hotels:
+            lines = [f"{r.label}: {r.price} {r.change} — {r.detail}" for r in h.rows] + list(h.problems)
+            parts.append(f'<p style="margin:0 0 10px;"><b>{_e(h.name)}</b> · {_e(h.dates)}<br>'
+                         f'{_e(h.verdict.headline)}'
+                         + "".join(f'<br><span style="{SUB}">{_e(line)}</span>' for line in lines)
+                         + "</p>")
 
     for block in d.blocks:
         parts.append(f'<h2 style="{H2}">{_e(block.heading)}</h2>')
@@ -425,7 +468,17 @@ def _text(d: _Digest) -> str:
     if d.budget:
         lines.append(d.budget)
 
-    lines += [""] + _heading("New deals")
+    lines.append("")
+    if d.hotel_alerts:
+        lines += _heading("Hotel alerts")
+        for a in d.hotel_alerts:
+            lines.append(a.title)
+            lines.append(f"  {a.price}")
+            if a.url:
+                lines.append(f"  book: {a.url}")
+            lines.append("")
+
+    lines += _heading("New deals")
     if d.deals:
         for deal in d.deals:
             lines.append(deal.title)
@@ -437,6 +490,15 @@ def _text(d: _Digest) -> str:
             lines.append("")
     else:
         lines += ["No new deals this week.", ""]
+
+    if d.hotels:
+        lines += _heading("Hotels")
+        for h in d.hotels:
+            lines.append(f"{h.name} · {h.dates}")
+            lines.append(f"  {h.verdict.headline}")
+            lines += [f"    {r.label}: {r.price} ({r.change}) — {r.detail}" for r in h.rows]
+            lines += [f"    {p}" for p in h.problems]
+            lines.append("")
 
     for block in d.blocks:
         lines += _heading(block.heading) + _text_table(block) + [""]
@@ -459,9 +521,9 @@ class SendResult:
 
 
 def compose_digest(data: ReportData, deals: list[NewDeal], config: Config,
-                   report_url: str | None) -> tuple[str, str, str]:
+                   report_url: str | None, hotel_alerts: list[HotelAlertRow] | None = None) -> tuple[str, str, str]:
     """(subject, text body, html body) for one weekly digest."""
-    d = _prepare(data, deals, config, report_url)
+    d = _prepare(data, deals, config, report_url, hotel_alerts)
     return d.subject, _text(d), _html(d)
 
 
@@ -482,7 +544,8 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
     if mode == "never":
         return SendResult()
     pending = storage.pending_deals()
-    if mode == "deals_only" and not pending:
+    alerts = storage.pending_hotel_alerts()
+    if mode == "deals_only" and not (pending or alerts):
         return SendResult()
     sec = config.secrets
     if not (sec.smtp_host and sec.mail_from and sec.mail_to):
@@ -495,7 +558,7 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
         # storage counts what was written.
         data.counts = {"ok": summary.ok, "error": summary.errors, "skipped": summary.skipped}
     deals = [new_deal(storage, config, d) for d in pending]   # the digest ranks them
-    subject, text, html = compose_digest(data, deals, config, report_url)
+    subject, text, html = compose_digest(data, deals, config, report_url, hotel_alerts=alerts)
 
     msg = EmailMessage()
     msg["Subject"], msg["From"], msg["To"] = subject, sec.mail_from, ", ".join(sec.mail_to)
@@ -518,4 +581,6 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
         return SendResult()
     if deals:
         storage.mark_notified([d.deal.id for d in deals], now)
+    if alerts:
+        storage.mark_hotel_alerts_notified([a.id for a in alerts], now)
     return SendResult(sent=True, deals=len(deals))
