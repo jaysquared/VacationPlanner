@@ -71,3 +71,10 @@ def test_the_sons_age_is_taken_on_the_check_in_date():
     assert guests_on(t, date(2027, 4, 20)) == (2, (7,))
     assert guests_on(t, date(2027, 4, 21)) == (2, (8,))
     assert guests_on(t, date(2031, 5, 1)) == (3, ())      # 12 and older pays as an adult
+
+
+def test_duplicate_watch_ids_are_rejected(config_dir: Path):
+    f = config_dir / "hotels.yaml"
+    f.write_text(f.read_text().replace("id: mango-herbst-2027", "id: waldorf-herbst-2027", 1))
+    with pytest.raises(ConfigError, match="hotels.yaml: duplicate watch id waldorf-herbst-2027"):
+        load_config(config_dir, env={})

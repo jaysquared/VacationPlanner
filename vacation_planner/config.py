@@ -324,6 +324,8 @@ def _hotel_watches(config_dir: Path, slot_ids: set[str]) -> tuple[list[HotelWatc
     watches: list[HotelWatch] = []
     for w in raw.hotel_watches:
         where = f"hotels.yaml: watch {w.id}"
+        if any(x.id == w.id for x in watches):
+            raise ConfigError(f"hotels.yaml: duplicate watch id {w.id}")
         if w.slot not in slot_ids:
             raise ConfigError(f"{where}: unknown slot {w.slot}")
         if w.check_out <= w.check_in:
