@@ -106,7 +106,7 @@ hotel_watches:
       until: 2027-10-14
 
 hilton:
-  point_value_eur: 0.005           # what one Hilton point is worth to the family
+  point_value_eur: 0.0044          # Hilton's points sale, 0.44 ct/point until 2026-11-21
 ```
 
 Guests default to `travellers.yaml` (2 adults + the son, aged on the check-in
@@ -135,8 +135,8 @@ re-alert only when the price falls a further 5 % (same `renotify_drop_ratio`
 as flights). Only this run's rates count, as for flights.
 
 With today's figures nothing alerts: Ikos 6,898 EUR > 5,076 EUR; Waldorf cash
-7,402 EUR (refundable) vs points 850,000 × 0.005 + 350 = 4,600 EUR; Mango House
-3,850 EUR vs 600,000 × 0.005 = 3,000 EUR.
+7,402 EUR (refundable) vs points 850,000 × 0.0044 + 350 = 4,090 EUR; Mango House
+3,850 EUR vs 600,000 × 0.0044 = 2,640 EUR.
 
 ## 5. Storage
 
