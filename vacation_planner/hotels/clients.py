@@ -6,6 +6,7 @@ is `no_rates`, never a price. Tested live 2026-11-03/05; the fixtures are those 
 
 from __future__ import annotations
 
+import re
 from typing import Protocol
 from urllib.parse import urlencode
 
@@ -22,6 +23,10 @@ SERPAPI_URL = "https://serpapi.com/search.json"
 APIFY_TIMEOUT = 300
 #: Google's wrong-date fallback prices one night; a real total is about nightly x nights.
 TOTAL_TOLERANCE = 0.15
+#: "Advance Purchase", "Adv Purchase", "Adv. Purchase" (any casing) are always prepaid.
+_ADVANCE_PURCHASE_RE = re.compile(r"\badv(ance|\.)?\s+purchase\b", re.IGNORECASE)
+#: Booking's own API reports its price currency with the symbol, not the ISO code.
+_EUR_CURRENCIES = {"EUR", "€"}
 
 
 class HotelClient(Protocol):
@@ -34,9 +39,19 @@ def _no_rates(stay: HotelStay, note: str) -> HotelResult:
     return HotelResult(stay, "no_rates", [], note)
 
 
-def _non_refundable_name(name: str | None) -> bool:
-    # Hilton reports its Advance Purchase plans as refundable; they are prepaid and are not.
-    return "advance purchase" in (name or "").lower()
+def _is_advance_purchase(name: str | None) -> bool:
+    return bool(name) and _ADVANCE_PURCHASE_RE.search(name) is not None
+
+
+def _refundable(raw: bool | None, name: str | None) -> bool | None:
+    """A cash rate's refundability, with the Advance Purchase override applied.
+
+    A source may call its Advance Purchase plan "refundable" (Hilton does); it is prepaid
+    and never is, whatever the source says. Anything else passes through unchanged, so an
+    unknown (`None`) refundability stays unknown rather than becoming a `False` that would
+    never alert for the wrong reason.
+    """
+    return False if _is_advance_purchase(name) else raw
 
 
 class ApifyActor:
@@ -82,12 +97,12 @@ def parse_booking(items: list[dict], stay: HotelStay) -> HotelResult:
     rates = []
     for room in h.get("rooms") or []:
         for o in room.get("options") or []:
-            if not o.get("price"):
+            if not o.get("price") or o.get("currency") not in _EUR_CURRENCIES:
                 continue
+            name = ", ".join(o.get("yourChoices") or []) or None
             rates.append(HotelRate(
                 "booking", "cash", total=round(float(o["price"]), 2), room=room.get("roomType"),
-                rate_name=", ".join(o.get("yourChoices") or []) or None,
-                refundable=bool(o.get("freeCancellation")), url=h.get("url")))
+                rate_name=name, refundable=_refundable(bool(o.get("freeCancellation")), name), url=h.get("url")))
     return HotelResult(stay, "ok", rates) if rates else _no_rates(stay, "Booking.com: no room available")
 
 
@@ -129,17 +144,17 @@ def parse_hilton(rows: list[dict], stay: HotelStay) -> HotelResult:
             rates.append(HotelRate("direct", "points", points=int(r["points_total"]), room=r.get("room_name"),
                                    rate_name=r.get("rate_name"), award_type="standard" if std else "premium"))
         elif stay.mode == "parity":
-            if r.get("channel") == "direct" or not r.get("public_total"):
-                continue   # the `rates` check prices direct room by room
-            rates.append(HotelRate(r["channel"], "cash", total=float(r["public_total"]),
-                                   rate_name=r.get("rate_name"), refundable=r.get("refundable")))
-        else:   # rates
-            if not r.get("price_total"):
-                continue   # award plans appear here with price 0
+            if r.get("channel") == "direct" or not r.get("public_total") or r.get("currency") not in _EUR_CURRENCIES:
+                continue   # the `rates` check prices direct room by room; other-currency quotes aren't comparable
             name = r.get("rate_name")
-            refundable = bool(r.get("refundable")) and not _non_refundable_name(name)
+            rates.append(HotelRate(r["channel"], "cash", total=float(r["public_total"]),
+                                   rate_name=name, refundable=_refundable(r.get("refundable"), name)))
+        else:   # rates
+            if not r.get("price_total") or r.get("currency") not in _EUR_CURRENCIES:
+                continue   # award plans appear here with price 0; other-currency quotes aren't comparable
+            name = r.get("rate_name")
             rates.append(HotelRate("direct", "cash", total=float(r["price_total"]), room=r.get("room_name"),
-                                   rate_name=name, refundable=refundable))
+                                   rate_name=name, refundable=_refundable(bool(r.get("refundable")), name)))
     return HotelResult(stay, "ok", rates) if rates else _no_rates(stay, "Hilton: no priced rate")
 
 
@@ -164,6 +179,8 @@ def _lowest(block: dict | None) -> float | None:
 
 
 def parse_google(data: dict, stay: HotelStay) -> HotelResult:
+    if (data.get("search_parameters") or {}).get("currency") != "EUR":
+        return _no_rates(stay, "Google Hotels: not EUR")
     nightly, total = _lowest(data.get("rate_per_night")), _lowest(data.get("total_rate"))
     if nightly is None or total is None:
         return _no_rates(stay, "Google Hotels: no price")
@@ -176,12 +193,22 @@ def parse_google(data: dict, stay: HotelStay) -> HotelResult:
             rates.append(HotelRate(src.get("source") or "google", "cash", total=t, url=src.get("link")))
     for src in data.get("featured_prices") or []:
         for room in src.get("rooms") or []:
-            t = _lowest(room.get("total_rate"))
-            if not t:
+            room_total = _lowest(room.get("total_rate"))
+            entries = room.get("rates") or []
+            if not entries:
+                if room_total:
+                    rates.append(HotelRate(src.get("source") or "google", "cash", total=room_total,
+                                           room=room.get("name"), refundable=None, url=room.get("link")))
                 continue
-            free = [x.get("free_cancellation") for x in room.get("rates") or [] if "free_cancellation" in x]
-            rates.append(HotelRate(src.get("source") or "google", "cash", total=t, room=room.get("name"),
-                                   refundable=(any(free) if free else None), url=room.get("link")))
+            for entry in entries:
+                t = _lowest(entry.get("total_rate")) or room_total
+                if not t:
+                    continue
+                name = ", ".join(entry.get("inclusions") or []) or None
+                raw = entry.get("free_cancellation") if "free_cancellation" in entry else None
+                rates.append(HotelRate(src.get("source") or "google", "cash", total=t, room=room.get("name"),
+                                       rate_name=name, refundable=_refundable(raw, name),
+                                       url=entry.get("link") or room.get("link")))
     return HotelResult(stay, "ok", rates) if rates else _no_rates(stay, "Google Hotels: no price")
 
 

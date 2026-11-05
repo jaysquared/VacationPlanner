@@ -59,6 +59,22 @@ def test_parse_booking_with_nothing_found_is_no_rates():
     assert parse_booking([], IKOS).status == "no_rates"
 
 
+def test_parse_booking_advance_purchase_option_is_non_refundable_even_if_booking_says_free_cancellation():
+    items = load("booking_ikos.json")
+    opt = items[0]["rooms"][0]["options"][0]
+    opt["yourChoices"] = ["Adv. Purchase Rate"]
+    opt["freeCancellation"] = True   # Booking's own flag says yes; the plan name overrides it
+    res = parse_booking(items, IKOS)
+    assert res.rates[0].refundable is False
+
+
+def test_parse_booking_skips_non_eur_options():
+    items = load("booking_ikos.json")
+    items[0]["rooms"][0]["options"][0]["currency"] = "$"
+    res = parse_booking(items, IKOS)
+    assert len(res.rates) == 16   # the USD option for that room is dropped, the other 16 remain
+
+
 # ---- Hilton ----
 
 def test_parse_hilton_rates_keeps_cash_and_marks_advance_purchase_non_refundable():
@@ -84,9 +100,10 @@ def test_parse_hilton_award_tells_standard_from_premium():
 def test_parse_hilton_parity_keeps_other_channels_and_unknown_refundability():
     res = parse_hilton(load("hilton_waldorf_parity.json"), waldorf("parity"))
     by = {r.channel: r for r in res.rates}
-    assert set(by) == {"booking", "expedia", "hotelscom", "agoda"}   # direct is covered by `rates`; ctrip had no hotel
+    # direct is covered by `rates`; ctrip had no hotel; expedia/hotelscom quoted USD, not comparable
+    assert set(by) == {"booking", "agoda"}
     assert (by["agoda"].total, by["agoda"].refundable) == (6470, False)
-    assert by["expedia"].refundable is None
+    assert all(r.total != 7905 for r in res.rates)   # the USD 7905 quotes never survive
 
 
 def test_parse_hilton_rejects_rows_for_other_guests_or_dates():
@@ -94,6 +111,21 @@ def test_parse_hilton_rejects_rows_for_other_guests_or_dates():
     assert parse_hilton(rows, waldorf("rates", adults=3, ages=())).status == "no_rates"
     rows[0]["checkin"] = "2027-10-11"
     assert parse_hilton(rows, waldorf("rates")).status == "no_rates"
+
+
+def mango(mode, adults=2, ages=(8,)):
+    return HotelStay("mango-herbst-2027", HotelSource.HILTON, "SEZITOL", mode,
+                     date(2027, 10, 15), date(2027, 10, 20), adults, ages)
+
+
+def test_parse_hilton_treats_abbreviated_advance_purchase_names_as_non_refundable():
+    res = parse_hilton(load("hilton_mango_rates.json"), mango("rates"))
+    assert res.status == "ok"
+    for r in res.rates:
+        if "adv" in r.rate_name.lower() and "purchase" in r.rate_name.lower():
+            assert r.refundable is False, r.rate_name
+    flexible = [r for r in res.rates if r.rate_name == "Flexible Rate incl Breakfast" and r.room == "King Deluxe Room"]
+    assert flexible and flexible[0].refundable is True   # a genuinely flexible rate still alerts
 
 
 # ---- Google Hotels ----
@@ -110,6 +142,54 @@ def test_parse_google_detects_the_silent_wrong_date_fallback():
     stay = waldorf("rooms", source=HotelSource.GOOGLE, ref="ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE")
     res = parse_google(load("google_waldorf_wrong_dates.json"), stay)
     assert res.status == "no_rates" and res.rates == [] and "other dates" in res.note
+
+
+#: One room from google_waldorf_wrong_dates.json's "Villa mit 1 Schlafzimmer und Pool": a
+#: non-refundable 1,652 rate and a free-cancellation 1,942 rate for the same room.
+GOOGLE_ROOM_WITH_MIXED_RATES = {
+    "search_parameters": {"currency": "EUR"},
+    "rate_per_night": {"extracted_lowest": 1652}, "total_rate": {"extracted_lowest": 1652},
+    "featured_prices": [{"source": "Booking.com", "rooms": [{
+        "name": "Villa mit 1 Schlafzimmer und Pool", "link": "https://example.com/room",
+        "total_rate": {"extracted_lowest": 1652},
+        "rates": [
+            {"link": "https://example.com/rate1", "breakfast_included": True,
+             "total_rate": {"extracted_lowest": 1652}, "inclusions": ["3 Gäste", "Frühstück"]},
+            {"link": "https://example.com/rate2", "free_cancellation": True, "breakfast_included": True,
+             "total_rate": {"extracted_lowest": 1942},
+             "inclusions": ["3 Gäste", "Kostenlose Stornierung bis zum 12. Nov.", "Frühstück"]},
+        ],
+    }]}],
+}
+
+
+#: One night, so the nightly-vs-total date-ratio guard (which only applies for 2+ nights) is skipped.
+ONE_NIGHT_GOOGLE_STAY = HotelStay("mango-herbst-2027", HotelSource.GOOGLE, "tok", "rooms",
+                                  date(2027, 10, 15), date(2027, 10, 16), 2, (8,))
+
+
+def test_parse_google_emits_one_rate_per_entry_with_its_own_total_and_refundability():
+    res = parse_google(GOOGLE_ROOM_WITH_MIXED_RATES, ONE_NIGHT_GOOGLE_STAY)
+    assert res.status == "ok"
+    by_total = {r.total: r for r in res.rates}
+    assert by_total[1652].refundable is None   # no `free_cancellation` key on this entry: unknown, never alerts
+    assert by_total[1942].refundable is True
+    assert all(r.room == "Villa mit 1 Schlafzimmer und Pool" for r in res.rates)
+
+
+def test_parse_google_advance_purchase_inclusions_are_non_refundable_even_with_free_cancellation_flag():
+    data = json.loads(json.dumps(GOOGLE_ROOM_WITH_MIXED_RATES))   # deep copy
+    entry = data["featured_prices"][0]["rooms"][0]["rates"][1]
+    entry["inclusions"] = ["Advance Purchase Rate"]
+    res = parse_google(data, ONE_NIGHT_GOOGLE_STAY)
+    assert {r.refundable for r in res.rates} == {None, False}   # the 1942 entry is no longer refundable
+
+
+def test_parse_google_non_eur_response_is_no_rates():
+    data = json.loads(json.dumps(GOOGLE_ROOM_WITH_MIXED_RATES))
+    data["search_parameters"]["currency"] = "USD"
+    res = parse_google(data, IKOS_GOOGLE)
+    assert res.status == "no_rates" and res.rates == []
 
 
 def test_google_no_results_is_no_rates_not_an_error(httpx_mock):
