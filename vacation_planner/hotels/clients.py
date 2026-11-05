@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 from typing import Protocol
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlencode, urlsplit
 
 import httpx
 
@@ -37,6 +37,24 @@ class HotelClient(Protocol):
 
 def _no_rates(stay: HotelStay, note: str) -> HotelResult:
     return HotelResult(stay, "no_rates", [], note)
+
+
+def _guests(adults, ages) -> tuple[int, tuple[int, ...]] | None:
+    """(adults, sorted child ages) from echoed values, or None if they don't parse."""
+    try:
+        return int(adults), tuple(sorted(int(a) for a in ages))
+    except (TypeError, ValueError):
+        return None
+
+
+def _stay_guests(stay: HotelStay) -> tuple[int, tuple[int, ...]]:
+    return stay.adults, tuple(sorted(stay.child_ages))
+
+
+def _guest_text(g: tuple[int, tuple[int, ...]] | None) -> str:
+    if g is None:
+        return "not echoed"
+    return f"{g[0]}A" + (f", ages {', '.join(map(str, g[1]))}" if g[1] else "")
 
 
 def _is_advance_purchase(name: str | None) -> bool:
@@ -107,6 +125,18 @@ def parse_booking(items: list[dict], stay: HotelStay) -> HotelResult:
     h = items[0]
     if (h.get("checkInDate"), h.get("checkOutDate")) != (stay.check_in.isoformat(), stay.check_out.isoformat()):
         return _no_rates(stay, f"Booking.com priced other dates ({h.get('checkInDate')}..{h.get('checkOutDate')})")
+    q = parse_qs(urlsplit(h.get("url") or "").query)
+    got = None
+    if "group_adults" in q and "group_children" in q:
+        ages = q.get("age", [])
+        got = _guests(q["group_adults"][0], ages)
+        try:
+            if got is not None and int(q["group_children"][0]) != len(ages):
+                got = None   # a child count without matching ages can't be verified
+        except ValueError:
+            got = None
+    if got != _stay_guests(stay):   # also when the URL doesn't echo the guests: unverifiable
+        return _no_rates(stay, f"Booking.com priced other guests ({_guest_text(got)})")
     rates = []
     for room in h.get("rooms") or []:
         for o in room.get("options") or []:
@@ -192,9 +222,26 @@ def _lowest(block: dict | None) -> float | None:
     return float(v) if v else None
 
 
+def _google_guests(params: dict) -> tuple[int, tuple[int, ...]] | None:
+    """The guests SerpApi echoes in `search_parameters`; children absent means none."""
+    ages_raw = params.get("children_ages")
+    ages = [a for a in str(ages_raw).split(",") if a.strip()] if ages_raw not in (None, "") else []
+    got = _guests(params.get("adults"), ages)
+    try:
+        if got is not None and int(params.get("children") or 0) != len(ages):
+            return None
+    except (TypeError, ValueError):
+        return None
+    return got
+
+
 def parse_google(data: dict, stay: HotelStay) -> HotelResult:
-    if (data.get("search_parameters") or {}).get("currency") != "EUR":
+    params = data.get("search_parameters") or {}
+    if params.get("currency") != "EUR":
         return _no_rates(stay, "Google Hotels: not EUR")
+    got = _google_guests(params)
+    if got != _stay_guests(stay):
+        return _no_rates(stay, f"Google priced other guests ({_guest_text(got)})")
     nightly, total = _lowest(data.get("rate_per_night")), _lowest(data.get("total_rate"))
     if nightly is None or total is None:
         return _no_rates(stay, "Google Hotels: no price")

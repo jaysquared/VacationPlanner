@@ -70,6 +70,23 @@ def test_parse_booking_rejects_other_dates():
     assert res.status == "no_rates" and res.rates == [] and "other dates" in res.note
 
 
+def test_parse_booking_rejects_other_guests_echoed_in_the_url():
+    items = load("booking_ikos.json")
+    items[0]["url"] = items[0]["url"].replace("age=8", "age=12")
+    res = parse_booking(items, IKOS)
+    assert res.status == "no_rates" and res.rates == [] and "other guests" in res.note
+    items = load("booking_ikos.json")
+    items[0]["url"] = items[0]["url"].replace("group_adults=2", "group_adults=1")
+    assert parse_booking(items, IKOS).status == "no_rates"
+
+
+def test_parse_booking_without_guests_in_the_url_cannot_be_verified():
+    items = load("booking_ikos.json")
+    items[0]["url"] = items[0]["url"].split("?")[0]
+    res = parse_booking(items, IKOS)
+    assert res.status == "no_rates" and "other guests" in res.note
+
+
 def test_parse_booking_with_nothing_found_is_no_rates():
     assert parse_booking([], IKOS).status == "no_rates"
 
@@ -153,6 +170,16 @@ def test_parse_google_reads_sites_and_rooms():
     assert any(r.channel == "Booking.com" and r.room is None and r.total == 6840 for r in res.rates)
 
 
+def test_parse_google_rejects_other_guests():
+    data = load("google_ikos.json")
+    data["search_parameters"]["children_ages"] = "12"
+    res = parse_google(data, IKOS_GOOGLE)
+    assert res.status == "no_rates" and res.rates == [] and "other guests" in res.note
+    data = load("google_ikos.json")
+    del data["search_parameters"]["children"], data["search_parameters"]["children_ages"]
+    assert parse_google(data, IKOS_GOOGLE).status == "no_rates"   # absent children = 0, but the stay has one
+
+
 def test_parse_google_detects_the_silent_wrong_date_fallback():
     stay = waldorf("rooms", source=HotelSource.GOOGLE, ref="ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE")
     res = parse_google(load("google_waldorf_wrong_dates.json"), stay)
@@ -162,7 +189,7 @@ def test_parse_google_detects_the_silent_wrong_date_fallback():
 #: One room from google_waldorf_wrong_dates.json's "Villa mit 1 Schlafzimmer und Pool": a
 #: non-refundable 1,652 rate and a free-cancellation 1,942 rate for the same room.
 GOOGLE_ROOM_WITH_MIXED_RATES = {
-    "search_parameters": {"currency": "EUR"},
+    "search_parameters": {"currency": "EUR", "adults": 2, "children": 1, "children_ages": "8"},
     "rate_per_night": {"extracted_lowest": 1652}, "total_rate": {"extracted_lowest": 1652},
     "featured_prices": [{"source": "Booking.com", "rooms": [{
         "name": "Villa mit 1 Schlafzimmer und Pool", "link": "https://example.com/room",
