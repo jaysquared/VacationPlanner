@@ -173,6 +173,18 @@ def test_plan_falls_back_to_settings_origins(config_dir):
     assert len(ps) == 20 * 2 * 3
 
 
+def test_reserved_serpapi_searches_come_off_the_flight_share():
+    cfg = load_config_dir()
+    assert provider_shares(cfg, Storage(":memory:"), TODAY, reserved={Provider.SERPAPI: 3}) == [
+        (Provider.SERPAPI, 59), (Provider.SEARCHAPI, 25), (Provider.FAST_FLIGHTS, None)]
+
+
+def test_a_reservation_never_drives_a_share_below_zero():
+    cfg = load_config_dir()
+    shares = dict(provider_shares(cfg, Storage(":memory:"), TODAY, reserved={Provider.SERPAPI: 500}))
+    assert shares[Provider.SERPAPI] == 0
+
+
 SEED_AT = datetime(2026, 9, 10, tzinfo=timezone.utc)
 
 

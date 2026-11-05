@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date, datetime, timedelta, timezone
+from typing import Mapping
 
 from .calendar import Window, free_window, pax_for
 from .config import Config
@@ -21,12 +22,16 @@ def candidate_pairs(window: Window, nights: Nights) -> list[tuple[date, date]]:
     return pairs
 
 
-def provider_shares(config: Config, storage: Storage, today: date) -> list[tuple[Provider, int | None]]:
+def provider_shares(config: Config, storage: Storage, today: date,
+                    reserved: Mapping[Provider, int] | None = None) -> list[tuple[Provider, int | None]]:
     """Per-run search allowance per provider, in configured order. None means unlimited.
 
     The cron fires on Mondays, so a month can have five runs: the per-run share alone
     (monthly_budget / runs_per_month) would overshoot a free tier. Cap it by what this
     calendar month has actually spent (ok and error rows both cost a credit).
+
+    `reserved` holds searches another part of the run (the hotel checks) will make on a
+    provider; they come off its share first so the flight plan cannot spend them.
     """
     runs = config.settings.budget.runs_per_month
     month_start = datetime(today.year, today.month, 1, tzinfo=timezone.utc)
@@ -36,7 +41,8 @@ def provider_shares(config: Config, storage: Storage, today: date) -> list[tuple
             shares.append((e.name, None))
             continue
         used = storage.searches_by_provider_since(e.name, month_start)
-        shares.append((e.name, max(0, min(max(1, e.monthly_budget // runs), e.monthly_budget - used))))
+        share = max(0, min(max(1, e.monthly_budget // runs), e.monthly_budget - used))
+        shares.append((e.name, max(0, share - (reserved or {}).get(e.name, 0))))
     return shares
 
 
@@ -58,7 +64,8 @@ def _route_requests(cfg: Config, storage: Storage, slot: Slot, origin: str, dest
     return reqs[: cfg.settings.budget.max_pairs_per_route_per_run]
 
 
-def plan(config: Config, storage: Storage, today: date) -> list[PlannedSearch]:
+def plan(config: Config, storage: Storage, today: date,
+         reserved: Mapping[Provider, int] | None = None) -> list[PlannedSearch]:
     s = config.settings
     horizon = today + timedelta(days=s.deals.lookahead_days)
     requests: list[SearchRequest] = []
@@ -71,7 +78,7 @@ def plan(config: Config, storage: Storage, today: date) -> list[PlannedSearch]:
             for origin in config.destination(dest_code).origins or s.origins:
                 requests.extend(_route_requests(config, storage, slot, origin, dest_code, today))
 
-    shares = provider_shares(config, storage, today)
+    shares = provider_shares(config, storage, today, reserved)
     out: list[PlannedSearch] = []
     for req in requests[: s.budget.max_searches_per_run]:
         for i, (provider, left) in enumerate(shares):

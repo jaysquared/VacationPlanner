@@ -11,7 +11,8 @@ import typer
 from .calendar import free_window
 from .config import Config, ConfigError, load_config
 from .deals import DetectedDeal, detect_for_run
-from .models import Provider
+from .hotels.runner import HotelSummary, build_hotel_clients, check_hotels, planned_stays
+from .models import HotelSource, Provider
 from .planner import plan as make_plan
 from .providers.base import FlightClient
 from .providers.executor import ExecutionSummary, execute
@@ -108,7 +109,7 @@ def build_clients(config: Config, fake: bool) -> dict[Provider, FlightClient]:
 
 def do_scan(config: Config, storage: Storage, today: date, now: datetime, limit: int | None,
             fake: bool, raw_dir: Path | None) -> tuple[ExecutionSummary, list[DetectedDeal]]:
-    planned = make_plan(config, storage, today)
+    planned = make_plan(config, storage, today, _hotel_reservation(config, today) if not fake else None)
     if limit is not None:
         planned = planned[:limit]
     clients = build_clients(config, fake)
@@ -135,6 +136,17 @@ def _echo_send(result) -> None:
         typer.echo("notified 0 deals")
 
 
+def _hotel_reservation(config: Config, today: date) -> dict[Provider, int]:
+    google = sum(1 for s in planned_stays(config, today) if s.source is HotelSource.GOOGLE)
+    return {Provider.SERPAPI: google} if google and config.secrets.serpapi_key else {}
+
+
+def _print_hotels(s: HotelSummary) -> None:
+    typer.echo(f"hotels: {s.ok} ok, {s.no_rates} no rates, {s.errors} error, {s.skipped} skipped; alerts: {s.alerts}")
+    for v in s.verdicts:
+        typer.echo(f"  {v.watch_id}: {v.headline}")
+
+
 @app.command()
 def holidays(ctx: typer.Context):
     """List slots with their school-free windows and targets."""
@@ -151,7 +163,7 @@ def plan_cmd(ctx: typer.Context):
     """Show what the next run would search. No API calls."""
     c: Ctx = ctx.obj
     storage = _storage(c)
-    planned = make_plan(c.config, storage, c.today)
+    planned = make_plan(c.config, storage, c.today, _hotel_reservation(c.config, c.today))
     for p in planned:
         r = p.request
         typer.echo(f"{p.provider.value:12} {r.slot_id:18} {r.origin}->{r.destination} {r.outbound_date}..{r.return_date} ({r.nights}n) {r.seat.value} {r.adults}A{r.children}C")
@@ -159,6 +171,12 @@ def plan_cmd(ctx: typer.Context):
     for p in planned:
         by[p.provider.value] = by.get(p.provider.value, 0) + 1
     typer.echo(f"{len(planned)} searches: " + ", ".join(f"{k}={v}" for k, v in by.items()))
+    stays = planned_stays(c.config, c.today)
+    for s in stays:
+        ages = f" ({', '.join(map(str, s.child_ages))})" if s.child_ages else ""
+        typer.echo(f"hotel   {s.watch_id:24} {s.source.value:8} {s.mode:7} {s.check_in}..{s.check_out} {s.adults}A{ages}")
+    google = sum(1 for s in stays if s.source is HotelSource.GOOGLE)
+    typer.echo(f"{len(stays)} hotel checks ({google} via SerpApi)")
 
 
 @app.command()
@@ -170,6 +188,13 @@ def scan(ctx: typer.Context, limit: Optional[int] = typer.Option(None, "--limit"
     storage = _storage(c)
     summary, deals = do_scan(c.config, storage, c.today, c.now, limit, fake, c.config.root / "data" / "raw")
     _print_summary(summary, deals)
+
+
+@app.command("hotels")
+def hotels_cmd(ctx: typer.Context):
+    """Check the hotel watches now and store the results (no report, no mail)."""
+    c: Ctx = ctx.obj
+    _print_hotels(check_hotels(c.config, _storage(c), build_hotel_clients(c.config), c.today, c.now))
 
 
 @app.command("report")
@@ -200,6 +225,14 @@ def run(ctx: typer.Context, limit: Optional[int] = typer.Option(None, "--limit")
     storage = _storage(c)
     summary, deals = do_scan(c.config, storage, c.today, c.now, limit, fake, c.config.root / "data" / "raw")
     _print_summary(summary, deals)
+    if fake:
+        typer.echo("hotels: skipped (fake run)")
+    else:
+        try:
+            _print_hotels(check_hotels(c.config, storage, build_hotel_clients(c.config), c.today, c.now))
+        except Exception as e:   # the flight results are already stored; never lose the report and mail
+            log.exception("hotel checks failed")
+            typer.echo(f"hotels: failed ({type(e).__name__}: {e})")
     out = Path(c.config.settings.report.output_dir)
     if not out.is_absolute():
         out = c.config.root / out
