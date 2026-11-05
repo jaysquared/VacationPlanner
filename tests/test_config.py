@@ -75,6 +75,7 @@ def test_origins_default_to_none_and_are_read_per_destination(config_dir: Path):
     hol = config_dir / "holidays.yaml"
     hol.write_text("holidays:\n"
                    "  - { id: s1, name: S1, start: 2027-01-01, end: 2027-01-10, targets: [AAA, BBB] }\n")
+    (config_dir / "hotels.yaml").unlink()  # its watches target slots this minimal holidays.yaml lacks
     cfg = load_config(config_dir, env={})
     assert cfg.destination("AAA").origins is None
     assert cfg.destination("BBB").origins == ("HAM", "FRA", "CPH")

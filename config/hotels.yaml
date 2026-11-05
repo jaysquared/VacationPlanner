@@ -1,0 +1,48 @@
+# Hotel stays the family has chosen; the weekly run checks each one (see docs/superpowers/specs/2026-11-05-hotel-watch-design.md).
+hotel_watches:
+  - id: ikos-pfingsten-2027
+    name: Ikos Porto Petro
+    slot: pfingsten-2027
+    check_in: 2027-05-07
+    check_out: 2027-05-14
+    room: ["Junior Suite mit eigenem Garten", "Junior Suite with Private Garden"]
+    sources:
+      booking: https://www.booking.com/hotel/es/ikos-porto-petro.de.html
+      google: ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE
+    rule:
+      type: booked
+      paid_total: 5640
+      min_saving_ratio: 0.10
+      until: 2027-04-07            # free-cancellation deadline
+
+  - id: waldorf-herbst-2027
+    name: Waldorf Astoria Seychelles Platte Island
+    slot: herbst-2027
+    check_in: 2027-10-10
+    check_out: 2027-10-15
+    sources:
+      hilton: SEZPIWA
+      google: ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE
+    rule:
+      type: points
+      points_adults: 2             # the award is booked for 2 adults
+      surcharge: 350               # cash upgrade for the son on site
+      until: 2027-10-09
+
+  - id: mango-herbst-2027
+    name: Mango House Seychelles
+    slot: herbst-2027
+    check_in: 2027-10-15
+    check_out: 2027-10-20
+    sources:
+      hilton: SEZITOL
+      google: ChoI4ML8m8ni8aHiARoNL2cvMTFsbDlfNnhrZBAB
+    rule:
+      type: points
+      points_adults: 2
+      surcharge: 0                 # no cost for the son
+      until: 2027-10-14
+
+hilton:
+  point_value_eur: 0.0044
+  # Hilton's points sale, 0.44 ct/point until 2026-11-21

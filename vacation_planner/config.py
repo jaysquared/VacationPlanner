@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, time
 from pathlib import Path
 from typing import Literal, Mapping
@@ -8,7 +8,9 @@ from typing import Literal, Mapping
 import yaml
 from pydantic import BaseModel, ValidationError, ValidationInfo, field_validator, model_validator
 
-from .models import Cabin, Child, Destination, Nights, Provider, Slot, Travellers
+from .calendar import child_age_on
+from .models import (BookedRule, Cabin, Child, Destination, HotelSource, HotelWatch, Nights,
+                      PointsRule, Provider, Slot, Travellers)
 
 
 class ConfigError(Exception):
@@ -55,6 +57,39 @@ class _Slot(BaseModel):
 class _Holidays(BaseModel):
     source: str | None = None
     holidays: list[_Slot]
+
+
+class _HotelRule(BaseModel):
+    type: Literal["booked", "points"]
+    until: date
+    paid_total: float | None = None
+    min_saving_ratio: float = 0.10
+    points_adults: int = 2
+    surcharge: float = 0
+
+
+class _HotelWatch(BaseModel):
+    id: str
+    name: str
+    slot: str
+    check_in: date
+    check_out: date
+    room: list[str] = []
+    sources: dict[HotelSource, str]
+    rule: _HotelRule
+
+
+class _HiltonSettings(BaseModel):
+    point_value_eur: float
+
+
+class _Hotels(BaseModel):
+    hotel_watches: list[_HotelWatch] = []
+    hilton: _HiltonSettings | None = None
+
+
+#: Google Hotels returns nothing for longer stays (tested 2026-11-03: 7 nights priced, 9+ empty).
+GOOGLE_MAX_NIGHTS = 8
 
 
 class BridgeDays(BaseModel):
@@ -221,6 +256,7 @@ class Secrets:
     smtp_password: str | None
     mail_from: str | None
     mail_to: list[str]
+    apify_token: str | None = None
 
 
 @dataclass
@@ -231,6 +267,8 @@ class Config:
     settings: Settings
     secrets: Secrets
     root: Path
+    hotels: list[HotelWatch] = field(default_factory=list)
+    point_value_eur: float | None = None
 
     def destination(self, code: str) -> Destination:
         return self.destinations[code]
@@ -261,7 +299,51 @@ def _secrets(env: Mapping[str, str]) -> Secrets:
         smtp_password=env.get("SMTP_PASSWORD") or None,
         mail_from=env.get("MAIL_FROM") or None,
         mail_to=to,
+        apify_token=env.get("APIFY_TOKEN") or None,
     )
+
+
+def guests_on(travellers: Travellers, day: date) -> tuple[int, tuple[int, ...]]:
+    """(adults, child ages) on `day`; hotels price a child of 12 or more as an adult."""
+    adults, ages = travellers.adults, []
+    for c in travellers.children:
+        age = child_age_on(c.birthdate, day)
+        if age >= 12:
+            adults += 1
+        else:
+            ages.append(age)
+    return adults, tuple(ages)
+
+
+def _hotel_watches(config_dir: Path, slot_ids: set[str]) -> tuple[list[HotelWatch], float | None]:
+    path = config_dir / "hotels.yaml"
+    if not path.exists():
+        return [], None
+    raw = _load(path, _Hotels)
+    point_value = raw.hilton.point_value_eur if raw.hilton else None
+    watches: list[HotelWatch] = []
+    for w in raw.hotel_watches:
+        where = f"hotels.yaml: watch {w.id}"
+        if w.slot not in slot_ids:
+            raise ConfigError(f"{where}: unknown slot {w.slot}")
+        if w.check_out <= w.check_in:
+            raise ConfigError(f"{where}: check_out must be after check_in")
+        nights = (w.check_out - w.check_in).days
+        if HotelSource.GOOGLE in w.sources and nights > GOOGLE_MAX_NIGHTS:
+            raise ConfigError(f"{where}: Google Hotels prices at most {GOOGLE_MAX_NIGHTS} nights, this stay has {nights}")
+        if w.rule.type == "booked":
+            if w.rule.paid_total is None:
+                raise ConfigError(f"{where}: booked rule needs paid_total")
+            rule: BookedRule | PointsRule = BookedRule(w.rule.paid_total, w.rule.min_saving_ratio, w.rule.until)
+        else:
+            if HotelSource.HILTON not in w.sources:
+                raise ConfigError(f"{where}: points rule needs a hilton source")
+            if point_value is None:
+                raise ConfigError(f"{where}: points rule needs hilton.point_value_eur")
+            rule = PointsRule(w.rule.points_adults, w.rule.surcharge, w.rule.until)
+        watches.append(HotelWatch(w.id, w.name, w.slot, w.check_in, w.check_out,
+                                  tuple(w.room), dict(w.sources), rule))
+    return watches, point_value
 
 
 def load_config(config_dir: Path, env: Mapping[str, str] | None = None) -> Config:
@@ -300,6 +382,7 @@ def load_config(config_dir: Path, env: Mapping[str, str] | None = None) -> Confi
     slots.sort(key=lambda s: s.start)
 
     travellers = Travellers(trav.adults, tuple(Child(c.birthdate) for c in trav.children))
+    hotels, point_value = _hotel_watches(config_dir, seen)
     return Config(
         travellers=travellers,
         destinations=destinations,
@@ -307,4 +390,6 @@ def load_config(config_dir: Path, env: Mapping[str, str] | None = None) -> Confi
         settings=settings,
         secrets=_secrets(env),
         root=config_dir.parent,
+        hotels=hotels,
+        point_value_eur=point_value,
     )
