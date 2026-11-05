@@ -12,7 +12,7 @@ from ..models import HotelSource, HotelStay, HotelWatch, PointsRule
 from ..providers.base import ProviderError
 from ..storage import Storage
 from .clients import ApifyActor, BookingClient, GoogleHotelsClient, HiltonClient, HotelClient
-from .rules import Verdict, evaluate
+from .rules import Verdict, evaluate, judge
 
 log = logging.getLogger(__name__)
 
@@ -108,7 +108,8 @@ def check_hotels(config: Config, storage: Storage, clients: Mapping[HotelSource,
             else:
                 summary.no_rates += 1
         rates = [r.rate for r in storage.hotel_rates(watch.id, batch)]
-        verdict = evaluate(watch, rates, config.point_value_eur, today)
+        statuses = [c.status for c in storage.hotel_checks(watch.id, batch)]
+        verdict = judge(watch, rates, statuses, config.point_value_eur, today)
         summary.verdicts.append(verdict)
         summary.alerts += _maybe_alert(storage, config, batch, verdict, now)
     return summary

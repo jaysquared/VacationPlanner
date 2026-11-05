@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date
+from typing import Iterable
 
 from ..models import BookedRule, HotelRate, HotelWatch, PointsRule
 from ..report import MONTHS, money
@@ -85,3 +86,13 @@ def evaluate(watch: HotelWatch, rates: list[HotelRate], point_value: float | Non
         return evaluate_booked(watch, rates)
     assert point_value is not None, "config validation guarantees a point value for points watches"
     return evaluate_points(watch, rates, point_value)
+
+
+def judge(watch: HotelWatch, rates: list[HotelRate], statuses: Iterable[str], point_value: float | None,
+          today: date) -> Verdict:
+    """`evaluate`, unless no check of the batch came back `ok`: then "no price", not "room not offered"."""
+    statuses = list(statuses)
+    if today <= watch.until and "ok" not in statuses:
+        why = "no source had rates" if "no_rates" in statuses else "all checks failed or were skipped"
+        return Verdict(watch.id, "no_rates", f"No price this week ({why})")
+    return evaluate(watch, rates, point_value, today)

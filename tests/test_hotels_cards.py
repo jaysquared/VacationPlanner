@@ -124,3 +124,14 @@ def test_a_crashing_hotel_card_build_leaves_the_report_without_hotels(config_dir
     cfg = load_config(config_dir, env={})
     data = build_report(Storage(":memory:"), cfg, datetime(2026, 11, 9, 5, 0, tzinfo=timezone.utc), None)
     assert data.hotels == []
+
+
+def test_card_of_a_batch_without_any_answer_says_no_price(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    db.record_hotel_check(NOW.isoformat(), ikos_stay(), "error", NOW, error="apify down")
+    db.record_hotel_check(NOW.isoformat(), ikos_stay(HotelSource.GOOGLE, "rooms"), "skipped", NOW,
+                          error="SERPAPI_KEY not set")
+    card = next(c for c in build_hotel_cards(db, cfg, NOW.date()) if c.watch_id == "ikos-pfingsten-2027")
+    assert (card.verdict.state, card.verdict.headline) == (
+        "no_rates", "No price this week (all checks failed or were skipped)")

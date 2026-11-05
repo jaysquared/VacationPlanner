@@ -161,3 +161,20 @@ def test_without_apify_token_booking_and_hilton_are_skipped_and_google_runs(conf
 def test_with_both_keys_all_three_clients_are_built(config_dir: Path):
     cfg = load_config(config_dir, env={"SERPAPI_KEY": "k", "APIFY_TOKEN": "t"})
     assert set(build_hotel_clients(cfg)) == {HotelSource.BOOKING, HotelSource.HILTON, HotelSource.GOOGLE}
+
+
+def test_a_watch_whose_checks_all_failed_says_so_instead_of_room_not_offered(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    s = check_hotels(cfg, db, {HotelSource.BOOKING: FakeHotelClient(HotelSource.BOOKING, failing=("rates",))},
+                     TODAY, NOW)
+    v = {v.watch_id: v for v in s.verdicts}["ikos-pfingsten-2027"]
+    assert (v.state, v.headline) == ("no_rates", "No price this week (all checks failed or were skipped)")
+    assert db.pending_hotel_alerts() == []
+
+
+def test_a_watch_where_sources_answered_without_rates_says_no_source_had_rates(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    s = check_hotels(cfg, Storage(":memory:"), {HotelSource.BOOKING: FakeHotelClient(HotelSource.BOOKING)}, TODAY, NOW)
+    v = {v.watch_id: v for v in s.verdicts}["ikos-pfingsten-2027"]
+    assert (v.state, v.headline) == ("no_rates", "No price this week (no source had rates)")

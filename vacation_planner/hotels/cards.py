@@ -9,7 +9,7 @@ from ..config import Config
 from ..models import BookedRule, HotelRate, HotelWatch, PointsRule
 from ..report import change, date_range, money
 from ..storage import HotelCheckRow, Storage
-from .rules import Verdict, evaluate
+from .rules import Verdict, judge
 
 #: Channel ids the Hilton actor uses -> how the family knows them.
 CHANNELS = {"direct": "Hilton direct", "booking": "Booking.com", "expedia": "Expedia",
@@ -80,7 +80,8 @@ def _card(storage: Storage, config: Config, watch: HotelWatch, today: date) -> H
         return None
     rates = [s.rate for s in storage.hotel_rates(watch.id, batches[0])]
     before = [s.rate for s in storage.hotel_rates(watch.id, batches[1])] if len(batches) > 1 else []
-    verdict = evaluate(watch, rates, config.point_value_eur, today)
+    checks = storage.hotel_checks(watch.id, batches[0])
+    verdict = judge(watch, rates, [c.status for c in checks], config.point_value_eur, today)
     rows: list[HotelRow] = []
     previous = _relevant_cash(watch, before)
     for channel, r in sorted(_relevant_cash(watch, rates).items(), key=lambda kv: kv[1].total):
@@ -98,7 +99,7 @@ def _card(storage: Storage, config: Config, watch: HotelWatch, today: date) -> H
         label, cls = change(prev_points[0] if prev_points else None, cost)
         detail = " · ".join(x for x in (r.room, f"{r.points:,} pts") if x)
         rows.append(HotelRow("Hilton points", detail, money(cost), label, cls, None))
-    problems = [_problem(c) for c in storage.hotel_checks(watch.id, batches[0]) if c.status != "ok"]
+    problems = [_problem(c) for c in checks if c.status != "ok"]
     return HotelCard(watch.id, watch.name, f"{date_range(watch.check_in, watch.check_out)} {watch.check_out.year}",
                      verdict, rows, problems)
 
