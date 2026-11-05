@@ -188,8 +188,11 @@ def parse_hilton(rows: list[dict], stay: HotelStay) -> HotelResult:
             rates.append(HotelRate("direct", "points", points=int(r["points_total"]), room=r.get("room_name"),
                                    rate_name=r.get("rate_name"), award_type="standard" if std else "premium"))
         elif stay.mode == "parity":
-            if r.get("channel") == "direct" or not r.get("public_total") or r.get("currency") not in _EUR_CURRENCIES:
-                continue   # the `rates` check prices direct room by room; other-currency quotes aren't comparable
+            if (r.get("channel") == "direct" or not r.get("public_total") or r.get("currency") not in _EUR_CURRENCIES
+                    or r.get("basis") != "after_tax"):
+                # the `rates` check prices direct room by room; other-currency quotes and
+                # "native"-basis totals (which may exclude taxes) aren't comparable
+                continue
             name = r.get("rate_name")
             rates.append(HotelRate(r["channel"], "cash", total=float(r["public_total"]),
                                    rate_name=name, refundable=_refundable(r.get("refundable"), name)))

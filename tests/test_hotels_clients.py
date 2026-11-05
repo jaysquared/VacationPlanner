@@ -129,13 +129,14 @@ def test_parse_hilton_award_tells_standard_from_premium():
     assert {r.award_type for r in res.rates} == {"standard", "premium"}
 
 
-def test_parse_hilton_parity_keeps_other_channels_and_unknown_refundability():
+def test_parse_hilton_parity_keeps_only_comparable_after_tax_eur_quotes_from_other_channels():
     res = parse_hilton(load("hilton_waldorf_parity.json"), waldorf("parity"))
     by = {r.channel: r for r in res.rates}
-    # direct is covered by `rates`; ctrip had no hotel; expedia/hotelscom quoted USD, not comparable
-    assert set(by) == {"booking", "agoda"}
-    assert (by["agoda"].total, by["agoda"].refundable) == (6470, False)
-    assert all(r.total != 7905 for r in res.rates)   # the USD 7905 quotes never survive
+    # direct is covered by `rates`; ctrip had no hotel; expedia/hotelscom quoted USD, not comparable;
+    # agoda's 6470 is on a "native" basis that may exclude taxes, so it isn't comparable either
+    assert set(by) == {"booking"}
+    assert (by["booking"].total, by["booking"].refundable) == (7471, False)
+    assert all(r.total not in (7905, 6470) for r in res.rates)
 
 
 def test_parse_hilton_rejects_rows_for_other_guests_or_dates():
