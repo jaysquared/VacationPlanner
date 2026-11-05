@@ -19,7 +19,7 @@ destinations:
   - { code: CPT, name: Cape Town, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
   - { code: DPS, name: Bali (Denpasar), cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
   - { code: ZNZ, name: Zanzibar, cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
-  - { code: SEZ, name: Seychelles (Mahé), cabin: business, max_price_per_person: 2500, origins: [HAM, FRA] }
+  - { code: SEZ, name: Seychelles (Mahé), cabin: business, max_price_per_person: 3200, origins: [HAM, FRA] }
   - { code: SGN, name: Ho Chi Minh City, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
   - { code: PQC, name: Phu Quoc, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }
   - { code: KUL, name: Kuala Lumpur, cabin: business, max_price_per_person: 2000, origins: [HAM, FRA] }

@@ -7,7 +7,7 @@ holidays:
   # A fixed week inside the summer break: Sat 24.7. out, Sat 31.7. back.
   - { id: sizilien-2027,    name: "Sizilien Sommer 2027",        start: 2027-07-24, end: 2027-07-31, targets: [CTA], nights: { min: 7, max: 7 } }
   - { id: sommer-2027,      name: "Sommerferien 2027",           start: 2027-07-01, end: 2027-08-11, targets: [], nights: { min: 14, max: 21 } }
-  - { id: herbst-2027,      name: "Herbstferien 2027",           start: 2027-10-11, end: 2027-10-22, targets: [SEZ, MRU, MLE], nights: { min: 10, max: 14 } }
+  - { id: herbst-2027,      name: "Herbstferien 2027",           start: 2027-10-11, end: 2027-10-22, targets: [SEZ], nights: { min: 12, max: 12 } }   # Seychelles, ~9.10.-21.10.
   - { id: weihnachten-2027, name: "Weihnachtsferien 2027/28",    start: 2027-12-20, end: 2027-12-31, targets: [] }
   - { id: fruehjahr-2028,   name: "Frühjahrsferien 2028",        start: 2028-03-06, end: 2028-03-17, targets: [] }
   - { id: pfingsten-2028,   name: "Himmelfahrt/Pfingsten 2028",  start: 2028-05-22, end: 2028-05-26, targets: [] }
