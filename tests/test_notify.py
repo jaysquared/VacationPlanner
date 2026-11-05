@@ -411,3 +411,31 @@ def test_mode_deals_only_mails_for_a_hotel_alert_and_marks_it(config_dir):
     assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP).sent is True
     assert FakeSMTP.instances[0].sent[0]["Subject"].startswith("Vacation Planner · 1 hotel alert")
     assert db.pending_hotel_alerts() == []
+
+
+def test_alerts_of_ended_or_removed_watches_are_dropped_without_a_mail(config_dir):
+    set_mode(config_dir, "deals_only")
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    later = datetime(2027, 4, 8, tzinfo=timezone.utc)   # the Ikos watch ran until 7 Apr 2027
+    db.insert_hotel_alert("ikos-pfingsten-2027", NOW.isoformat(), "cheaper_room", 5000, 5076, "Rebook: old", NOW)
+    db.insert_hotel_alert("gone-watch", NOW.isoformat(), "cheaper_room", 100, 200, "Rebook: removed", NOW)
+    FakeSMTP.instances.clear()
+    assert send_pending(db, cfg, later, smtp_factory=FakeSMTP).sent is False
+    assert FakeSMTP.instances == []
+    assert db.pending_hotel_alerts() == []   # marked, so they never pile up
+
+
+def test_a_live_alert_is_mailed_and_a_stale_one_is_left_out(config_dir):
+    set_mode(config_dir, "deals_only")
+    cfg = load_config(config_dir, env=ENV)
+    db = Storage(":memory:")
+    db.insert_hotel_alert("gone-watch", NOW.isoformat(), "cheaper_room", 100, 200, "Rebook: removed", NOW)
+    db.insert_hotel_alert("ikos-pfingsten-2027", NOW.isoformat(), "cheaper_room", 5000, 5076,
+                          "Rebook: Junior Suite mit eigenem Garten 5,000 € on booking", NOW)
+    FakeSMTP.instances.clear()
+    assert send_pending(db, cfg, NOW, smtp_factory=FakeSMTP).sent is True
+    msg = FakeSMTP.instances[0].sent[0]
+    assert msg["Subject"].startswith("Vacation Planner · 1 hotel alert")
+    assert "Rebook: removed" not in msg.get_body(("plain",)).get_content()
+    assert db.pending_hotel_alerts() == []

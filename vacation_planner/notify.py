@@ -531,6 +531,21 @@ def compose_digest(data: ReportData, deals: list[NewDeal], config: Config,
 compose = compose_digest
 
 
+def _live_hotel_alerts(storage: Storage, config: Config, now: datetime) -> list[HotelAlertRow]:
+    """Pending hotel alerts whose watch is still on; the rest are marked notified, unmailed.
+
+    An alert of a watch that has ended or left `hotels.yaml` is no longer actionable, and
+    leaving it pending would let it pile up forever.
+    """
+    live = {w.id for w in config.hotels if now.date() <= w.until}
+    alerts = storage.pending_hotel_alerts()
+    stale = [a for a in alerts if a.watch_id not in live]
+    if stale:
+        log.info("dropping %d hotel alerts of ended or removed watches", len(stale))
+        storage.mark_hotel_alerts_notified([a.id for a in stale], now)
+    return [a for a in alerts if a.watch_id in live]
+
+
 def send_pending(storage: Storage, config: Config, now: datetime, report_url: str | None = None,
                  summary: ExecutionSummary | None = None,
                  smtp_factory: Callable[[str, int], smtplib.SMTP] | None = None,
@@ -544,7 +559,7 @@ def send_pending(storage: Storage, config: Config, now: datetime, report_url: st
     if mode == "never":
         return SendResult()
     pending = storage.pending_deals()
-    alerts = storage.pending_hotel_alerts()
+    alerts = _live_hotel_alerts(storage, config, now)
     if mode == "deals_only" and not (pending or alerts):
         return SendResult()
     sec = config.secrets
