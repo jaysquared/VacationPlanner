@@ -1,0 +1,2124 @@
+[
+ {
+  "order": 0,
+  "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html?group_children=1&lang=de&group_adults=2&selected_currency=EUR&lang_changed=1&explicit_curr_change=1&checkout=2027-05-14&no_rooms=1&checkin=2027-05-07&age=8&soz=1&explicit_lang_change=1",
+  "startUrlOrQuery": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html?checkin=2027-05-07&checkout=2027-05-14&group_adults=2&group_children=1&age=8&no_rooms=1&selected_currency=EUR&lang=de",
+  "name": "Ikos Porto Petro",
+  "type": "resort",
+  "description": "Erleben Sie Weltklasse-Service in der Unterkunft Ikos Porto PetroDie Unterkunft Ikos Porto Petro, die in Portopetro, 400 m von Strand Calos des Homes Morts entfernt gelegen ist, verf\u00fcgt \u00fcber \u00dcbernachtungsm\u00f6glichkeiten mit einem Fitnesscenter, einem kostenlosen Privatparkplatz, einem Restaurant und einer Bar. Dieses Resort mit 5 Sternen verf\u00fcgt \u00fcber einen Geldautomaten und einen Conciergeservice. Die Unterkunft bietet eine rund um die Uhr besetzte Rezeption, Flughafentransfers, einen Zimmerservice und kostenloses WLAN in der ganzen Unterkunft.\n\nDie Unterkunft Ikos Porto Petro bietet ein als Buffet angebotenes oder kontinentales Fr\u00fchst\u00fcck.\n\nDie Unterkunft Ikos Porto Petro bietet einen Au\u00dfenpool. Die G\u00e4ste in der Unterkunft Ikos Porto Petro k\u00f6nnen Aktivit\u00e4ten wie Fahrradfahren in und um Portopetro genie\u00dfen.\n\nTropfsteinh\u00f6hlen Coves del Drac liegt 29 km von der Unterkunft Ikos Porto Petro entfernt, w\u00e4hrend Cala D'es Pou 3,6 km entfernt ist. Der n\u00e4chstgelegene Flughafen ist der Flughafen Palma de Mallorca, 58 km von der Unterkunft Ikos Porto Petro entfernt.Familien sch\u00e4tzen die Lage besonders \u2013 sie haben diese mit 9,4 f\u00fcr einen Aufenthalt mit Kindern bewertet.Die Entfernung in der Unterkunftsbeschreibung wurde mit \u00a9 OpenStreetMap berechnet",
+  "stars": 5,
+  "price": 6503.58178181818,
+  "currency": "\u20ac",
+  "rating": 9.1,
+  "ratingLabel": null,
+  "reviews": 49,
+  "breakfast": "Kontinental, Buffet",
+  "checkIn": "Ab 15:00",
+  "checkOut": "Bis 11:00",
+  "checkInDate": "2027-05-07",
+  "checkOutDate": "2027-05-14",
+  "location": {
+   "lat": "39.359358",
+   "lng": "3.211004"
+  },
+  "address": {
+   "full": "16 Carrer d'es Far, 07691 Portopetro, Spanien",
+   "country": "es",
+   "city": "Portopetro"
+  },
+  "image": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265354.jpg?k=fd0cc56126c17bf525326f6c9f9956371c8357c7b7d50cc5ddc94ffad501de47&o=",
+  "rooms": [
+   {
+    "available": true,
+    "id": 961614002,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614002",
+    "roomType": "Junior Suite mit Gartenblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "2 Einzelbetten AND 1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Eigene Suite",
+     "42 m\u00b2",
+     "Blick auf den Garten",
+     "Klimaanlage",
+     "Eigenes Badezimmer (im Zimmer)",
+     "Flachbild-TV",
+     "Schalld\u00e4mmung",
+     "Kaffeemaschine",
+     "Minibar",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 6503.58178181818,
+      "displayedPrice": 5293.6364,
+      "excludedTaxesPrice": 621.7636,
+      "discount": {
+       "discountedPrice": 5915.400000000001,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614002_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614003,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614003",
+    "roomType": "Junior Suite mit Poolblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "2 Einzelbetten AND 1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Eigene Suite",
+     "42 m\u00b2",
+     "Blick auf den Pool",
+     "Klimaanlage",
+     "Eigenes Badezimmer (im Zimmer)",
+     "Flachbild-TV",
+     "Schalld\u00e4mmung",
+     "Kaffeemaschine",
+     "Minibar",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 6658.16366363636,
+      "displayedPrice": 5421.2727,
+      "excludedTaxesPrice": 634.5273,
+      "discount": {
+       "discountedPrice": 6055.8,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614003_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614013,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614013",
+    "roomType": "Junior Suite mit eigenem Garten",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "2 Einzelbetten AND 1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Eigene Suite",
+     "42 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 6897.96366363636,
+      "displayedPrice": 5619.2727,
+      "excludedTaxesPrice": 654.3273,
+      "discount": {
+       "discountedPrice": 6273.6,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614013_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614005,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614005",
+    "roomType": "Deluxe Junior Suite mit teilweisem Meerblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett",
+       "1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Zimmer",
+     "45 m\u00b2",
+     "Aussicht",
+     "Klimaanlage",
+     "Eigenes Badezimmer (im Zimmer)",
+     "Flachbild-TV",
+     "Schalld\u00e4mmung",
+     "Kaffeemaschine",
+     "Minibar",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 6881.100100000001,
+      "displayedPrice": 6171.5455,
+      "excludedTaxesPrice": 709.5546,
+      "discount": null,
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614005_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614015,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614015",
+    "roomType": "Suite mit 1 Schlafzimmer und Poolblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": "Schlafzimmer\u00a01",
+      "beds": [
+       "1 Doppelbett"
+      ]
+     },
+     {
+      "room": "Wohnzimmer",
+      "beds": [
+       "1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Eigene Suite",
+     "62 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 7942.38178181818,
+      "displayedPrice": 6481.6364,
+      "excludedTaxesPrice": 740.5636,
+      "discount": {
+       "discountedPrice": 7222.200000000001,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614015_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614021,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614021",
+    "roomType": "Deluxe Junior Suite mit Meerblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett",
+       "1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "",
+     "45 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 4,
+    "options": [
+     {
+      "price": 7438.5599999999995,
+      "displayedPrice": 6678.3273,
+      "excludedTaxesPrice": 760.2327,
+      "discount": null,
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614021_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614018,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614018",
+    "roomType": "Suite mit einem Schlafzimmer, eigenem Garten und Gartenblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": "Schlafzimmer\u00a01",
+      "beds": [
+       "1 Doppelbett"
+      ]
+     },
+     {
+      "room": "Wohnzimmer",
+      "beds": [
+       "1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Eigene Suite",
+     "62 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 9,
+    "options": [
+     {
+      "price": 8309.01821818182,
+      "displayedPrice": 6784.3636,
+      "excludedTaxesPrice": 770.8364,
+      "discount": {
+       "discountedPrice": 7555.2,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614018_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614006,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614006",
+    "roomType": "Deluxe Suite mit 1 Schlafzimmer und teilweisem Meerblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett",
+       "1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Zimmer",
+     "60 m\u00b2",
+     "Aussicht",
+     "Klimaanlage",
+     "Eigenes Badezimmer (im Zimmer)",
+     "Flachbild-TV",
+     "Schalld\u00e4mmung",
+     "Kaffeemaschine",
+     "Minibar",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 7874.61,
+      "displayedPrice": 7074.7364,
+      "excludedTaxesPrice": 799.8736,
+      "discount": null,
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614006_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614025,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614025",
+    "roomType": "Deluxe Suite mit 1 Schlafzimmer und Meerblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett",
+       "1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "",
+     "60 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 2,
+    "options": [
+     {
+      "price": 8228.58,
+      "displayedPrice": 7396.5273,
+      "excludedTaxesPrice": 832.0527,
+      "discount": null,
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614025_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614024,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614024",
+    "roomType": "Deluxe Suite mit 1 Schlafzimmer, eigenem Pool und Gartenblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett",
+       "1 Schlafsofa"
+      ]
+     }
+    ],
+    "facilities": [
+     "Zimmer",
+     "60 m\u00b2",
+     "Eigenes Badezimmer",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 4,
+    "options": [
+     {
+      "price": 9545.279999999999,
+      "displayedPrice": 8593.5273,
+      "excludedTaxesPrice": 951.7527,
+      "discount": null,
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614024_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614004,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614004",
+    "roomType": "Familienzimmer mit Gartenblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 Einzelbett",
+       "1 franz\u00f6sisches Doppelbett"
+      ]
+     }
+    ],
+    "facilities": [
+     "Zimmer",
+     "70 m\u00b2",
+     "Blick auf den Garten",
+     "Klimaanlage",
+     "Eigenes Badezimmer (im Zimmer)",
+     "Flachbild-TV",
+     "Schalld\u00e4mmung",
+     "Kaffeemaschine",
+     "Minibar",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 11515.6,
+      "displayedPrice": 9432,
+      "excludedTaxesPrice": 1035.6,
+      "discount": {
+       "discountedPrice": 10467.6,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614004_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614014,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614014",
+    "roomType": "Familienzimmer mit eigenem Garten",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 Einzelbett",
+       "1 franz\u00f6sisches Doppelbett"
+      ]
+     }
+    ],
+    "facilities": [
+     "",
+     "70 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 11971.4182181818,
+      "displayedPrice": 9808.3636,
+      "excludedTaxesPrice": 1073.2364,
+      "discount": {
+       "discountedPrice": 10881.6,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614014_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027",
+       "Kostenlose \u00dcbernachtung f\u00fcr Ihr Kind"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614020,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614020",
+    "roomType": "Deluxe Drei-Zimmer-Residenz mit eigenem Pool und Blick auf die K\u00fcste",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "2 Einzelbetten",
+       "1 Schlafsofa",
+       "2 Doppelbetten"
+      ]
+     }
+    ],
+    "facilities": [
+     "Zimmer",
+     "160 m\u00b2",
+     "Eigenes Badezimmer",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 2,
+    "options": [
+     {
+      "price": 21674.31,
+      "displayedPrice": 19619.9182,
+      "excludedTaxesPrice": 2054.3918,
+      "discount": null,
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614020_369722068_6_85_0",
+      "persons": 6,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614016,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614016",
+    "roomType": "Deluxe Villa mit 4 Schlafzimmern, eigenem Pool und Gartenblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "2 Einzelbetten",
+       "3 Doppelbetten"
+      ]
+     }
+    ],
+    "facilities": [
+     "Zimmer",
+     "265 m\u00b2",
+     "Eigenes Badezimmer",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 2,
+    "options": [
+     {
+      "price": 28888.8001,
+      "displayedPrice": 26178.5455,
+      "excludedTaxesPrice": 2710.2546,
+      "discount": null,
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614016_369722068_8_85_0",
+      "persons": 8,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614009,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614009",
+    "roomType": "Superior Doppelzimmer mit Gartenblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett"
+      ]
+     }
+    ],
+    "facilities": [
+     "",
+     "35 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 2,
+    "options": [
+     {
+      "price": 5773.2,
+      "displayedPrice": 4716,
+      "excludedTaxesPrice": 533.2,
+      "discount": {
+       "discountedPrice": 5249.2,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614009_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614010,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614010",
+    "roomType": "Superior Doppelzimmer mit eigenem Garten",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett"
+      ]
+     }
+    ],
+    "facilities": [
+     "",
+     "35 m\u00b2",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 1,
+    "options": [
+     {
+      "price": 6001.10910909091,
+      "displayedPrice": 4904.1818,
+      "excludedTaxesPrice": 552.0182,
+      "discount": {
+       "discountedPrice": 5456.200000000001,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614010_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027"
+      ]
+     }
+    ]
+   },
+   {
+    "available": true,
+    "id": 961614001,
+    "url": "https://www.booking.com/hotel/es/ikos-porto-petro.de.html#room_961614001",
+    "roomType": "Superior Doppelzimmer mit eingeschr\u00e4nktem Meerblick",
+    "persons": 2,
+    "bedTypes": [
+     {
+      "room": null,
+      "beds": [
+       "1 franz\u00f6sisches Doppelbett"
+      ]
+     }
+    ],
+    "facilities": [
+     "Zimmer",
+     "35 m\u00b2",
+     "Aussicht",
+     "Klimaanlage",
+     "Eigenes Badezimmer (im Zimmer)",
+     "Flachbild-TV",
+     "Schalld\u00e4mmung",
+     "Kaffeemaschine",
+     "Minibar",
+     "Kostenfreies WLAN"
+    ],
+    "isPartnerOfferRoom": false,
+    "roomsLeft": 10,
+    "options": [
+     {
+      "price": 6145.78178181818,
+      "displayedPrice": 5023.6364,
+      "excludedTaxesPrice": 563.9636,
+      "discount": {
+       "discountedPrice": 5587.6,
+       "text": "10% sparen",
+       "description": "Sie erhalten einen erm\u00e4\u00dfigten Preis, da diese Unterkunft das Angebot \u201eAngebot f\u00fcr Fr\u00fchbucher\u201c anbietet."
+      },
+      "hasGeniusDiscount": false,
+      "geniusDiscountText": null,
+      "id": "961614001_369722068_2_85_0",
+      "persons": 2,
+      "currency": "\u20ac",
+      "cancellationType": "free_cancellation",
+      "freeCancellation": true,
+      "yourChoices": [
+       "All-Inclusive",
+       "Kostenlose Stornierung vor dem 7. April 2027",
+       "Sie zahlen nichts vor dem 5. April 2027"
+      ]
+     }
+    ]
+   }
+  ],
+  "highlights": [
+   {
+    "header": "Perfekt f\u00fcr einen Aufenthalt von 1 Woche!",
+    "contents": [
+     "Tolle Lage: von G\u00e4sten aktuell mit sehr gut bewertet (9,2)",
+     "Top-Tipp von Familien mit Kindern"
+    ]
+   },
+   {
+    "header": "Fr\u00fchst\u00fccks-Info",
+    "contents": [
+     "Kontinental, Buffet"
+    ]
+   },
+   {
+    "header": "",
+    "contents": [
+     "An der Unterkunft stehen kostenfreie Privatparkpl\u00e4tze zur Verf\u00fcgung"
+    ]
+   },
+   {
+    "header": "Aktivit\u00e4ten:",
+    "contents": [
+     "Tennisplatz",
+     "Fitnesscenter",
+     "Spa & Wellnesscenter"
+    ]
+   }
+  ],
+  "finePrint": "Lizenznummer: H/1225",
+  "policies": [],
+  "images": [
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265354.jpg?k=fd0cc56126c17bf525326f6c9f9956371c8357c7b7d50cc5ddc94ffad501de47&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764893.jpg?k=d79a1604d9d68f4e6b0d6d9577624a2cb73a46fd590e8c289e4c0b569cb7b475&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858759629.jpg?k=dd29dd7eeab6b27ef8e7d481247823d98486aa42629b861c26484fef81653ccf&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765957.jpg?k=4d9c968c19c43fe874e124e1b4d03961664055d927ef5e4973f3e9e6b5615ecf&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265330.jpg?k=fb455aaa4c65f79204d00d58c11d9fc89108561cb91537c0fa17007b3531edaa&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858766026.jpg?k=668b52e85e47abe1b2d231846dc99f7e7879183f60654b76d0e9cce79f76d13e&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765550.jpg?k=d299e37b0ab7e12e8e63afbf61faecc266c507994a71c62b8a6bab5416020bb0&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265348.jpg?k=4f4791b85a0cab0daaa1ec088cfd6fac66fd32f7fc5a48f659d605eb8c9b292f&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858761797.jpg?k=d954c4d62529494aae0cfdd3314e384ce4a631da03a7242eb80d0c1e9417e1f5&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765574.jpg?k=f5f194eb20997b5516b1aea17830bea48d383a37030231a997ef6e6d60e7ed84&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765583.jpg?k=9beeb9fc0752ef06dce7b8073c4074edfe572990bd863c36ddc0ca819e34f9e5&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765604.jpg?k=00a5e12f81eb42d80c2e5e69c527af65a33dc18c75faa63ae60ca1572ca713a9&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858761519.jpg?k=f2aa5ba10b45671a7413a905221c7ac69cd9f043bf85afefc4d59d021bdee66a&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765633.jpg?k=01ac3656069660060182b4a9ec7aee46064a422b46da3b85839b19042cc4c8b9&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765649.jpg?k=1abb1d6963ed932c4cea95da9bc297df37c430a2b0ff698c72d8a515a5246cd0&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265334.jpg?k=693325b58b0b1f5455525868ea047cc08091cab996b55dbf5b1074cc91081310&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/863051496.jpg?k=7bc37d60076e3f9b91a8c20251ea32334b201f7481eb3ac35569f552c2179262&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858759623.jpg?k=bd98caa31ebf495d98a21d370630e44a542a76c6f51b86d3ee31e82f6b88149f&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764990.jpg?k=7d62bdc2722dfd33098a7f4e7d91b3e85dc7a67262bb3c6c6a114959efea651a&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764139.jpg?k=cac1d300cd783dda560f254e5deebe822f91e58b331a6491269e6dc37d9c4ef4&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265323.jpg?k=02d74f9e0a052fbf90fcdccf8d4052d8f0064487f0fd629a70753025dce0f2ea&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764181.jpg?k=44b0373ec5d53787af549b29deac25513d1eed20018e1dd3fe246ae1c2c34d2f&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764214.jpg?k=4f316c7ea0b84e9037161e94efde2d5352a6c21c59aa4776ca0aeeab0ebbff41&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858761164.jpg?k=1d7371030ba23d3ea47d7a0de41ee6d41dbc2bdb7e0af5c57146c3396f3e6e7a&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265335.jpg?k=ec23660800f03bfd91e43a27f7d3a0487b4e7a763e00289e619fcf3232c5faab&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764306.jpg?k=a7185daa452b82e0437a0a26a2e9e029387f781ce98ff80fa5653583767964dd&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764351.jpg?k=eca42c90d6f24b79a7e22635a75c2058d9343beb23e444dd8759e87a06d4b053&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764366.jpg?k=2cd17105e347062a76811cfa39590198607d2bc495fa557cb02e59a70f45f436&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764384.jpg?k=14f06c75e1cdebf7fc3cc443a6dc4e02121c4d7e63c71224cd609e9918989769&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265326.jpg?k=79e01049a07aa3f47cf069f3b8d378def5eb4f7331c9081056ee5fbe9cf2ac0f&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265338.jpg?k=90845e534fefdad0444f5a5c0ad51c12ce4b836c7d3ee3dc1f004a6b006c8d7f&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764443.jpg?k=087e9d90fd24d474477e9ec4678e63a42b1d9435130fef42f87be94fba689a4d&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265328.jpg?k=2f03d4d8abe1dd3cde5a1add7aff4cbe3fcc1359a16c9769061a1104034faa8c&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265363.jpg?k=9e2f3982a8b2f63fdd7e6ffc3d56c455496c485b13d95a723d290137a2535503&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265327.jpg?k=ffa5c48024cc517e11e6b559fbd6548f70b4ffc5fc00a964019b23035b9ebbcc&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858762292.jpg?k=9342eef81674763c38a37fc6afbb18f43164bf00e1de0d1762b38307b2ec3141&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858763164.jpg?k=8721cb294e9c632b14407813aa271aa40d9810584f3a0e2a8e90f3764a7594ef&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858763168.jpg?k=bb967522ed7b2738da5de7852178432ee9111613f858d0bc883eba3e0ec22083&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858763183.jpg?k=bad19214a39ab003091df0f6ecce5b33f3517fb06397138a9475a90d73874873&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858727293.jpg?k=df67d5b30a0919e403c945ba3ace0857116ed39ee8086735bdf2b47c679498b7&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858763271.jpg?k=3983da102c5f9abf5ad7bb0d9e837704c961ad13f701cb2ff1728049d555ab6f&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265344.jpg?k=7cd2fd6bb10841dc798cae2f81180bdeb9f9d15976671c5f44c0dc3a34ef4fb6&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858762847.jpg?k=6fd35f762421f05031b3dcc302158dd7b8c27e6f6dd24201c8b2c88d929244df&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858762851.jpg?k=99f220c362e0b1f9f1b3a835a5aab8fc73629d67086ea05c7f50f23221275211&o=&hp=1",
+   "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858762860.jpg?k=3e71f23dbe1e9a48eab1c15cf28271ced01604d1f84f64500a9f8c89d56b265a&o=&hp=1"
+  ],
+  "roomImages": [
+   {
+    "id": "501265323",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265323.jpg?k=02d74f9e0a052fbf90fcdccf8d4052d8f0064487f0fd629a70753025dce0f2ea&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265323.jpg?k=02d74f9e0a052fbf90fcdccf8d4052d8f0064487f0fd629a70753025dce0f2ea&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:13",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "501265326",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265326.jpg?k=79e01049a07aa3f47cf069f3b8d378def5eb4f7331c9081056ee5fbe9cf2ac0f&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265326.jpg?k=79e01049a07aa3f47cf069f3b8d378def5eb4f7331c9081056ee5fbe9cf2ac0f&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:14",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1659
+    }
+   },
+   {
+    "id": "501265327",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265327.jpg?k=ffa5c48024cc517e11e6b559fbd6548f70b4ffc5fc00a964019b23035b9ebbcc&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265327.jpg?k=ffa5c48024cc517e11e6b559fbd6548f70b4ffc5fc00a964019b23035b9ebbcc&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:15",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1681
+    }
+   },
+   {
+    "id": "501265328",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265328.jpg?k=2f03d4d8abe1dd3cde5a1add7aff4cbe3fcc1359a16c9769061a1104034faa8c&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265328.jpg?k=2f03d4d8abe1dd3cde5a1add7aff4cbe3fcc1359a16c9769061a1104034faa8c&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:15",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1816
+    }
+   },
+   {
+    "id": "501265330",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265330.jpg?k=fb455aaa4c65f79204d00d58c11d9fc89108561cb91537c0fa17007b3531edaa&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265330.jpg?k=fb455aaa4c65f79204d00d58c11d9fc89108561cb91537c0fa17007b3531edaa&o=&hp=1",
+    "associatedRoomIds": [
+     "961614025"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:15",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "501265334",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265334.jpg?k=693325b58b0b1f5455525868ea047cc08091cab996b55dbf5b1074cc91081310&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265334.jpg?k=693325b58b0b1f5455525868ea047cc08091cab996b55dbf5b1074cc91081310&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:15",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1836
+    }
+   },
+   {
+    "id": "501265335",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265335.jpg?k=ec23660800f03bfd91e43a27f7d3a0487b4e7a763e00289e619fcf3232c5faab&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265335.jpg?k=ec23660800f03bfd91e43a27f7d3a0487b4e7a763e00289e619fcf3232c5faab&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:16",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1919
+    }
+   },
+   {
+    "id": "501265338",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265338.jpg?k=90845e534fefdad0444f5a5c0ad51c12ce4b836c7d3ee3dc1f004a6b006c8d7f&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265338.jpg?k=90845e534fefdad0444f5a5c0ad51c12ce4b836c7d3ee3dc1f004a6b006c8d7f&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:16",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "501265344",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265344.jpg?k=7cd2fd6bb10841dc798cae2f81180bdeb9f9d15976671c5f44c0dc3a34ef4fb6&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265344.jpg?k=7cd2fd6bb10841dc798cae2f81180bdeb9f9d15976671c5f44c0dc3a34ef4fb6&o=&hp=1",
+    "associatedRoomIds": [
+     "961614021"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:18",
+    "grid": {
+     "photoWidth": 2872,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "501265348",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265348.jpg?k=4f4791b85a0cab0daaa1ec088cfd6fac66fd32f7fc5a48f659d605eb8c9b292f&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265348.jpg?k=4f4791b85a0cab0daaa1ec088cfd6fac66fd32f7fc5a48f659d605eb8c9b292f&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:20",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1921
+    }
+   },
+   {
+    "id": "501265363",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/501265363.jpg?k=9e2f3982a8b2f63fdd7e6ffc3d56c455496c485b13d95a723d290137a2535503&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/501265363.jpg?k=9e2f3982a8b2f63fdd7e6ffc3d56c455496c485b13d95a723d290137a2535503&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2023-10-24 12:19:26",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858727293",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858727293.jpg?k=df67d5b30a0919e403c945ba3ace0857116ed39ee8086735bdf2b47c679498b7&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858727293.jpg?k=df67d5b30a0919e403c945ba3ace0857116ed39ee8086735bdf2b47c679498b7&o=&hp=1",
+    "associatedRoomIds": [
+     "961614001"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 11:35:08",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858759623",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858759623.jpg?k=bd98caa31ebf495d98a21d370630e44a542a76c6f51b86d3ee31e82f6b88149f&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858759623.jpg?k=bd98caa31ebf495d98a21d370630e44a542a76c6f51b86d3ee31e82f6b88149f&o=&hp=1",
+    "associatedRoomIds": [
+     "961614015",
+     "961614023"
+    ],
+    "orientation": "portrait",
+    "created": "2026-04-27 12:20:09",
+    "grid": {
+     "photoWidth": 1400,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858759629",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858759629.jpg?k=dd29dd7eeab6b27ef8e7d481247823d98486aa42629b861c26484fef81653ccf&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858759629.jpg?k=dd29dd7eeab6b27ef8e7d481247823d98486aa42629b861c26484fef81653ccf&o=&hp=1",
+    "associatedRoomIds": [
+     "961614015",
+     "961614025"
+    ],
+    "orientation": "portrait",
+    "created": "2026-04-27 12:20:14",
+    "grid": {
+     "photoWidth": 1400,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858761164",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858761164.jpg?k=1d7371030ba23d3ea47d7a0de41ee6d41dbc2bdb7e0af5c57146c3396f3e6e7a&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858761164.jpg?k=1d7371030ba23d3ea47d7a0de41ee6d41dbc2bdb7e0af5c57146c3396f3e6e7a&o=&hp=1",
+    "associatedRoomIds": [
+     "961614016",
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:26:30",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858761519",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858761519.jpg?k=f2aa5ba10b45671a7413a905221c7ac69cd9f043bf85afefc4d59d021bdee66a&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858761519.jpg?k=f2aa5ba10b45671a7413a905221c7ac69cd9f043bf85afefc4d59d021bdee66a&o=&hp=1",
+    "associatedRoomIds": [
+     "961614006",
+     "961614016",
+     "961614017",
+     "961614019",
+     "961614020",
+     "961614021",
+     "961614022",
+     "961614023",
+     "961614024",
+     "961614025"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:28:02",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858761797",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858761797.jpg?k=d954c4d62529494aae0cfdd3314e384ce4a631da03a7242eb80d0c1e9417e1f5&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858761797.jpg?k=d954c4d62529494aae0cfdd3314e384ce4a631da03a7242eb80d0c1e9417e1f5&o=&hp=1",
+    "associatedRoomIds": [
+     "961614006",
+     "961614018",
+     "961614024"
+    ],
+    "orientation": "portrait",
+    "created": "2026-04-27 12:29:04",
+    "grid": {
+     "photoWidth": 1521,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858762292",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858762292.jpg?k=9342eef81674763c38a37fc6afbb18f43164bf00e1de0d1762b38307b2ec3141&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858762292.jpg?k=9342eef81674763c38a37fc6afbb18f43164bf00e1de0d1762b38307b2ec3141&o=&hp=1",
+    "associatedRoomIds": [
+     "961614005",
+     "961614019",
+     "961614021"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:30:11",
+    "grid": {
+     "photoWidth": 2648,
+     "photoHeight": 1986
+    }
+   },
+   {
+    "id": "858762847",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858762847.jpg?k=6fd35f762421f05031b3dcc302158dd7b8c27e6f6dd24201c8b2c88d929244df&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858762847.jpg?k=6fd35f762421f05031b3dcc302158dd7b8c27e6f6dd24201c8b2c88d929244df&o=&hp=1",
+    "associatedRoomIds": [
+     "961614020"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:31:53",
+    "grid": {
+     "photoWidth": 2800,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858762851",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858762851.jpg?k=99f220c362e0b1f9f1b3a835a5aab8fc73629d67086ea05c7f50f23221275211&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858762851.jpg?k=99f220c362e0b1f9f1b3a835a5aab8fc73629d67086ea05c7f50f23221275211&o=&hp=1",
+    "associatedRoomIds": [
+     "961614020"
+    ],
+    "orientation": "portrait",
+    "created": "2026-04-27 12:31:54",
+    "grid": {
+     "photoWidth": 1400,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858763164",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858763164.jpg?k=8721cb294e9c632b14407813aa271aa40d9810584f3a0e2a8e90f3764a7594ef&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858763164.jpg?k=8721cb294e9c632b14407813aa271aa40d9810584f3a0e2a8e90f3764a7594ef&o=&hp=1",
+    "associatedRoomIds": [
+     "961614021"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:33:32",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 2089
+    }
+   },
+   {
+    "id": "858763168",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858763168.jpg?k=bb967522ed7b2738da5de7852178432ee9111613f858d0bc883eba3e0ec22083&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858763168.jpg?k=bb967522ed7b2738da5de7852178432ee9111613f858d0bc883eba3e0ec22083&o=&hp=1",
+    "associatedRoomIds": [
+     "961614021"
+    ],
+    "orientation": "portrait",
+    "created": "2026-04-27 12:33:34",
+    "grid": {
+     "photoWidth": 1400,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858763183",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858763183.jpg?k=bad19214a39ab003091df0f6ecce5b33f3517fb06397138a9475a90d73874873&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858763183.jpg?k=bad19214a39ab003091df0f6ecce5b33f3517fb06397138a9475a90d73874873&o=&hp=1",
+    "associatedRoomIds": [
+     "961614021"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:33:35",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1698
+    }
+   },
+   {
+    "id": "858764139",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764139.jpg?k=cac1d300cd783dda560f254e5deebe822f91e58b331a6491269e6dc37d9c4ef4&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764139.jpg?k=cac1d300cd783dda560f254e5deebe822f91e58b331a6491269e6dc37d9c4ef4&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:34:48",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 2160
+    }
+   },
+   {
+    "id": "858764181",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764181.jpg?k=44b0373ec5d53787af549b29deac25513d1eed20018e1dd3fe246ae1c2c34d2f&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764181.jpg?k=44b0373ec5d53787af549b29deac25513d1eed20018e1dd3fe246ae1c2c34d2f&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:34:51",
+    "grid": {
+     "photoWidth": 2694,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858764214",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764214.jpg?k=4f316c7ea0b84e9037161e94efde2d5352a6c21c59aa4776ca0aeeab0ebbff41&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764214.jpg?k=4f316c7ea0b84e9037161e94efde2d5352a6c21c59aa4776ca0aeeab0ebbff41&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:34:53",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858764306",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764306.jpg?k=a7185daa452b82e0437a0a26a2e9e029387f781ce98ff80fa5653583767964dd&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764306.jpg?k=a7185daa452b82e0437a0a26a2e9e029387f781ce98ff80fa5653583767964dd&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:34:57",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1602
+    }
+   },
+   {
+    "id": "858764351",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764351.jpg?k=eca42c90d6f24b79a7e22635a75c2058d9343beb23e444dd8759e87a06d4b053&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764351.jpg?k=eca42c90d6f24b79a7e22635a75c2058d9343beb23e444dd8759e87a06d4b053&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:35:00",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858764366",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764366.jpg?k=2cd17105e347062a76811cfa39590198607d2bc495fa557cb02e59a70f45f436&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764366.jpg?k=2cd17105e347062a76811cfa39590198607d2bc495fa557cb02e59a70f45f436&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:35:03",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858764384",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764384.jpg?k=14f06c75e1cdebf7fc3cc443a6dc4e02121c4d7e63c71224cd609e9918989769&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764384.jpg?k=14f06c75e1cdebf7fc3cc443a6dc4e02121c4d7e63c71224cd609e9918989769&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "portrait",
+    "created": "2026-04-27 12:35:05",
+    "grid": {
+     "photoWidth": 1400,
+     "photoHeight": 2100
+    }
+   },
+   {
+    "id": "858764443",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764443.jpg?k=087e9d90fd24d474477e9ec4678e63a42b1d9435130fef42f87be94fba689a4d&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764443.jpg?k=087e9d90fd24d474477e9ec4678e63a42b1d9435130fef42f87be94fba689a4d&o=&hp=1",
+    "associatedRoomIds": [
+     "961614022"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:35:11",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858764893",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764893.jpg?k=d79a1604d9d68f4e6b0d6d9577624a2cb73a46fd590e8c289e4c0b569cb7b475&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764893.jpg?k=d79a1604d9d68f4e6b0d6d9577624a2cb73a46fd590e8c289e4c0b569cb7b475&o=&hp=1",
+    "associatedRoomIds": [
+     "961614006",
+     "961614023",
+     "961614025"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:36:01",
+    "grid": {
+     "photoWidth": 2132,
+     "photoHeight": 1599
+    }
+   },
+   {
+    "id": "858764990",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858764990.jpg?k=7d62bdc2722dfd33098a7f4e7d91b3e85dc7a67262bb3c6c6a114959efea651a&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858764990.jpg?k=7d62bdc2722dfd33098a7f4e7d91b3e85dc7a67262bb3c6c6a114959efea651a&o=&hp=1",
+    "associatedRoomIds": [
+     "961614023"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:36:09",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858765550",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858765550.jpg?k=d299e37b0ab7e12e8e63afbf61faecc266c507994a71c62b8a6bab5416020bb0&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765550.jpg?k=d299e37b0ab7e12e8e63afbf61faecc266c507994a71c62b8a6bab5416020bb0&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:37:14",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 2160
+    }
+   },
+   {
+    "id": "858765574",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858765574.jpg?k=f5f194eb20997b5516b1aea17830bea48d383a37030231a997ef6e6d60e7ed84&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765574.jpg?k=f5f194eb20997b5516b1aea17830bea48d383a37030231a997ef6e6d60e7ed84&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:37:18",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858765583",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858765583.jpg?k=9beeb9fc0752ef06dce7b8073c4074edfe572990bd863c36ddc0ca819e34f9e5&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765583.jpg?k=9beeb9fc0752ef06dce7b8073c4074edfe572990bd863c36ddc0ca819e34f9e5&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:37:20",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858765604",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858765604.jpg?k=00a5e12f81eb42d80c2e5e69c527af65a33dc18c75faa63ae60ca1572ca713a9&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765604.jpg?k=00a5e12f81eb42d80c2e5e69c527af65a33dc18c75faa63ae60ca1572ca713a9&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:37:23",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858765633",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858765633.jpg?k=01ac3656069660060182b4a9ec7aee46064a422b46da3b85839b19042cc4c8b9&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765633.jpg?k=01ac3656069660060182b4a9ec7aee46064a422b46da3b85839b19042cc4c8b9&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:37:27",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858765649",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858765649.jpg?k=1abb1d6963ed932c4cea95da9bc297df37c430a2b0ff698c72d8a515a5246cd0&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765649.jpg?k=1abb1d6963ed932c4cea95da9bc297df37c430a2b0ff698c72d8a515a5246cd0&o=&hp=1",
+    "associatedRoomIds": [
+     "961614024"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:37:29",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858765957",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858765957.jpg?k=4d9c968c19c43fe874e124e1b4d03961664055d927ef5e4973f3e9e6b5615ecf&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858765957.jpg?k=4d9c968c19c43fe874e124e1b4d03961664055d927ef5e4973f3e9e6b5615ecf&o=&hp=1",
+    "associatedRoomIds": [
+     "961614025"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:38:47",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 1920
+    }
+   },
+   {
+    "id": "858766026",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/858766026.jpg?k=668b52e85e47abe1b2d231846dc99f7e7879183f60654b76d0e9cce79f76d13e&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/858766026.jpg?k=668b52e85e47abe1b2d231846dc99f7e7879183f60654b76d0e9cce79f76d13e&o=&hp=1",
+    "associatedRoomIds": [
+     "961614025"
+    ],
+    "orientation": "landscape",
+    "created": "2026-04-27 12:38:57",
+    "grid": {
+     "photoWidth": 7018,
+     "photoHeight": 4151
+    }
+   },
+   {
+    "id": "863051496",
+    "thumbUrl": "https://cf.bstatic.com/xdata/images/hotel/max200/863051496.jpg?k=7bc37d60076e3f9b91a8c20251ea32334b201f7481eb3ac35569f552c2179262&o=&hp=1",
+    "largeUrl": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/863051496.jpg?k=7bc37d60076e3f9b91a8c20251ea32334b201f7481eb3ac35569f552c2179262&o=&hp=1",
+    "associatedRoomIds": [
+     "961614010"
+    ],
+    "orientation": "landscape",
+    "created": "2026-05-05 17:39:44",
+    "grid": {
+     "photoWidth": 2880,
+     "photoHeight": 2003
+    }
+   }
+  ],
+  "categoryReviews": [
+   {
+    "title": "Sauberkeit",
+    "score": 9.4
+   },
+   {
+    "title": "Komfort",
+    "score": 9.4
+   },
+   {
+    "title": "Ausstattung",
+    "score": 9.5
+   },
+   {
+    "title": "Lage",
+    "score": 9.2
+   },
+   {
+    "title": "Hotelpersonal",
+    "score": 9.6
+   },
+   {
+    "title": "Preis-Leistungs-Verh\u00e4ltnis",
+    "score": 8.3
+   },
+   {
+    "title": "Kostenfreies WLAN",
+    "score": 7.5
+   }
+  ],
+  "reviewSummary": null,
+  "hotelChain": null,
+  "licenseInfo": {
+   "numbers": [
+    "H/1225"
+   ],
+   "phrases": [
+    "Lizenznummer: H/1225"
+   ]
+  },
+  "hostInfo": null,
+  "traderInfo": null,
+  "breadcrumbs": [
+   {
+    "name": "Startseite",
+    "fullName": "Booking.com",
+    "link": "https://www.booking.com/index.de.html?aid=304142&label=gen173nr-10CAsoRkIQaWtvcy1wb3J0by1wZXRyb0gHWARopwKIAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AriysNcGwAIB0gIkOWE1NmVkNzctZTk2MC00ZTlhLTg5ZWQtMmUyMWYzMWM3NThh2AIB4AIB",
+    "altLink": null
+   },
+   {
+    "name": "Hotels",
+    "fullName": "Hotels auf Booking.com",
+    "link": "https://www.booking.com/hotel/index.de.html?aid=304142&label=gen173nr-10CAsoRkIQaWtvcy1wb3J0by1wZXRyb0gHWARopwKIAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AriysNcGwAIB0gIkOWE1NmVkNzctZTk2MC00ZTlhLTg5ZWQtMmUyMWYzMWM3NThh2AIB4AIB",
+    "altLink": null
+   },
+   {
+    "name": "Resorts: alle",
+    "fullName": "Resorts auf Booking.com",
+    "link": "https://www.booking.com/resorts/index.de.html?aid=304142&label=gen173nr-10CAsoRkIQaWtvcy1wb3J0by1wZXRyb0gHWARopwKIAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AriysNcGwAIB0gIkOWE1NmVkNzctZTk2MC00ZTlhLTg5ZWQtMmUyMWYzMWM3NThh2AIB4AIB",
+    "altLink": null
+   },
+   {
+    "name": "Spanien",
+    "fullName": "Resorts in Spanien",
+    "link": "https://www.booking.com/searchresults.de.html?aid=304142&label=gen173nr-10CAsoRkIQaWtvcy1wb3J0by1wZXRyb0gHWARopwKIAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AriysNcGwAIB0gIkOWE1NmVkNzctZTk2MC00ZTlhLTg5ZWQtMmUyMWYzMWM3NThh2AIB4AIB&dest_id=197&dest_type=country&nflt=sth%3D12",
+    "altLink": "https://www.booking.com/country/es.html"
+   },
+   {
+    "name": "Mallorca",
+    "fullName": "Resorts in der Region Mallorca",
+    "link": "https://www.booking.com/searchresults.de.html?aid=304142&label=gen173nr-10CAsoRkIQaWtvcy1wb3J0by1wZXRyb0gHWARopwKIAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AriysNcGwAIB0gIkOWE1NmVkNzctZTk2MC00ZTlhLTg5ZWQtMmUyMWYzMWM3NThh2AIB4AIB&dest_id=767&dest_type=region&nflt=sth%3D12",
+    "altLink": null
+   },
+   {
+    "name": "Portopetro",
+    "fullName": "Resorts in Portopetro",
+    "link": "https://www.booking.com/searchresults.de.html?aid=304142&label=gen173nr-10CAsoRkIQaWtvcy1wb3J0by1wZXRyb0gHWARopwKIAQGYATO4AQfIAQzYAQPoAQH4AQGIAgGoAgG4AriysNcGwAIB0gIkOWE1NmVkNzctZTk2MC00ZTlhLTg5ZWQtMmUyMWYzMWM3NThh2AIB4AIB&dest_id=-397280&dest_type=city&nflt=sth%3D12",
+    "altLink": null
+   },
+   {
+    "name": "Ikos Porto Petro (Resort) (Spanien) Angebote",
+    "fullName": "Ikos Porto Petro (Resort) (Spanien) Angebote",
+    "link": null,
+    "altLink": null
+   }
+  ],
+  "hotelId": 9616140,
+  "facilities": [
+   {
+    "name": "Great for your stay",
+    "facilities": [
+     {
+      "name": "Parkplatz inbegriffen",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 2
+     },
+     {
+      "name": "WLAN inklusive",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      }
+     },
+     {
+      "name": "Parkplatz",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 2
+     },
+     {
+      "name": "Nichtraucherzimmer",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 16
+     },
+     {
+      "name": "Strand",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 302
+     },
+     {
+      "name": "Flughafenshuttle",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      }
+     },
+     {
+      "name": "6 Restaurants",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      }
+     },
+     {
+      "name": "Fitnesscenter",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 11
+     },
+     {
+      "name": "Familienzimmer",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 28
+     },
+     {
+      "name": "Spa & Wellnesscenter",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 54
+     }
+    ],
+    "overview": null,
+    "id": null
+   },
+   {
+    "name": "Aktivit\u00e4ten",
+    "overview": null,
+    "id": 2,
+    "facilities": [
+     {
+      "name": "Aerobic",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 413
+     },
+     {
+      "name": "Live-Sportveranstaltung (\u00dcbertragung)",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 411
+     },
+     {
+      "name": "Live-Musik/Performance",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 410
+     },
+     {
+      "name": "Strand",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 302
+     },
+     {
+      "name": "Tennisausr\u00fcstung",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 215
+     },
+     {
+      "name": "Wassersportm\u00f6glichkeiten vor Ort",
+      "additionalInfo": {
+       "requiresAdditionalCharge": true,
+       "isOffSite": false
+      },
+      "id": 137
+     },
+     {
+      "name": "Radfahren",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 76
+     },
+     {
+      "name": "Kanusport",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 69
+     },
+     {
+      "name": "Tischtennis",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 58
+     },
+     {
+      "name": "Tennisplatz",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 9
+     }
+    ]
+   },
+   {
+    "name": "Speisen & Getr\u00e4nke",
+    "overview": null,
+    "id": 7,
+    "facilities": [
+     {
+      "name": "Caf\u00e9 vor Ort",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 219
+     },
+     {
+      "name": "Obst",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 205
+     },
+     {
+      "name": "Wein/Sekt",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 203
+     },
+     {
+      "name": "Kinderfreundliches Buffet",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 177
+     },
+     {
+      "name": "Kindermahlzeiten",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 176
+     },
+     {
+      "name": "Snackbar",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 117
+     },
+     {
+      "name": "Fr\u00fchst\u00fcck im Zimmer",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 43
+     },
+     {
+      "name": "Bar",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 7
+     },
+     {
+      "name": "Restaurant",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 3
+     }
+    ]
+   },
+   {
+    "name": "Internet",
+    "overview": "WLAN ist in allen Bereichen nutzbar und ist kostenfrei.",
+    "id": 11,
+    "facilities": [
+     {
+      "name": "Internet",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 47
+     }
+    ]
+   },
+   {
+    "name": "Parkm\u00f6glichkeiten",
+    "overview": "Private Parkpl\u00e4tze stehen kostenfrei an der Unterkunft (Reservierung ist nicht erforderlich) zur Verf\u00fcgung.",
+    "id": 16,
+    "facilities": [
+     {
+      "name": "Parkplatz",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 2
+     }
+    ]
+   },
+   {
+    "name": "Rezeptionsservice",
+    "overview": null,
+    "id": 23,
+    "facilities": [
+     {
+      "name": "Conciergeservice",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 124
+     },
+     {
+      "name": "Geldautomat vor Ort",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 111
+     },
+     {
+      "name": "Gep\u00e4ckaufbewahrung",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 91
+     },
+     {
+      "name": "W\u00e4hrungsumtausch",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 53
+     },
+     {
+      "name": "24-Stunden-Rezeption",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 8
+     }
+    ]
+   },
+   {
+    "name": "Unterhaltung und Familienangebote",
+    "overview": null,
+    "id": 25,
+    "facilities": [
+     {
+      "name": "Baby-/ Kinderbetreuung",
+      "additionalInfo": {
+       "requiresAdditionalCharge": true,
+       "isOffSite": false
+      },
+      "id": 21
+     },
+     {
+      "name": "Outdoorspielger\u00e4te f\u00fcr Kinder",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 173
+     }
+    ]
+   },
+   {
+    "name": "Reinigungsservices",
+    "overview": null,
+    "id": 26,
+    "facilities": [
+     {
+      "name": "T\u00e4gliche Reinigung",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 158
+     }
+    ]
+   },
+   {
+    "name": "Sicherheit",
+    "overview": null,
+    "id": 34,
+    "facilities": [
+     {
+      "name": "Zugang mit Schl\u00fcsselkarte",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 420
+     },
+     {
+      "name": "24-Stunden-Sicherheitspersonal",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 418
+     },
+     {
+      "name": "Safe",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 51
+     }
+    ]
+   },
+   {
+    "name": "Allgemein",
+    "overview": null,
+    "id": 1,
+    "facilities": [
+     {
+      "name": "Minimarkt vor Ort",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 145
+     },
+     {
+      "name": "Klimaanlage",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 109
+     },
+     {
+      "name": "Familienzimmer",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 28
+     },
+     {
+      "name": "Flughafenshuttle",
+      "additionalInfo": {
+       "requiresAdditionalCharge": true,
+       "isOffSite": false
+      },
+      "id": 17
+     },
+     {
+      "name": "Nichtraucherzimmer",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 16
+     },
+     {
+      "name": "Zimmerservice",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 5
+     }
+    ]
+   },
+   {
+    "name": "Wellness",
+    "overview": null,
+    "id": 21,
+    "facilities": [
+     {
+      "name": "Pool 1 - im Freien",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 433
+     },
+     {
+      "name": "Spa & Wellnesscenter",
+      "additionalInfo": {
+       "requiresAdditionalCharge": true,
+       "isOffSite": false
+      },
+      "id": 54
+     },
+     {
+      "name": "Fitnesscenter",
+      "additionalInfo": {
+       "requiresAdditionalCharge": false,
+       "isOffSite": false
+      },
+      "id": 11
+     }
+    ]
+   }
+  ],
+  "timeOfScrapeISO": "2026-11-05T05:51:00.251Z"
+ }
+]

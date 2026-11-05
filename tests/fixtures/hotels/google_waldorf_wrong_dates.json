@@ -1,0 +1,1361 @@
+{
+ "search_metadata": {
+  "id": "6aec2c57a33d2ba597d8ae68",
+  "status": "Success",
+  "json_endpoint": "https://serpapi.com/searches/_B8JeisgIX8SqOGJelejKoE36ljfWfgoFM1TeUzA4Uw/6aec2c57a33d2ba597d8ae68.json",
+  "markdown_endpoint": "https://serpapi.com/searches/_B8JeisgIX8SqOGJelejKoE36ljfWfgoFM1TeUzA4Uw/6aec2c57a33d2ba597d8ae68.md",
+  "created_at": "2026-11-05T07:12:23.346Z",
+  "processed_at": "2026-11-05T07:12:23.347Z",
+  "google_hotels_url": "https://www.google.com/travel/hotels/entity/ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE?hl=de&gl=de",
+  "raw_html_file": "https://serpapi.com/searches/_B8JeisgIX8SqOGJelejKoE36ljfWfgoFM1TeUzA4Uw/6aec2c57a33d2ba597d8ae68.html",
+  "prettify_html_file": "https://serpapi.com/searches/_B8JeisgIX8SqOGJelejKoE36ljfWfgoFM1TeUzA4Uw/6aec2c57a33d2ba597d8ae68.prettify",
+  "total_time_taken": {
+   "float": 3.9963595867156982
+  }
+ },
+ "search_parameters": {
+  "engine": "google_hotels",
+  "gl": "de",
+  "hl": "de",
+  "currency": "EUR",
+  "check_in_date": "2027-10-10",
+  "check_out_date": "2027-10-15",
+  "adults": 2,
+  "children": 1,
+  "children_ages": "8",
+  "property_token": "ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+ },
+ "type": "hotel",
+ "name": "Waldorf Astoria Seychelles Platte Island",
+ "link": "https://www.hilton.com/en/hotels/sezpiwa-waldorf-astoria-seychelles-platte-island/?SEO_id=GMB-EMEA-WA-SEZPIWA",
+ "property_token": "ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE",
+ "address": "Platte Island, Outer Islands, Seychellen",
+ "directions": "https://maps.google.com/maps?hl=de&gl=ZZ&um=1&ie=UTF-8&fb=1&sa=X&geocode=KTEPC0Mvh-IiMR6Lg7dUsHZZ&daddr=Waldorf+Astoria+Seychelles+Platte+Island,+Platte+Island,+Outer+Islands,+Seychellen",
+ "phone": "+248 4 229 000",
+ "phone_link": "tel:+2484229000",
+ "gps_coordinates": {
+  "latitude": -5.8634718,
+  "longitude": 55.382578099999996
+ },
+ "check_in_time": "15:00",
+ "check_out_time": "12:00",
+ "rate_per_night": {
+  "display_price": "1.641 €",
+  "extracted_display_price": 1641,
+  "lowest": "1.641 €",
+  "extracted_lowest": 1641
+ },
+ "total_rate": {
+  "display_price": "1.641 €",
+  "extracted_display_price": 1641,
+  "lowest": "1.641 €",
+  "extracted_lowest": 1641
+ },
+ "featured_prices": [
+  {
+   "source": "Booking.com",
+   "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQARoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASABEgJnfPD_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_0TSCCyZ2f7tncJ5SRvbctP7GH8-Q&adurl",
+   "logo": "https://www.gstatic.com/travel-hotels/branding/icon_184.png",
+   "rooms": [
+    {
+     "name": "Villa mit 1 Schlafzimmer und Pool",
+     "images": [
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zyuC3ALGrrBgQVkVNN6WLG4t4JCEbuPbRdbjVOVxtUlnT1_2pMwbmW6rKHYkQBiGvIyBGwTcdXBEXfWllWH-SgrehmUKGO1ocKsOYituvChqO97U9sVB_CFekrTWu1KbKaKzMVB5Q75zolDXHMzdT2R29JVru9JufZrU4gwxsEN27gzuiAsjGZI8nEmM2ZDtXr9R89b0r3Ertdw04JOzWBqrQkMEMy9gGE",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_wJH2uxfIS-GyLYwMX5PKsjjOFGihdQr--7AwLR9MO5CfmEDvid2pLbfJ7moX4Kw_rmwfmMYjhz70IgcmHaSWsmC7oNArIlEPqvIi9oywn1kmNwzFVSSoZ7J9etok1gEIi97ecQ9RBDoeQAtoPfzJzuJHlOV3FZzVtQjpl7J0kvYfj4k7joJTxoIyaT-WUPf5s6mYvHSuSoBpQABEBCn_eYsfDh1m11yjsG",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xNrgOwlmGGMUVggTMOgyl3YOvTTEzbNRPza7rH_Ighfjl7Wb8Leigiu8Becq8ZO1djjkgtSC5eKu9A0KmzGLDj0EDYtDdbl6-NEXdV7-ytUJFpLq3X64E0Xbe9uJJzFkwCdnAL52OA3NfjKoYOP2lEVcj6P3q9g5PBcOlHxaIQ7jH1o5DDeXoA6PJ5-8PvrwsL9NbbcPUlWZDORT7Ioaxl5Oq8pmBEkCsU",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zqqE9djwm1VargZjLn-wHtlXsh40_ABOJh5UJKypset6RC7cY0IgVYRWeGdloZfR9CEyvtRKqxK9DOiU1k3JAFvQdae9BDVKPxHmiFEwCPpvwBzc0zOsEH-RRGP-SoOqqwNuTnrttfWosANxliwLyXZ19647CVpLlEnZc8IkyXZhi7ILaz9QG1kQh6696EhFjbUw1z6GCk8-tmynQOQ79ufiomp47qOpE",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yNPf0OIph0eFWJHXL89coG3PXhqTe_etjrpE9FhJeFv__Vp_ToPgm6qic4yinfk0s695KG_JtVRMVF6oGKj-N3wxtWDmM57SdrDkYFmx54w7ZRvJLv82eQLFM23LXOF_lgq-I3MOUGrrjIZyxx4wpLcbU8bXyD07cE3xdS75OupbA0YVO_Pn39pw3vErPdh2cIkJViN8inR7yDk67hWHdxTv7YrxBg4ak",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xlcse1wH-KV4j0gu5hY2eRC-n5WtBBEWsuyW6VlscY-DCLFocXmwaFqIGN5baQxJFS_i1ItchPiTJ1HRAQORDCfuhJ8aU1aQpcue3H-tCNM-CbOUTUeqJsgmgqED0ixCzo3U9K-4E-EkDlnCK6KR2vfnDpLe_2x1TU1PBVc6XXupTksp6ug8cQbvoG6YNTmIvZWhPy9pn8Xsh4LlRTtweJQCMJNW0C_3V6",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_ybJs3q4toDRu-Y04D5AxMTw8D36q9IwilcS40yr2B4QV2Wr6HrcJj6YQMiTRzNXdyQ1doPgAvrRunabyt55mHKalSp9s4D1R1cYOfQlpXWZdGdK8MKazKSJnQ8MeaYCghK1Af5WlYT6zG5KwnPvfCrdH1buget_DeN9yLVnj0kJUW16EwcAlvgNyhDW5jsZPiO00KMgYaJ3N-lrak3wBbHM7vBXbsB4FaK",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zRw_i6s4HVjQjHbpIDWpk00jKv8FX0G4eimEx5BG2RA5HwElr4v5vvEt5Z5h3gOOyo7Yt7ELcx5lo1h95ynBHo8rBolVxMuVf_BKDonhzEp1YkK3BwjXjidtNkuOgzfM6m64m2ys0V6ZHb0FJFe9ewUjdsyWJhoLvv43nfq71V7Xuf2MYNrPgbatR6iEoIIOXn7zG4L7IyeoO_j2nsmjb51p9Jvr_9ghY",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_w32h-UP7O11aElJboRS4daZdH3sYrtJC-7VzzcM-RARB22DbgJz_gFzRDbNqG4_5I5XXy5dju7gWvs2LzXYhN__ePHDecFKCNcYXYRGTwL_dNPrmEqpVH7UXL60MV9TmHQhGJWxRyhjiMgW3svWhmjtvmyb-zsOgsVKfhv6V7QPiVLCHMAjnHHtWfveJJUYqUaif67NalBECCjk8a76DC7Kly0EjjIJHE",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_w7oWCrcPS0SALKKwSk0UrfCKeg45KzcOvTHv8SkN51H4NZJsPsND0xf-fpfikZ8AblfxAHyNf5jFVklnU0OTS7Gz1xl_Gkkpm472zlQXJMgml1xcb4TbaxzDn24YHJdNnQeONLkfKyvQXQOhvwShs-C63UD9OuQZQ8WU4jObgESwcZsgcnF8N-fRGCtIg5lqmszv50hJcNKqGeq5FVI9tS7_b5qSBMq9b-",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zue-097qao-BFwgmmuar5LsqjaMQ8HWELgw5eZksknBPOQuDezvFOCz2WWc7BIOuLFfh_zJMKNok135bZzRStQyyfZsyjDvVgpaiLJn3gKkg3CdM6OwxSTmP33wXktwe6wtb5tGGTJLjkZDQYRkBcHe6-zStOPR4VLBLHSEvsQ2hXyhLY3KygFmPswe9_Z44IBhce8q0CVPmJxursC7NwdssrfAl63LlwV"
+     ],
+     "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQBRoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAFEgLcjfD_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_2Yl_ldpwE4Ip6eP9dG6cerKmgPKA&adurl",
+     "num_guests": 3,
+     "rate_per_night": {
+      "display_price": "1.652 €",
+      "extracted_display_price": 1652,
+      "lowest": "1.652 €",
+      "extracted_lowest": 1652
+     },
+     "total_rate": {
+      "display_price": "1.652 €",
+      "extracted_display_price": 1652,
+      "lowest": "1.652 €",
+      "extracted_lowest": 1652
+     },
+     "rates": [
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQBRoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAFEgLcjfD_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_2Yl_ldpwE4Ip6eP9dG6cerKmgPKA&adurl",
+       "num_guests": 3,
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "1.652 €",
+        "extracted_display_price": 1652,
+        "lowest": "1.652 €",
+        "extracted_lowest": 1652
+       },
+       "total_rate": {
+        "display_price": "1.652 €",
+        "extracted_display_price": 1652,
+        "lowest": "1.652 €",
+        "extracted_lowest": 1652
+       },
+       "inclusions": [
+        "3 Gäste",
+        "Frühstück"
+       ]
+      },
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQBhoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAGEgLEe_D_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_0g4kxf-sAP0XTcXVcWREmwJA6n_A&adurl",
+       "num_guests": 3,
+       "free_cancellation": true,
+       "free_cancellation_until_date": "12. Nov.",
+       "free_cancellation_until_time": "23:59",
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "1.942 €",
+        "extracted_display_price": 1942,
+        "lowest": "1.942 €",
+        "extracted_lowest": 1942,
+        "before_taxes_fees": "1.942 €",
+        "extracted_before_taxes_fees": 1942,
+        "after_taxes_fees": "1.942 €",
+        "extracted_after_taxes_fees": 1942
+       },
+       "total_rate": {
+        "display_price": "1.942 €",
+        "extracted_display_price": 1942,
+        "lowest": "1.942 €",
+        "extracted_lowest": 1942,
+        "before_taxes_fees": "1.942 €",
+        "extracted_before_taxes_fees": 1942,
+        "after_taxes_fees": "1.942 €",
+        "extracted_after_taxes_fees": 1942
+       },
+       "inclusions": [
+        "3 Gäste",
+        "Kostenlose Stornierung bis zum 12. Nov.",
+        "Frühstück"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Grand Villa mit einem Schlafzimmer und Pool",
+     "images": [
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zyuC3ALGrrBgQVkVNN6WLG4t4JCEbuPbRdbjVOVxtUlnT1_2pMwbmW6rKHYkQBiGvIyBGwTcdXBEXfWllWH-SgrehmUKGO1ocKsOYituvChqO97U9sVB_CFekrTWu1KbKaKzMVB5Q75zolDXHMzdT2R29JVru9JufZrU4gwxsEN27gzuiAsjGZI8nEmM2ZDtXr9R89b0r3Ertdw04JOzWBqrQkMEMy9gGE",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_wJH2uxfIS-GyLYwMX5PKsjjOFGihdQr--7AwLR9MO5CfmEDvid2pLbfJ7moX4Kw_rmwfmMYjhz70IgcmHaSWsmC7oNArIlEPqvIi9oywn1kmNwzFVSSoZ7J9etok1gEIi97ecQ9RBDoeQAtoPfzJzuJHlOV3FZzVtQjpl7J0kvYfj4k7joJTxoIyaT-WUPf5s6mYvHSuSoBpQABEBCn_eYsfDh1m11yjsG",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yh35xEQReRLBzKZWCjNxIYXG7_H-kKiRmmZ2o5z4MYmPmH7Wf3OtcX8O3nmu0YE40Jp4eDyi1xuQny6NivUTwalthxgPprGJkPKl7RVBqVHoLvTwf5f0DuKZtx6UaDhc55gLAegfAF4xRQhPQUyFLDfeuWFslwXVgn-IQUXoAnH2a5EMIFeoZe6FsJhlSprATtsM6nt2qEbaF_In4JE7oHa1wFYnfwi3sL",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zBQiQ-rXnbHlTsdSgYCBuHtKVJ4R3caDR5CjJ1vvtyGvDEJT8vRiz04txZO-hl0yY-R3IPK6huC40XWZujFoD4LB2y-uVHhZROs05NIzxwhFWsmZPN2b2jjYIhNAqw2DthWWSEY2Ifa0qNVZtGMWXrJ0oxPv7BESSHDMsjEVB1RTwPwEwKUdnckme55yQORz3RrHmLSOlPgmAoM_1knbmtb1OVdJ93saI",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_wxbge_c3awyf9M4zws8yQgp6AO8CDXHGIrOMJgecU_K7ySjco9tt0V2NpYmnw6FuHUI_CRzIZu0gcJCeb2co7LwCgUDTKweyN1TqyRRN_19fSz9WTPKJvqc3KG45d1zw3aFSSkSN7Taf4ZEJOkp-pkkZrqDw80rQiXhrHrDwuaRgqoiRGUg2kIS4aOmcAMSmdTWIIyew0BN3FydFWDJNgIfogL26Fi45vd",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_x05ofr15fLBqBsJBnoEEUM9DvLuqC0mxUW1n13VmRQdCHT-uk8jr16MWnmjUQpsQ0_baffP56QGjN7EveH0Td_E3pDOJ8L-AwQVEYMIJ0ET5E4nqprLvtTFQJE_7uY_b0CK5ZSjb_oMEMzWT2mUrmHoUr4M8sUfR5H_iaodHOr_ou2UcLs-tqdJZmwgbrfoeW9waKssiHJuOW5MHmtorMpyb-tVCISrYOj"
+     ],
+     "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQBxoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAHEgLRovD_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_1rNeleTznYQiHYVLAPdlLTpeOPGQ&adurl",
+     "num_guests": 4,
+     "rate_per_night": {
+      "display_price": "1.907 €",
+      "extracted_display_price": 1907,
+      "lowest": "1.907 €",
+      "extracted_lowest": 1907,
+      "before_taxes_fees": "1.907 €",
+      "extracted_before_taxes_fees": 1907,
+      "after_taxes_fees": "1.907 €",
+      "extracted_after_taxes_fees": 1907
+     },
+     "total_rate": {
+      "display_price": "1.907 €",
+      "extracted_display_price": 1907,
+      "lowest": "1.907 €",
+      "extracted_lowest": 1907,
+      "before_taxes_fees": "1.907 €",
+      "extracted_before_taxes_fees": 1907,
+      "after_taxes_fees": "1.907 €",
+      "extracted_after_taxes_fees": 1907
+     },
+     "rates": [
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQBxoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAHEgLRovD_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_1rNeleTznYQiHYVLAPdlLTpeOPGQ&adurl",
+       "num_guests": 4,
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "1.907 €",
+        "extracted_display_price": 1907,
+        "lowest": "1.907 €",
+        "extracted_lowest": 1907,
+        "before_taxes_fees": "1.907 €",
+        "extracted_before_taxes_fees": 1907,
+        "after_taxes_fees": "1.907 €",
+        "extracted_after_taxes_fees": 1907
+       },
+       "total_rate": {
+        "display_price": "1.907 €",
+        "extracted_display_price": 1907,
+        "lowest": "1.907 €",
+        "extracted_lowest": 1907,
+        "before_taxes_fees": "1.907 €",
+        "extracted_before_taxes_fees": 1907,
+        "after_taxes_fees": "1.907 €",
+        "extracted_after_taxes_fees": 1907
+       },
+       "inclusions": [
+        "4 Gäste",
+        "Frühstück"
+       ]
+      },
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQCBoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAIEgLgePD_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_2Q5XXimVZD8sbJ6G1pbk8p_iocsQ&adurl",
+       "num_guests": 4,
+       "free_cancellation": true,
+       "free_cancellation_until_date": "12. Nov.",
+       "free_cancellation_until_time": "23:59",
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "2.242 €",
+        "extracted_display_price": 2242,
+        "lowest": "2.242 €",
+        "extracted_lowest": 2242
+       },
+       "total_rate": {
+        "display_price": "2.242 €",
+        "extracted_display_price": 2242,
+        "lowest": "2.242 €",
+        "extracted_lowest": 2242
+       },
+       "inclusions": [
+        "4 Gäste",
+        "Kostenlose Stornierung bis zum 12. Nov.",
+        "Frühstück"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Villa mit 3 Schlafzimmern und Pool",
+     "images": [
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_z5dNoNRMX1kV1BeE-OfDEIlHSA1YSL-oXAfEEykcV4_mo7esVptHHaDDamWnkBdHelRvY4xhZvHL16QDSi7D4n5qJSV4qLu0FWM6kB3b9TYxDqbrdoIhZ6c7lus_ePGBwLdrW2f0QtipP-R3U8bIYkm9MZLJvmTPkT66Z6MHazGjPYcxy8retAOQxBtfpYLEEkwDXoqdJZ2pkEbyvwspD2h-ixWBHqYsA",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_w0nb_sWFS1XGyqngQVT7I4rvkcohCLaQj1oi_u7NnrZIXYYLKvVpTiM4qiPbCZkmTM1g1XWXVs2yc-n5CzBu0VZaRc3R8IYk8ADaXtFK3G8_hitlrc_MZ6xy8jRnF1yerVE-SRdfH6jw3v_88LB2VRVzy-TnTD3005E1rgvX0a_Tyux1jFw5yevsZV2d0Cq1X9t3dZUX5ss0Mr6qTgbLXwpDHnXEmuOjC3",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_wNojQcaLKWf3WBZF0jLLXdSaHs8hgG5MCSTVRZZqZLJoBmqTaDfpBfgMsAsIYnfZnHt33KjQFskqkZb55o7q5BL5eWyq2JQKJ1si6-62wP7yb7-IASFmZCUafzMC5-FVIskSmG1Ai3fE5XPFaM_n6TIw-wmwEBtR3pjisYF8YC9Gb-HG7oWsynB2vkf_ilrQSUgsncQO8nUqUS16h2TASFTXfFrLAPC9c",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_x0HVOJaUWW2RcyxPfcXWzEuL4WasHQnAJHSnJIhFgclLh5ma7vrfDQs-NQFFb0J5Qx2xEYWEIIvz5e9vJCzllu5MF_wxg-WfWDgB6auqQr3QXdZbRyQWInO54Wqh39nEf9diNUPbSDqIuIcUOREmwvc50vPe2YQV6Du1yRMwDriRfTg9P2rVE_Z94u_1-0pgTyn1Ay-qdk-6udtFFGwqtTS0cnsdm-4Ndg",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yBAokRvE124UUyvLfjKs3kVFdwG-JW3-Eyf2iVVJYl2vjoMIoXlOY1vgTUsMcM1FrKkIWFHEYTqtOncM9Q60HBu9fBxA1cIgTpTpFhbU0mkXGSv3X84SCp3xNSCwYZl9JI4XFPid0ZOQt1SWg0ejjd0ATpGKjSgugHJR17-inxXVXjXi_WuD1So4wSplQOkR47msuoc-yYcq7DGm9Exk-Bm1diU5alM36j",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xIvr6gotoRwhV1opIm4y1W_nXimzDgOYCcziuUPjzi85Qg2ZuHxKfyCqVXnJaS7HKTj-gb-yUiFgRx_arSpvZCBum74pdKVEmY3NHjmL_6ZuMY6WJ4LslSGHNWbCN8qw4hzbn3Ij_tJb24PWmQmV2mzRk38GeRwiRDrSiNJJr_qSXL3vHNBpLpzKkCpGKSF7ZHwU50yAefHdN2emqeMJIhQjg3ZwsgLe3R",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_waIz6DrMI9qu1VhQfnS2HizaB-1-UH6tAmEvSUu5THmFT2XD-6wgQdJ3X34UFjRJ-fYq0FgbUDWLJA1viViJVRs4gwOvNrAn6XI5788_gLXu0-woTxlWi6apL6ThlKnGdTaWCiJidRiBPac6f4Vrxsok5osuNyC7RlDPjCADKIr7I-x1ex04HLjAEjFNWA7e1el_ToQAUhyx0QKCDbynfdSLytT6l5595-",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xsV8jIuezlztbUwnRAYRjsEAdd2vSjJDmmoF2BM7-fMTrA_CMnkKMt-JDPJ8PGD9kqC11OWWX_kMi6lnOwA3Uprkhwieu2aYQJ3EIQiYvfVCMsjMXFYh023Q3LoxM9T4sN5axoFLYt2NkdLVq_RsTu1iVA7rGUUphvaP_oINF0JoxbQrZMzR8M9bIQbYZPZRX4DEf0lsTJ9IrRQlkwZMFrz_asNUPksclL",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xz6T8dqJ3Qn5BLsxczscKJuAmcWNGgvOblo65eEm4ETWKa8QqcouBQNJyz0w1DF9h-SLTS6yr-_BI3meQiLSDvgBzYnjlwvSFVH55DPj9n-i7ZBO-rr2mygFqD8af7kxbgoiAFAX2ZoolUxOEokkzxUFGYhFUb_r_OMTPKfHEaA1tKwKi7H8avoCyLNKs3mQ35ROkAjTs1jEu3m0TbKwLSuWSiW9k0p-fz"
+     ],
+     "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQCRoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAJEgJfH_D_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_2ljOupDomD-t3HOcOUOW8P9IQZoQ&adurl",
+     "num_guests": 6,
+     "rate_per_night": {
+      "display_price": "5.415 €",
+      "extracted_display_price": 5415,
+      "lowest": "5.415 €",
+      "extracted_lowest": 5415
+     },
+     "total_rate": {
+      "display_price": "5.415 €",
+      "extracted_display_price": 5415,
+      "lowest": "5.415 €",
+      "extracted_lowest": 5415
+     },
+     "rates": [
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQCRoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAJEgJfH_D_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_2ljOupDomD-t3HOcOUOW8P9IQZoQ&adurl",
+       "num_guests": 6,
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "5.415 €",
+        "extracted_display_price": 5415,
+        "lowest": "5.415 €",
+        "extracted_lowest": 5415
+       },
+       "total_rate": {
+        "display_price": "5.415 €",
+        "extracted_display_price": 5415,
+        "lowest": "5.415 €",
+        "extracted_lowest": 5415
+       },
+       "inclusions": [
+        "6 Gäste",
+        "Frühstück"
+       ]
+      },
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwi3j-y9o_CXAxXVo4MHHWcUEcQYACICCAEQChoCZWY&co=1&gclid=EAIaIQobChMIt4_svaPwlwMV1aODBx1nFBHEEAoYASAKEgInOPD_BwE&cid=CAASuwHkaOVum4V21GWVFZSRpLnbdXVIiDahtWQ9xFqEMUt3CU2oGZUMUUQDWJnTRO7noSeSnjSlTSHp1cuYxIt0zDEYeAz2VptFpZ-OSj5nrqmHISMZjPMJoIWXMmu8_2tQYoE1On6n8QONlmEB_TP_glAeMLkWYC-zkCojMcWCkdwyVfCheDIUCejqCBfgIyzvHkZ1GDGEaJhfjqXvQe_AiHVK_C0lVo9OqgtvSUckPnWZ347tmxFNe2XzxXxk&sig=AOD64_1NeUUbulcqtX1n9jT48MmLAIUMFg&adurl",
+       "num_guests": 6,
+       "free_cancellation": true,
+       "free_cancellation_until_date": "12. Nov.",
+       "free_cancellation_until_time": "23:59",
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "6.369 €",
+        "extracted_display_price": 6369,
+        "lowest": "6.369 €",
+        "extracted_lowest": 6369,
+        "before_taxes_fees": "6.369 €",
+        "extracted_before_taxes_fees": 6369,
+        "after_taxes_fees": "6.369 €",
+        "extracted_after_taxes_fees": 6369
+       },
+       "total_rate": {
+        "display_price": "6.369 €",
+        "extracted_display_price": 6369,
+        "lowest": "6.369 €",
+        "extracted_lowest": 6369,
+        "before_taxes_fees": "6.369 €",
+        "extracted_before_taxes_fees": 6369,
+        "after_taxes_fees": "6.369 €",
+        "extracted_after_taxes_fees": 6369
+       },
+       "inclusions": [
+        "6 Gäste",
+        "Kostenlose Stornierung bis zum 12. Nov.",
+        "Frühstück"
+       ]
+      }
+     ]
+    }
+   ],
+   "num_guests": 3,
+   "rate_per_night": {
+    "display_price": "1.652 €",
+    "extracted_display_price": 1652,
+    "lowest": "1.652 €",
+    "extracted_lowest": 1652
+   },
+   "total_rate": {
+    "display_price": "1.652 €",
+    "extracted_display_price": 1652,
+    "lowest": "1.652 €",
+    "extracted_lowest": 1652
+   }
+  }
+ ],
+ "prices": [
+  {
+   "source": "Agoda",
+   "link": "https://www.google.com/travel/lodging/clk?pc=AJ0xEyjj5q8GEzXI2jkd2x4bTZCFWZ65vYJePAmL3H6wzL7YlOEDWkZiTrHAed1fyJEj4U3ZVoTiwlIhwtLvb9kR3FYnC0AhNKdv2zKTMf2Em1aoMtGFTPyMJrrt23gzJMyi7GPjM43rDLwK6MbLvQpkLz2QOQkGm1VP38YCv19j7K37YpbczL8y0S0z9e6xPA&pcurl=https://www.agoda.com/de-de/partners/partnersearch.aspx?site_id%3D1917614%26CkInDay%3D01%26CkInMonth%3D12%26CkInYear%3D2026%26CkOutDay%3D02%26campaignid%3D%26CkOutMonth%3D12%26CkOutYear%3D2026%26SearchDateType%3Ddefault%26NumberOfAdults%3D2%26LT%3D26%26NumberOfChildren%3D1%26childages%3D8,%26NumberOfRooms%3D1%26gsite%3Dlocaluniversal%26los%3D1%26PartnerCurrency%3DEUR%26hid%3D55175108%26RoomID%3D847468346%26masterRoomId%3D847468346%26PriceTotal%3D1640.50%26PriceTax%3D214.00%26PriceFee%3D0.00%26RatePlan%3D219c7510-9990-6a93-5e42-05caf22838ec%26UserCountry%3DJO%26Currency%3DEUR%26UserDevice%3Ddesktop%26Verif%3Dfalse%26rr%3Drow_desktop%26audience_list%3D%26mcid%3D29005%26booking_source%3Dcpc%26adType%3D0%26mpt%3DSWNEclMvblljS1hxYUdPMzV4eXAvY3RibWMrS1BSaGZsUDQ2emNjTFV4RkpNZFIrVlJuNHFzSHQzajVsOGlvRm5TV1NUK0FEV29oZHludzM%26original_rr%3DJO%26gaClickSrc%3D%26clickType%3Dhotel%26lang%3Dde%26pkgId%3DBreakfast_NoDinner_true&s=ALZo0YK_4KIzzASrmg7AVn9IBXOj&ap=1",
+   "logo": "https://www.gstatic.com/travel-hotels/branding/b13642de-d476-41bd-8254-3edc2e567aa6.png",
+   "num_guests": 3,
+   "rate_per_night": {
+    "display_price": "1.641 €",
+    "extracted_display_price": 1641,
+    "lowest": "1.641 €",
+    "extracted_lowest": 1641
+   },
+   "total_rate": {
+    "display_price": "1.641 €",
+    "extracted_display_price": 1641,
+    "lowest": "1.641 €",
+    "extracted_lowest": 1641
+   }
+  }
+ ],
+ "typical_price_range": {
+  "extracted_lowest": 188,
+  "extracted_highest": 252
+ },
+ "nearby_places": [
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Platte",
+   "link": "https://www.google.com/search?q=Platte&stick=H4sIAAAAAAAAAONgFmJQ4tTP1TcwKzKqMNRSzE620s_JT04syczPgzOsEktKihKTQcxiAFtmmGYyAAAA#fpstate=trskp&trifp=kpq%253DPlatte%2526skpm%253D/m/06r2x1%2526t%253Dd",
+   "thumbnail": "http://t2.gstatic.com/images?q=tbn:ANd9GcRVvdfRXShQwM0BHm10NMuMMwQh2XGcLbXM4VoAtoiISPQbnzv12GIryw",
+   "rating": 4.8,
+   "reviews": 11,
+   "gps_coordinates": {
+    "latitude": -5.863654599999999,
+    "longitude": 55.3848803
+   }
+  },
+  {
+   "category": "Flughafen",
+   "name": "Flughafen Seychellen",
+   "gps_coordinates": {
+    "latitude": -4.6744444,
+    "longitude": 55.521944399999995
+   }
+  },
+  {
+   "category": "Restaurant",
+   "name": "Maison des Epices",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLfN_mQFUbs_eamalqFfRv2kSJLI3cvogaGtD0LRz0lP3lwDkjWW71gLj6sQGC4ulAQof44WonXX_405196Tfqh6l0RwTBPRiAdpFCyuaz6wK_7P0aP0Y50_UPstVkjPDECtIMc=k-no",
+   "rating": 4.8,
+   "reviews": 21,
+   "gps_coordinates": {
+    "latitude": -5.869222499999999,
+    "longitude": 55.3842279
+   }
+  },
+  {
+   "category": "Restaurant",
+   "name": "Moulin",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdhj8H7HtT3cmJKNu3oam9zwwoHfUfP-OCYWiuZ6a-SgYaBm3SV-7epi93qWOO8fCYRdTJqXvns0ow0eauFXCp41enbr2nX3ZcZKeZYrz8BGFvlbUieoBy6952r6F-gUlKNwqKwii-41jbm=k-no",
+   "rating": 4.4,
+   "reviews": 7,
+   "gps_coordinates": {
+    "latitude": -5.862080799999999,
+    "longitude": 55.386363599999996
+   }
+  },
+  {
+   "category": "Restaurant",
+   "name": "La Perle",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLe3kOqp51FrsCSAFylOP3xzhSY-ANGMu58J1RgR0OBMIGhRPonjp1boYiwxe6kNpxKZ7ECJG8UwDUVhEtxzZx88nK_xwihQdglTUe23f6GNznVEjjQD9JFfBoLdJoavH1wozavAeQ=k-no",
+   "rating": 4.2,
+   "reviews": 5,
+   "gps_coordinates": {
+    "latitude": -5.864347899999999,
+    "longitude": 55.3836249
+   }
+  }
+ ],
+ "hotel_class": "5-Sterne-Hotel",
+ "extracted_hotel_class": 5,
+ "images": [
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLeIZ0ahjWnb1LN2Ji9tsQnghttVcwZacArtQHC1ZMPAkZBlToNze7lUqxbtsiuwuRnIsw2ztPGBSOogjYznzTsRsq_UmDEHewrzRbmTZLhtvYyKyhfuDThn5nrOkRu7_rZVkvU=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLeIZ0ahjWnb1LN2Ji9tsQnghttVcwZacArtQHC1ZMPAkZBlToNze7lUqxbtsiuwuRnIsw2ztPGBSOogjYznzTsRsq_UmDEHewrzRbmTZLhtvYyKyhfuDThn5nrOkRu7_rZVkvU=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdVpKiklzEBwH1PuDeB5xeplEriHdX5tBYvUN98zyzWZkJHjjClKJSaSMUT8S-Hsv2t2h1TMGuf3Z8X7hNOAYL9FQ8PuGAvd8pUmH-W4wvuYAzg4PgzjSrioxXqNLT41k5O-BoT8w=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLdVpKiklzEBwH1PuDeB5xeplEriHdX5tBYvUN98zyzWZkJHjjClKJSaSMUT8S-Hsv2t2h1TMGuf3Z8X7hNOAYL9FQ8PuGAvd8pUmH-W4wvuYAzg4PgzjSrioxXqNLT41k5O-BoT8w=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLfLI68lvJUjyqIFbyq9Qs73VTwxeUUdJ-Jm0pTJBeggEAhJtmqi_uuQftUOm_9pP_epzOkVkKvEA1q_2rELRK-FV4mZhWupLiPdvyPqLRb06bEO2xFbhodEOoPmbVPzOhEAwd36GQ=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLfLI68lvJUjyqIFbyq9Qs73VTwxeUUdJ-Jm0pTJBeggEAhJtmqi_uuQftUOm_9pP_epzOkVkKvEA1q_2rELRK-FV4mZhWupLiPdvyPqLRb06bEO2xFbhodEOoPmbVPzOhEAwd36GQ=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdWR5JsJ_y1NAGkVVGVWXmJU3PEO9da3HrCHGUtWDNgqaYLkTa64yUuwopZVk4q7ueL9omu8rDPy78CfZxOdCWfbGzvBsYjm-CtiIDPtGCXcCxnNSO_zAk8F1ir5ONsS7sehbQTLA=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLdWR5JsJ_y1NAGkVVGVWXmJU3PEO9da3HrCHGUtWDNgqaYLkTa64yUuwopZVk4q7ueL9omu8rDPy78CfZxOdCWfbGzvBsYjm-CtiIDPtGCXcCxnNSO_zAk8F1ir5ONsS7sehbQTLA=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLc1liVH967GMxEukWUQy_c2EVmhBflW7j7wJbwvtBXrHNw2qZE1LAYP-9BwXnr9U5hS10UcYwHOUNG_xKjJTKcsjfeE1imkTPVnBek6gC7D3FeJIxG6TLT4WBQRzvnDAdUyOI0CbL-M67HC=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLc1liVH967GMxEukWUQy_c2EVmhBflW7j7wJbwvtBXrHNw2qZE1LAYP-9BwXnr9U5hS10UcYwHOUNG_xKjJTKcsjfeE1imkTPVnBek6gC7D3FeJIxG6TLT4WBQRzvnDAdUyOI0CbL-M67HC=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1Y6A1QLMUOu50-CMG6iFBW6U7MirjCJn_4x9HNFeRwLQS5f5K53OZksPAsrwbRP3rOf46fmrBXMx6KWcP0xGmnY6pMHUCfCbzjBvSgnKsdRYR-_YFOoO9pMRE4rz5hhyfpxMC7A3s2LwLHIIA_N0OlcnarzcF5-O9XvCLCQ1FM36kpAWW0WMra=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://d2hyz2bfif3cr8.cloudfront.net/imageRepo/4/0/195/941/602/rr7mWtI3r0qVLOWeZUrGcQ_LR_saba_pearl_fireplace_dusk_6027_O.jpg"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLd_QHx6SqzNPIylcU1xNgh8GC1n-XsO2-lCUGi2EQnvE3ft8fSC09bavmJ_SQssZLyAgeCZo-FDn6JBRYf3lKkktUC1GUFXR1QNIym-IRQHPICqWsI82G-t6RwLql_BgfMdX9q8=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLd_QHx6SqzNPIylcU1xNgh8GC1n-XsO2-lCUGi2EQnvE3ft8fSC09bavmJ_SQssZLyAgeCZo-FDn6JBRYf3lKkktUC1GUFXR1QNIym-IRQHPICqWsI82G-t6RwLql_BgfMdX9q8=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLfMtEJFaJE7ugjBZVyI2pGZyolALsqFAD594vdy0wCSi-4JC7dvi2nT7AumvkjyfkUrWC990HBXXovPisuaaGL1ANQM8d1krQhZiFBXkJo4J3pChXZux57mimAOszTXZJDdwnc=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLfMtEJFaJE7ugjBZVyI2pGZyolALsqFAD594vdy0wCSi-4JC7dvi2nT7AumvkjyfkUrWC990HBXXovPisuaaGL1ANQM8d1krQhZiFBXkJo4J3pChXZux57mimAOszTXZJDdwnc=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLf5R5rj4wCQVttZgF_BssbuQJ407GRILCa4--8cjwkD3_s415mBM-smIz9Hx_ogqDLzHqjWT1FDf6v52a592031ABvblciu9kUtOwAjfzi9aSJFQEKzGyWVdXzSlcifj8QBgmTgSdGKs7iu=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLf5R5rj4wCQVttZgF_BssbuQJ407GRILCa4--8cjwkD3_s415mBM-smIz9Hx_ogqDLzHqjWT1FDf6v52a592031ABvblciu9kUtOwAjfzi9aSJFQEKzGyWVdXzSlcifj8QBgmTgSdGKs7iu=s10000"
+  }
+ ],
+ "overall_rating": 4.9,
+ "reviews": 186,
+ "ratings": [
+  {
+   "stars": 5,
+   "count": 178
+  },
+  {
+   "stars": 4,
+   "count": 3
+  },
+  {
+   "stars": 3,
+   "count": 2
+  },
+  {
+   "stars": 2,
+   "count": 2
+  },
+  {
+   "stars": 1,
+   "count": 1
+  }
+ ],
+ "location_rating": 2.5,
+ "reviews_breakdown": [
+  {
+   "name": "Ambiente",
+   "description": "Atmosphere",
+   "total_mentioned": 12,
+   "positive": 12,
+   "negative": 0,
+   "neutral": 0,
+   "category_token": "SjdJ73ica1yRnFiSmp5fVDl5lWNJbn5xQUZqUSrjCsfcpMzUvJJUAOpoDas",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=SjdJ73ica1yRnFiSmp5fVDl5lWNJbn5xQUZqUSrjCsfcpMzUvJJUAOpoDas&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Gebäude Und Außenanlagen",
+   "description": "Property",
+   "total_mentioned": 40,
+   "positive": 40,
+   "negative": 0,
+   "neutral": 0,
+   "category_token": "x4UB4nica1yRnFiSmp5fVDl5RUBRfkFqUUkl4y731KTDS0pTUhVC81IUHEsPz0_NS8zLSUxPzQMACGEUvg",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=x4UB4nica1yRnFiSmp5fVDl5RUBRfkFqUUkl4y731KTDS0pTUhVC81IUHEsPz0_NS8zLSUxPzQMACGEUvg&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Paare",
+   "description": "Couple friendly",
+   "total_mentioned": 14,
+   "positive": 13,
+   "negative": 0,
+   "neutral": 1,
+   "category_token": "Npfw5Hica1yRnFiSmp5fVDl5vXN-aUFOqkJaUWZqXkpOJePSgMTEolQABIIOPg",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=Npfw5Hica1yRnFiSmp5fVDl5vXN-aUFOqkJaUWZqXkpOJePSgMTEolQABIIOPg&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Service",
+   "description": "Service",
+   "total_mentioned": 69,
+   "positive": 67,
+   "negative": 2,
+   "neutral": 0,
+   "category_token": "DZ7RYHica1yRnFiSmp5fVDl5eXBqUVlmciojjAEAtX8MDA",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=DZ7RYHica1yRnFiSmp5fVDl5eXBqUVlmciojjAEAtX8MDA&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Familienfreundlich",
+   "description": "Family friendly",
+   "total_mentioned": 12,
+   "positive": 11,
+   "negative": 0,
+   "neutral": 1,
+   "category_token": "WMxrXnica1yRnFiSmp5fVDl5vVtibmZOpUJaUWZqXkpOJeMmsACQk1aUWgoUyUzOAADjSBOl",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=WMxrXnica1yRnFiSmp5fVDl5vVtibmZOpUJaUWZqXkpOJeMmsACQk1aUWgoUyUzOAADjSBOl&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Natur",
+   "description": "Nature and outdoor activities",
+   "total_mentioned": 39,
+   "positive": 37,
+   "negative": 1,
+   "neutral": 1,
+   "category_token": "6_TcoXica1yRnFiSmp5fVDl5r19iSWlRqkJiXopCfmlJSn5-kUJicklmWWZJZmox41KwNAD0HxPL",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=6_TcoXica1yRnFiSmp5fVDl5r19iSWlRqkJiXopCfmlJSn5-kUJicklmWWZJZmox41KwNAD0HxPL&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Raum",
+   "description": "Room amenities",
+   "total_mentioned": 19,
+   "positive": 18,
+   "negative": 1,
+   "neutral": 0,
+   "category_token": "7Bky1Hica1yRnFiSmp5fVDl5XVB-fq5CYm5qXmZJZmox45KgxNJcAOftDX8",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=7Bky1Hica1yRnFiSmp5fVDl5XVB-fq5CYm5qXmZJZmox45KgxNJcAOftDX8&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Fitness",
+   "description": "Fitness",
+   "total_mentioned": 16,
+   "positive": 15,
+   "negative": 0,
+   "neutral": 1,
+   "category_token": "PXioD3ica1yRnFiSmp5fVDl5uVtmSV5qcTEjjAEAtXQMIg",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=PXioD3ica1yRnFiSmp5fVDl5uVtmSV5qcTEjjAEAtXQMIg&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Spabereich",
+   "description": "Spa",
+   "total_mentioned": 12,
+   "positive": 11,
+   "negative": 0,
+   "neutral": 1,
+   "category_token": "f4jylHica1yRnFiSmp5fVDl5cXBBIuMqIJGUWpSamZwBAKdqC4M",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=f4jylHica1yRnFiSmp5fVDl5cXBBIuMqIJGUWpSamZwBAKdqC4M&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Wellness",
+   "description": "Wellness",
+   "total_mentioned": 12,
+   "positive": 11,
+   "negative": 0,
+   "neutral": 1,
+   "category_token": "sp9xBHica1yRnFiSmp5fVDl5RXhqTk5eanExI5wFAM_4DQY",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=sp9xBHica1yRnFiSmp5fVDl5RXhqTk5eanExI5wFAM_4DQY&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Bar",
+   "description": "Bar or lounge",
+   "total_mentioned": 14,
+   "positive": 12,
+   "negative": 1,
+   "neutral": 1,
+   "category_token": "qI-Rpnica1yRnFiSmp5fVDl5rVNikUJ-kUJOfmleeirjYiAXAMhXDEE",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=qI-Rpnica1yRnFiSmp5fVDl5rVNikUJ-kUJOfmleeirjYiAXAMhXDEE&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Frühstück",
+   "description": "Breakfast",
+   "total_mentioned": 10,
+   "positive": 9,
+   "negative": 1,
+   "neutral": 0,
+   "category_token": "0t2w3Xica1yRnFiSmp5fVDl5pVNRamJ2WmJxCeNqt6LDezKKSw7vSc4GAA2HD9Y",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=0t2w3Xica1yRnFiSmp5fVDl5pVNRamJ2WmJxCeNqt6LDezKKSw7vSc4GAA2HD9Y&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Dining",
+   "description": "Food and Beverage",
+   "total_mentioned": 27,
+   "positive": 23,
+   "negative": 2,
+   "neutral": 2,
+   "category_token": "2aMhPHica1yRnFiSmp5fVDl5o1t-fopCYl6KglNqWWpRYnoq4zKXzLzMvHQAKAwO6A",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=2aMhPHica1yRnFiSmp5fVDl5o1t-fopCYl6KglNqWWpRYnoq4zKXzLzMvHQAKAwO6A&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Ort",
+   "description": "Location",
+   "total_mentioned": 9,
+   "positive": 7,
+   "negative": 1,
+   "neutral": 1,
+   "category_token": "w7titnica1yRnFiSmp5fVDl5hU8-kJ2Zn8ew2L-oBACSXArU",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=w7titnica1yRnFiSmp5fVDl5hU8-kJ2Zn8ew2L-oBACSXArU&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Sauberkeit",
+   "description": "Cleanliness",
+   "total_mentioned": 8,
+   "positive": 7,
+   "negative": 0,
+   "neutral": 1,
+   "category_token": "Xnu5_Xica1yRnFiSmp5fVDl5tXNOamJeTmZeanExw6rgxNKk1KLs1MwSABVBDvA",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=Xnu5_Xica1yRnFiSmp5fVDl5tXNOamJeTmZeanExw6rgxNKk1KLs1MwSABVBDvA&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Pool",
+   "description": "Pool",
+   "total_mentioned": 8,
+   "positive": 8,
+   "negative": 0,
+   "neutral": 0,
+   "category_token": "rjHzonica1yRnFiSmp5fVDl5SUB-fg4DmAQAcoAJlw",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=rjHzonica1yRnFiSmp5fVDl5SUB-fg4DmAQAcoAJlw&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Schlafqualität",
+   "description": "Sleep",
+   "total_mentioned": 7,
+   "positive": 7,
+   "negative": 0,
+   "neutral": 0,
+   "category_token": "WQqolXica1yRnFiSmp5fVDl5aXBOamoBw_rg5IycxLTC0sSczJLDS0oABsUPJA",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=WQqolXica1yRnFiSmp5fVDl5aXBOamoBw_rg5IycxLTC0sSczJLDS0oABsUPJA&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  },
+  {
+   "name": "Bad",
+   "description": "Bathroom and toiletries",
+   "total_mentioned": 5,
+   "positive": 5,
+   "negative": 0,
+   "neutral": 0,
+   "category_token": "Rv6T1Xica1yRnFiSmp5fVDl5u1NiSUZRfn6uQmJeikJJfmZOaklRZmoxw2KnxBQAYZkQbw",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=Rv6T1Xica1yRnFiSmp5fVDl5u1NiSUZRfn6uQmJeikJJfmZOaklRZmoxw2KnxBQAYZkQbw&engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+  }
+ ],
+ "amenities": [
+  "Wi-Fi",
+  "Wi-Fi in public areas",
+  "Public internet workstation",
+  "Restaurant",
+  "Bar",
+  "Table service",
+  "Room service",
+  "Breakfast",
+  "All inclusive available",
+  "Smoke-free property",
+  "Credit cards",
+  "Debit cards",
+  "Cash",
+  "Beach front",
+  "Bicycle rental",
+  "Tennis",
+  "Snorkeling",
+  "Scuba",
+  "Watercraft rental",
+  "Game room",
+  "Boutique shopping",
+  "Front desk",
+  "Baggage storage",
+  "Concierge",
+  "Currency exchange",
+  "Full-service laundry",
+  "Social hour",
+  "Wake up calls",
+  "Housekeeping",
+  "Turndown service",
+  "Kid-friendly",
+  "Babysitting",
+  "Activities for kids",
+  "Kids' club",
+  "Outdoor pool",
+  "Lifeguard",
+  "Accessible",
+  "Fitness center",
+  "Elliptical machine",
+  "Treadmill",
+  "Weight machines",
+  "Free weights",
+  "Massage",
+  "Sauna",
+  "Spa",
+  "Hair salon",
+  "Doctor on call",
+  "Meeting rooms",
+  "Air conditioning",
+  "Kitchen in some rooms",
+  "Refrigerator",
+  "Coffee maker",
+  "Minibar",
+  "Private bathroom",
+  "Bathtub",
+  "Shower",
+  "Arabic",
+  "Cantonese",
+  "Dutch",
+  "English",
+  "Filipino",
+  "French",
+  "German",
+  "Hindi",
+  "Indonesian",
+  "Italian",
+  "Japanese",
+  "Mandarin",
+  "Portuguese",
+  "Russian",
+  "Spanish"
+ ],
+ "excluded_amenities": [
+  "Hot tub",
+  "Parking",
+  "Pet-friendly"
+ ],
+ "amenities_detailed": {
+  "groups": [
+   {
+    "title": "Internet",
+    "list": [
+     {
+      "title": "Wi-Fi",
+      "label": "free",
+      "available": true
+     },
+     {
+      "title": "Wi-Fi in public areas",
+      "available": true
+     },
+     {
+      "title": "Public internet workstation",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Food & drink",
+    "list": [
+     {
+      "title": "Restaurant",
+      "available": true
+     },
+     {
+      "title": "Bar",
+      "available": true
+     },
+     {
+      "title": "Table service",
+      "available": true
+     },
+     {
+      "title": "Room service",
+      "label": "24 hour",
+      "available": true
+     },
+     {
+      "title": "Breakfast",
+      "label": "extra charge",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Policies & payments",
+    "list": [
+     {
+      "title": "All inclusive available",
+      "available": true
+     },
+     {
+      "title": "Smoke-free property",
+      "available": true
+     },
+     {
+      "title": "Credit cards",
+      "available": true
+     },
+     {
+      "title": "Debit cards",
+      "available": true
+     },
+     {
+      "title": "Cash",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Activities",
+    "list": [
+     {
+      "title": "Beach front",
+      "available": true
+     },
+     {
+      "title": "Bicycle rental",
+      "label": "free",
+      "available": true
+     },
+     {
+      "title": "Tennis",
+      "available": true
+     },
+     {
+      "title": "Snorkeling",
+      "available": true
+     },
+     {
+      "title": "Scuba",
+      "available": true
+     },
+     {
+      "title": "Watercraft rental",
+      "label": "extra charge",
+      "available": true
+     },
+     {
+      "title": "Game room",
+      "available": true
+     },
+     {
+      "title": "Boutique shopping",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Services",
+    "list": [
+     {
+      "title": "Front desk",
+      "label": "24 hour",
+      "available": true
+     },
+     {
+      "title": "Baggage storage",
+      "available": true
+     },
+     {
+      "title": "Concierge",
+      "available": true
+     },
+     {
+      "title": "Currency exchange",
+      "available": true
+     },
+     {
+      "title": "Full-service laundry",
+      "available": true
+     },
+     {
+      "title": "Social hour",
+      "available": true
+     },
+     {
+      "title": "Wake up calls",
+      "available": true
+     },
+     {
+      "title": "Housekeeping",
+      "label": "daily",
+      "available": true
+     },
+     {
+      "title": "Turndown service",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Children",
+    "list": [
+     {
+      "title": "Kid-friendly",
+      "available": true
+     },
+     {
+      "title": "Babysitting",
+      "available": true
+     },
+     {
+      "title": "Activities for kids",
+      "available": true
+     },
+     {
+      "title": "Kids' club",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Pools",
+    "list": [
+     {
+      "title": "Outdoor pool",
+      "available": true
+     },
+     {
+      "title": "Lifeguard",
+      "available": true
+     },
+     {
+      "title": "Hot tub",
+      "available": false
+     }
+    ]
+   },
+   {
+    "title": "Parking & transportation",
+    "list": [
+     {
+      "title": "Parking",
+      "available": false
+     }
+    ]
+   },
+   {
+    "title": "Accessibility",
+    "list": [
+     {
+      "title": "Accessible",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Wellness",
+    "list": [
+     {
+      "title": "Fitness center",
+      "label": "free",
+      "available": true
+     },
+     {
+      "title": "Elliptical machine",
+      "available": true
+     },
+     {
+      "title": "Treadmill",
+      "available": true
+     },
+     {
+      "title": "Weight machines",
+      "available": true
+     },
+     {
+      "title": "Free weights",
+      "available": true
+     },
+     {
+      "title": "Massage",
+      "available": true
+     },
+     {
+      "title": "Sauna",
+      "available": true
+     },
+     {
+      "title": "Spa",
+      "available": true
+     },
+     {
+      "title": "Hair salon",
+      "available": true
+     },
+     {
+      "title": "Doctor on call",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Business & events",
+    "list": [
+     {
+      "title": "Meeting rooms",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Rooms",
+    "list": [
+     {
+      "title": "Air conditioning",
+      "available": true
+     },
+     {
+      "title": "Kitchen in some rooms",
+      "available": true
+     },
+     {
+      "title": "Refrigerator",
+      "available": true
+     },
+     {
+      "title": "Coffee maker",
+      "available": true
+     },
+     {
+      "title": "Minibar",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Pets",
+    "list": [
+     {
+      "title": "Pet-friendly",
+      "available": false
+     }
+    ]
+   },
+   {
+    "title": "Bathrooms",
+    "list": [
+     {
+      "title": "Private bathroom",
+      "available": true
+     },
+     {
+      "title": "Bathtub",
+      "available": true
+     },
+     {
+      "title": "Shower",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Languages spoken",
+    "list": [
+     {
+      "title": "Arabic",
+      "available": true
+     },
+     {
+      "title": "Cantonese",
+      "available": true
+     },
+     {
+      "title": "Dutch",
+      "available": true
+     },
+     {
+      "title": "English",
+      "available": true
+     },
+     {
+      "title": "Filipino",
+      "available": true
+     },
+     {
+      "title": "French",
+      "available": true
+     },
+     {
+      "title": "German",
+      "available": true
+     },
+     {
+      "title": "Hindi",
+      "available": true
+     },
+     {
+      "title": "Indonesian",
+      "available": true
+     },
+     {
+      "title": "Italian",
+      "available": true
+     },
+     {
+      "title": "Japanese",
+      "available": true
+     },
+     {
+      "title": "Mandarin",
+      "available": true
+     },
+     {
+      "title": "Portuguese",
+      "available": true
+     },
+     {
+      "title": "Russian",
+      "available": true
+     },
+     {
+      "title": "Spanish",
+      "available": true
+     }
+    ]
+   }
+  ],
+  "popular": [
+   {
+    "title": "Pool",
+    "available": true
+   },
+   {
+    "title": "Spa",
+    "available": true
+   },
+   {
+    "title": "All inclusive available",
+    "available": true
+   },
+   {
+    "title": "Beach front",
+    "available": true
+   }
+  ]
+ },
+ "health_and_safety": {
+  "groups": [
+   {
+    "title": "Enhanced cleaning",
+    "list": [
+     {
+      "title": "Enhanced cleaning of guest rooms",
+      "available": true
+     },
+     {
+      "title": "Commercial-grade disinfectant used to clean the property",
+      "available": true
+     },
+     {
+      "title": "Enhanced cleaning of common areas",
+      "available": true
+     },
+     {
+      "title": "Employees trained in thorough hand-washing",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Personal protection",
+    "list": [
+     {
+      "title": "Hand-sanitizer and/or sanitizing wipes in common areas",
+      "available": true
+     },
+     {
+      "title": "Masks and/or gloves available for guests",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Physical distancing",
+    "list": [
+     {
+      "title": "Private spaces designated in spa and wellness areas",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Minimized contact",
+    "list": [
+     {
+      "title": "Plastic key cards are disinfected or discarded",
+      "available": true
+     },
+     {
+      "title": "Keyless mobile entry to guest rooms",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Increased food safety",
+    "list": [
+     {
+      "title": "Additional sanitation in dining areas",
+      "available": true
+     },
+     {
+      "title": "Additional safety measures during food prep and serving",
+      "available": true
+     }
+    ]
+   }
+  ]
+ },
+ "sustainability": {
+  "groups": [
+   {
+    "title": "Eco certifications",
+    "list": [
+     {
+      "title": "ISO 14001",
+      "available": true
+     },
+     {
+      "title": "ISO 50001",
+      "available": true
+     },
+     {
+      "title": "ISO 9001",
+      "available": true
+     },
+     {
+      "title": "Seychelles Sustainable Tourism Label",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Energy efficiency",
+    "list": [
+     {
+      "title": "Energy conservation program",
+      "available": true
+     },
+     {
+      "title": "Energy use audited by an independent organization",
+      "available": true
+     },
+     {
+      "title": "Energy from carbon-free sources",
+      "available": true
+     },
+     {
+      "title": "Energy-efficient heating and cooling systems",
+      "available": true
+     },
+     {
+      "title": "Energy-efficient lighting",
+      "available": true
+     },
+     {
+      "title": "Energy-saving thermostats",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Water conservation",
+    "list": [
+     {
+      "title": "Water use audited by an independent organization",
+      "available": true
+     },
+     {
+      "title": "Water-efficient faucets, toilets, and showers",
+      "available": true
+     },
+     {
+      "title": "Towel and linen reuse program",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Waste reduction",
+    "list": [
+     {
+      "title": "Recycling program",
+      "available": true
+     },
+     {
+      "title": "Food waste reduction program",
+      "available": true
+     },
+     {
+      "title": "Composts excess food",
+      "available": true
+     },
+     {
+      "title": "Safely handles hazardous substances",
+      "available": true
+     },
+     {
+      "title": "Safely disposes of electronics and batteries",
+      "available": true
+     },
+     {
+      "title": "Water bottle filling stations",
+      "available": true
+     },
+     {
+      "title": "Compostable food containers and cutlery",
+      "available": true
+     },
+     {
+      "title": "No Styrofoam food containers",
+      "available": true
+     },
+     {
+      "title": "No single-use plastic water bottles or straws",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Sustainable sourcing",
+    "list": [
+     {
+      "title": "Responsible purchasing policy",
+      "available": true
+     },
+     {
+      "title": "Organic food and beverages",
+      "available": true
+     },
+     {
+      "title": "Locally sourced food and beverages",
+      "available": true
+     },
+     {
+      "title": "Responsibly sourced seafood",
+      "available": true
+     },
+     {
+      "title": "Organic cage-free eggs",
+      "available": true
+     },
+     {
+      "title": "Vegetarian and vegan meals",
+      "available": true
+     },
+     {
+      "title": "Eco-friendly toiletries",
+      "available": true
+     }
+    ]
+   }
+  ]
+ },
+ "eco_certified": true,
+ "serpapi_google_hotels_reviews_link": "https://serpapi.com/search.json?engine=google_hotels_reviews&hl=en&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE",
+ "serpapi_google_hotels_photos_link": "https://serpapi.com/search.json?engine=google_hotels_photos&property_token=ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE"
+}

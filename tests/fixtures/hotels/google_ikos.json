@@ -1,0 +1,1680 @@
+{
+ "search_metadata": {
+  "id": "6aec2c554188d526ed6d0a99",
+  "status": "Success",
+  "json_endpoint": "https://serpapi.com/searches/ZuHcEzYK1llvxfO16xOicvTQKD77E6RIM50H7HUFtts/6aec2c554188d526ed6d0a99.json",
+  "markdown_endpoint": "https://serpapi.com/searches/ZuHcEzYK1llvxfO16xOicvTQKD77E6RIM50H7HUFtts/6aec2c554188d526ed6d0a99.md",
+  "created_at": "2026-11-05T07:12:21.939Z",
+  "processed_at": "2026-11-05T07:12:21.940Z",
+  "google_hotels_url": "https://www.google.com/travel/hotels/entity/ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE?hl=de&gl=de",
+  "raw_html_file": "https://serpapi.com/searches/ZuHcEzYK1llvxfO16xOicvTQKD77E6RIM50H7HUFtts/6aec2c554188d526ed6d0a99.html",
+  "prettify_html_file": "https://serpapi.com/searches/ZuHcEzYK1llvxfO16xOicvTQKD77E6RIM50H7HUFtts/6aec2c554188d526ed6d0a99.prettify",
+  "total_time_taken": {
+   "float": 1.101933479309082
+  }
+ },
+ "search_parameters": {
+  "engine": "google_hotels",
+  "gl": "de",
+  "hl": "de",
+  "currency": "EUR",
+  "check_in_date": "2027-05-07",
+  "check_out_date": "2027-05-14",
+  "adults": 2,
+  "children": 1,
+  "children_ages": "8",
+  "property_token": "ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+ },
+ "type": "hotel",
+ "name": "Ikos Porto Petro",
+ "link": "https://ikosresorts.com/resorts/ikos-porto-petro/",
+ "property_token": "ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE",
+ "address": "Carrer d'es Far, 16, 07691 Portopetro, Illes Balears, Spanien",
+ "directions": "https://maps.google.com/maps?hl=de&gl=ZZ&um=1&ie=UTF-8&fb=1&sa=X&geocode=KRHcnEQpV5YSMdo3GkufgMxm&daddr=Ikos+Porto+Petro,+Carrer+d'es+Far,+16,+07691+Portopetro,+Illes+Balears,+Spanien",
+ "phone": "+34 971 18 92 20",
+ "phone_link": "tel:+34971189220",
+ "gps_coordinates": {
+  "latitude": 39.359022599999996,
+  "longitude": 3.2102041
+ },
+ "check_in_time": "15:00",
+ "check_out_time": "11:00",
+ "rate_per_night": {
+  "display_price": "977 €",
+  "extracted_display_price": 977,
+  "lowest": "977 €",
+  "extracted_lowest": 977
+ },
+ "total_rate": {
+  "display_price": "6.840 €",
+  "extracted_display_price": 6840,
+  "lowest": "6.840 €",
+  "extracted_lowest": 6840
+ },
+ "featured_prices": [
+  {
+   "source": "Booking.com",
+   "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQARoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASABEgLYxvD_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_0IrsjETw9cok5-iZ_GWXoonq7x2w&adurl",
+   "logo": "https://www.gstatic.com/travel-hotels/branding/icon_184.png",
+   "rooms": [
+    {
+     "name": "Junior Suite mit Gartenblick",
+     "images": [
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xRtjOC34TybM5mMu7CUHpohd9MiOTBp9A1DE07tFqiQTb2XiUkh9Kf0OvE_Tdqfc_1At0uEJFjo0UXd4Szd8dDy6qgRpdoKkeSLgUvCYRLvGnN3JvjdQNx9Jgpk_0UnvJIQyyNgPihAWHw5tH1guu-PiHoJotBQrSuHb9Z1PJ9oAbc-ODtCReHAvae4s1m9nrbhH0MKgl4GiMc1avVswLOMaUNR0raWNpK",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yOQJ9mVe3BKhlH5CHUm_kCLiUMGatFzhSXQ0h3faDtw9QCwXSCkBmT53maqxpNniOXY_CZnQuhyoXxOCXPuRY06d0kEHxxXG2funWTHmbYfO9vmukRmsnB3ooZ9UNLXurVxld4ufY1PIHUwW_EZGrphPyzwLrwTbkIFR_FKTqOv9hN28cvkBKi6UsUXx5L0pmdwG-6HPpmt38zO-EXFnFgNar9e6R0ygA",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xHcJeeIoLXMOnjG9AbEsnD_UP1vPMCLV5ns9O5pXVhxJ2mUwet0y2UrWwvVw6myEMwA7ESNkJ9hCCTJEyfSTEhtl5aK-hloeroqngOr_fklinmta_SH_r7aZKSZsuf_TVRdHVGJDSrmT5iprpOZJ2SXIuzuCuv3_iPLL2ue7xUZ7nweeE4PnGwXC7-neFt4dhv_02pwIjz1XqyF7TpeL00Sy3vRV3N21A",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_waehOeCjXzlGC-BjKONA-RnazuQvLurKqEfBKAZz2y6TkkDpRPtkkkuuvly5q34FMKsFHZcNIx4Wshj5OZ3Vhx7TM8sDQFwOh-fvWWF339e0O4qS8af0Gw91ivb3A0o8S_1PJwIt7IM8fIlcC91BsNtcS0JXwkoERFowvk6UdvQt80wPtAOxnGnC8qirOwzSXcgPQN_zxFzvdtI5BbUj4JvG39dmsxa3w",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xBl83xSjp0SqLGZ6KKkq_Tdy-y_Odt7mpD7cjLOR6Y3B6BZVKj3D6vcclCeBirciIc_uBb2_2ZBUTk63SkqMetCcpK8xdbwzFyJ6dHRzjXqZiUbF_vnCyBbTuXOf10cur1cPfIwjMDyBjw-kkAxzAPJJj3r2xZESkCEEHL0qx9AwicIUD91EYEJ5zRqdqH1qhXXnIakciPUieoDJYkVldUjj3LHcn3nApY",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_z2429BdPgxt7YLK22VHKeD1-DTBjrfSS_5bnBZ_SmZmPPWwiT0uZnyV9LGiiERPipyQdiVx29u2yhNTyK4TIiJcjHpNhD2FTGBFZWOx5F0_blLKKeKJSaYXeUy8Svy0dig-wp4yhrQiEkpEN0me3uUuAQRZic0dBO8xPV-edx7I6MUllJt3iCyzNxzLEgEFqgcNdIrpUcIRxz1ztuugelZT4xhc7_LHYHL"
+     ],
+     "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQBRoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAFEgIOXfD_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_1D1UWGDxvBgKPsxJdaHBYfvtuk5w&adurl",
+     "num_guests": 3,
+     "rate_per_night": {
+      "display_price": "977 €",
+      "extracted_display_price": 977,
+      "lowest": "977 €",
+      "extracted_lowest": 977
+     },
+     "total_rate": {
+      "display_price": "6.840 €",
+      "extracted_display_price": 6840,
+      "lowest": "6.840 €",
+      "extracted_lowest": 6840
+     },
+     "rates": [
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQBRoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAFEgIOXfD_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_1D1UWGDxvBgKPsxJdaHBYfvtuk5w&adurl",
+       "num_guests": 3,
+       "free_cancellation": true,
+       "free_cancellation_until_date": "6. Apr.",
+       "free_cancellation_until_time": "22:59",
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "977 €",
+        "extracted_display_price": 977,
+        "lowest": "977 €",
+        "extracted_lowest": 977
+       },
+       "total_rate": {
+        "display_price": "6.840 €",
+        "extracted_display_price": 6840,
+        "lowest": "6.840 €",
+        "extracted_lowest": 6840
+       },
+       "inclusions": [
+        "Suite",
+        "3 Gäste",
+        "Kostenlose Stornierung bis zum 6. Apr.",
+        "Frühstück",
+        "Suite"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Familienzimmer mit Gartenblick",
+     "images": [
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yAphVxmzD9_Tb6sZSXwXoUELXZpS7kaP39F40-Fhlu_3UVBzt4RGHWiuC4K_mCSL9hqg2o6isyz2Dgkr2QeDLaLh-V7NwD-CZUdBihzK_N6TA8R9tBO7guQDbyz3PRxDZL-jXtsI8YsrtSSytEU7xJvZqzYPO0zqzfBoqccTtEWKjbuZZOdY4Vw-QqV_NL2es6GRRO7lMoywYPba5Sx2d1Uez6bY5XlPPs",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zBgrYTJ-rgicK6ccBkvGlxtdEBGA9zFyXQj1ualNaamuoyWNfpCeuYgQiuHF1S9Z9cPmb-yG9uNWn9UMTs558IcmWCISQKhSJFO2nRqyD5vXwaQnpKzRRVGlAWE57wi4_HQ9uFN-bWOOPyshU5H4DBVdY3_BAn_GiLSzfjly_nfOTRqdjvSS4uVJpxOy-kYKgD8lS2zKCf7Y2j0xkTxDgIRR7QsbarDfL8",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yWr3_o1tYlJiiJ7W7qijnBMeGtb8875J9uL6fD9k7QMAZvF34K13L7XWMUgVqhOqsKywBIT1mxiKbossl8w95icU_TVTRIBtxJHzagpl_JB9hv9vEcoBQnLGFA5HmMJgbKV39Y0pRiLLKintcxpSeQ9ijWFY6Xq2JxZJlKNv9TrrevjWLJILQkoslDC8wRhDNyDEsENNyry4TrOgejQqnxrK1Y93lt8beU",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zt3GTpfxahYHibb2ktCF4WUonbWxMY-3dDr8e2tEhf7W3BN4GZ-Os-NaM7Q5fWBfcznCuPcXJ4nNHB33TfxabbLklhMWJpPS_O7cxaJAL8BO4398cuMdI0k7-neZSr90BPYOXkZk0jqh4WRpmBcSu0X3YbK0UyoUVVSi2WwrS3JNVI0t4YaaimFnlB93DCZJj52ezYhUJ9NKk3bJ9FuDcvJYUm9sPYnX8",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xtgr8VjvM-gsjktuPDmrFz-5luh-md8l9S4We1TKCzE4ebODRQ5prsqa8lXH9s8utWHnRgxQny84TNE8XuFqi95zRkIMx6xlyw4rIaJp_MVz6qoy8v6MbDtwJ_uO1JHsaKrpZ6CTQ0P3M1DQVCVTshLL6XgVB8S6wiRzGHJENt3QPydwSEVBQat0m43j3zNe_405bcUKKZfo3J3-DTmY85mOBixffr7Pd0",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xlkV5DGETOn_9H7QiMHSGKlVOe3YSiNrM0CnDnJnD4KycbTHSY65jnRcLP4FGFqeg3mfv6teF6zWV7kjcHAvB5yN1ZaeoNWk9j_kKgbhCTXLGTyNLVo7izxzUjlfwKGIqipbA_n-GA46mAbtN0sPuWmc-tl27WVEx5v5U_BL2gINpjgO7XC-S-Rr-xClHgV8NDe9P1ogy6xzW2nG55Ypk3oBp9X8hHbQ0k",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_waehOeCjXzlGC-BjKONA-RnazuQvLurKqEfBKAZz2y6TkkDpRPtkkkuuvly5q34FMKsFHZcNIx4Wshj5OZ3Vhx7TM8sDQFwOh-fvWWF339e0O4qS8af0Gw91ivb3A0o8S_1PJwIt7IM8fIlcC91BsNtcS0JXwkoERFowvk6UdvQt80wPtAOxnGnC8qirOwzSXcgPQN_zxFzvdtI5BbUj4JvG39dmsxa3w"
+     ],
+     "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQBhoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAGEgLuq_D_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_31Ha34-Xt7peoiribi5T_cLDGvdQ&adurl",
+     "num_guests": 4,
+     "rate_per_night": {
+      "display_price": "1.687 €",
+      "extracted_display_price": 1687,
+      "lowest": "1.687 €",
+      "extracted_lowest": 1687
+     },
+     "total_rate": {
+      "display_price": "11.810 €",
+      "extracted_display_price": 11810,
+      "lowest": "11.810 €",
+      "extracted_lowest": 11810
+     },
+     "rates": [
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQBhoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAGEgLuq_D_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_31Ha34-Xt7peoiribi5T_cLDGvdQ&adurl",
+       "num_guests": 4,
+       "free_cancellation": true,
+       "free_cancellation_until_date": "6. Apr.",
+       "free_cancellation_until_time": "22:59",
+       "breakfast_included": true,
+       "beds": [
+        {
+         "type": "Double",
+         "count": 1
+        }
+       ],
+       "rate_per_night": {
+        "display_price": "1.687 €",
+        "extracted_display_price": 1687,
+        "lowest": "1.687 €",
+        "extracted_lowest": 1687
+       },
+       "total_rate": {
+        "display_price": "11.810 €",
+        "extracted_display_price": 11810,
+        "lowest": "11.810 €",
+        "extracted_lowest": 11810
+       },
+       "inclusions": [
+        "1 Doppelbett",
+        "4 Gäste",
+        "Kostenlose Stornierung bis zum 6. Apr.",
+        "Frühstück"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Deluxe Drei-Zimmer-Residenz mit eigenem Pool und Blick auf die Küste",
+     "images": [
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zcOA6mTD-tRxeq4Doq-lzqR5HbzoXMd4uqjWM9ziyaqmcRTJsgk4CVc64uhz3ioyt0PT_As-1NMqvW0pn8txx29DBml8C2ALoIQ_pRlSlbZFVwPkXvl8fMGl0JUiPQ03EwYhA1cheB-tDFElgnCJ5gCuMyoZZ3IE0RYLWTcKkg-xBAOefHpoaxkH8NSiznfO6LeBQv_OtCZcP2YK8yTPWBq1YcqFToHvNl",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yh9mOgpbvaYzc7X7EY8USFt9oo1bo1ULOL8hFd9QpBfUlqfGVIBu50zdK0rHnCT0mw5P5u6qQJxV3kHu753laCwx50GvpMJY3TyrTozs_RxC4IfngFFUz5iraJm7_DPiZNQEPX0i9e1MjeBYxOqMr227Z2nhXliRzhUM2PRpUgNN4mYypqY15O4prTq5cbtT1fmLvelBzGV_Ao86VcxkoNPeT7-OkoeFGK",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_ywcXkM8Iarnkpwxjg9n-5_R8JXFlubptFu2jOuDR-dbCfNUEBBde5kpk-WXCH1zXFXmuETPT2TSpPhkBo8ImFFzm2tyFnmElV7ydougZ4eiaxJrMRldUPcBOEH4NEA04Ug-WFbCeYiV-eNlgsP6m4pn6AJzYbSC0YmqgYyuNQjKQ0DrxdayOJNRLG100-9ch8vPiTQPSKevWRHwUMXbSZy8WokBULBM8o",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_whK2fDA08mTbBc1RLwosDKrA3zahbCIbTbW7clz94bBEmvBWQUv5At4P1tRtA8dZWNDxcLHkodsPALZZE9CaMNVSScYfp9q213h-iAavaxliV_xSc5ZXd90DN6Y_zXnQpwJ8nLI9pq6hAf3rWdXdpuGKOrkUBSRX3wWM2n5esdVmgzTWZ3pUYLTkxdHpbwrpobLYslCQVNVMemXBDWPOW67gTp7QdmUoXC",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_y9gNfzzxXG9XKncDn_4d7-6I4M3aBLiG3MPlPmH6sjKCMXnmNF93f7kQDxsE0xII8eaKx0ztKfmReF11bKPasfXFDI4OoRfCz-_Ls2toiiMS2HlIR-zz2ls4SnblMkc6UhO5tg3RuRoSY0Ag5psefYo-yj_Owv6pI9rqF2q5qeugsFfCthrxhf77r7stnwGELbcW2tCXx5M-kvnNhn0kwvocAH6GDkcHdX",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xMTf32T6GpCMGvP5MUhitsXrPLni_I1jktl6pTg_FRHvwpIRa7OWx5dJTrlWlerOeoIuUdhkckty31xYwAC7YwjIVab29zTQciv7WMsvpbKUjl2MOWopN6QPXWqvQwSmF02dnYte6DTZnSHfllR3MA6cfPREXtkhpas1-Nem-vbt3jwkLgqhpVQObWOs2byhdR82ZWVORlsTJK3hfH9_6-oS7bviT2SEe0",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yNbOf13mV7_AoQucP9JIxF6LJQrQsPpec0vp2UtFLXS035UnmqTOo191n5JX_VCEBe73rUj0DP8LE19LILjgTA6vRq8qLYCk5TtMbxbYR8JyFvn5d3eu0ko6cH9g3sAJOYZNJtuerLCsTZKhNu8R6_I9mWTwMEww131ZFXQWRgz4arkjak0xwuEyXuNG5MJpyiLvjlXwm75Zg3KknS3pG80vpb44GjaE8",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xJpbw2ga8Lqp6Ko2nZNdd7v4ZswNbe0r-hNhSwUcXW3kzAv5qhOlso1MHgxllqip6CWXG_9S6SZ0ZNv4L75cL-RQvWnSwD-QeVjV7JqEA20eA8qrDMZCLdhoJA5OJ5U-wltcDrK1l2X26PCEgG4RE8TvqloNYJl9LxL9DiRy1Oni2irbVZXN-DpYG4pB35Rb6ENGzHXQDeuY22_eHphsXiTjkJueDDnnOL",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_wrmTaTiQST4BWSpKmd1ZcsGe81Gd03cA-GXYF3UJlwYxIJtMN9PHRIcHyX3EzAt99n1MUmI03XHgJqpCQL7B5yi_6lR9_847fDqgUG0T2XVhDYvbXWjdcB3XL_vtA8lIvo46mnZT0wVOKzrIUm4wJPxf-qTScvt5x_6ZIQCV06mfA7pWW1NhDkSZmuhuXxgqTZss6tDtcXu6zpM3vdJhGvIJfNPWm1MNdm",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zTRamQ_Nn8HxRmU2Mu90GT3BtLh--aXE1gelJISh2EN_gXutbT0Hf_UkD1yOrKdV3vQRrZER0kssSr5u3J8uZpjAIP-yVsr3znpaku0Eme7-0SLVsPMBvltuPKzv8YPrFmqEL4NFILaKZEWCr8BNFvpvd0o3JDKz5ociJsukqWLY61iYL1OpqB8UxP7i0VxAyL68Xx1NhjxvE-J0x4OdJLGfKogeaj6Jpu",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_x-Yx05mdej8U0-HbwIoEHjfYBg9uOpFFEARfjPwlKMKlTHh1pVDLzR3JuzoMY-DTH4UPpEbYzGXRTV999ZkS_ypSK0bj6PZhSFWEMiKmu8VO2fRHNixsis5gFJYiiZAoCIhdvLzDT0loQ3Zvjfd9uNtmmT-TYWS7K-0gBCp7ofQ5mkylcvdAdbDH6-Pl9eOQVtCyMhjoKLIZ_kWzNchTifIeHlVvhDSgk"
+     ],
+     "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQBxoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAHEgLJ9PD_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_0B0EA7vh599Knm_WMPKlQSuiRetA&adurl",
+     "num_guests": 6,
+     "rate_per_night": {
+      "display_price": "3.021 €",
+      "extracted_display_price": 3021,
+      "lowest": "3.021 €",
+      "extracted_lowest": 3021
+     },
+     "total_rate": {
+      "display_price": "21.144 €",
+      "extracted_display_price": 21144,
+      "lowest": "21.144 €",
+      "extracted_lowest": 21144
+     },
+     "rates": [
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQBxoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAHEgLJ9PD_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_0B0EA7vh599Knm_WMPKlQSuiRetA&adurl",
+       "num_guests": 6,
+       "free_cancellation": true,
+       "free_cancellation_until_date": "6. Apr.",
+       "free_cancellation_until_time": "22:59",
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "3.021 €",
+        "extracted_display_price": 3021,
+        "lowest": "3.021 €",
+        "extracted_lowest": 3021
+       },
+       "total_rate": {
+        "display_price": "21.144 €",
+        "extracted_display_price": 21144,
+        "lowest": "21.144 €",
+        "extracted_lowest": 21144
+       },
+       "inclusions": [
+        "6 Gäste",
+        "Kostenlose Stornierung bis zum 6. Apr.",
+        "Frühstück"
+       ]
+      }
+     ]
+    },
+    {
+     "name": "Deluxe Villa mit 4 Schlafzimmern, eigenem Pool und Gartenblick",
+     "images": [
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_zcOA6mTD-tRxeq4Doq-lzqR5HbzoXMd4uqjWM9ziyaqmcRTJsgk4CVc64uhz3ioyt0PT_As-1NMqvW0pn8txx29DBml8C2ALoIQ_pRlSlbZFVwPkXvl8fMGl0JUiPQ03EwYhA1cheB-tDFElgnCJ5gCuMyoZZ3IE0RYLWTcKkg-xBAOefHpoaxkH8NSiznfO6LeBQv_OtCZcP2YK8yTPWBq1YcqFToHvNl",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yJduSAic_Gqj20_fzK28kuF1udYGoSKBRBWbbFtXoVu-VEIAb9aE3yNEeKOitx-jsT_0BNQGQS4RoVdx4Jt9uJd4bBbKqtwaUfroKs-1DNXND0n0r4VxP3SOqmx1VGeCH1jRgVHlnLGHwH8KtPxBRBPX90BNrK5F9XdR8w0828qNH_I8k-CrgWID7qd14IXM8B0e3GtmzoXaQGxuxx2085vfZkQNJZIFAP",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_wyXyDTKqJ4EnGaxccMpCgak0hMa1D4BCDvl26IAE-0ghzpm4Coe7kZPbCbTzJlIzzrfXL-7bdT9nudOYaPU_CIs2JS93fm-EqVlZ2BqU4u0NTZOlyloECK1lPHTEp-Wp7jCkWGgRmPBFs2Ztb-FY2expdx-bf0F_NzzHYSBOlfIvgoI3L6uscBKqj_TdUj5rN77NB_9EJJZL6QghPzLnk7C6uYgthI7Zo",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xrNo2AQuOgmz_mqQJAYnuhZTDhYNbKwBpFfDX_dCb2kYJ4CHcRVn5gbTZ6-l4xM65IJTuy_QNKgt3rvODX7xRl81SQiSj83uO3zYKZ2io3eLbaq_yM7L0dc3SNCkVocCQRDldKdqaznxxtkajW9ovv8WolAh6EaKTY0couLINM48caZ5GNcJJifmBlpUUKQg-BXsPzfLg0ou2Uqkd5v4-VMJCtMiQgipI",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_y9gNfzzxXG9XKncDn_4d7-6I4M3aBLiG3MPlPmH6sjKCMXnmNF93f7kQDxsE0xII8eaKx0ztKfmReF11bKPasfXFDI4OoRfCz-_Ls2toiiMS2HlIR-zz2ls4SnblMkc6UhO5tg3RuRoSY0Ag5psefYo-yj_Owv6pI9rqF2q5qeugsFfCthrxhf77r7stnwGELbcW2tCXx5M-kvnNhn0kwvocAH6GDkcHdX",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_yJI2LHTlRPx3-3bqYU_Z_o0_DNL-QSwH_zs_VklbYeXUMqybZz4lsL9fJzV4h-2q5SCmgSkqRS0FauhMf0Uw-lY3Mrzcq4hZm74eOGcQ_NY8B-39kE1--HODYQZ2jdaPFCXd3tfxazqJmCu3azRc-HGb5i6kKoWbFPQ4ITjCjRIfy3xdiqfjz1b8IeWIhVtbFgkKAMGVyOhTWx-qvq9j1nZrJiolrCyTPB",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xiNq4b4TV0tyEhel3KohyqwUpqZ0EQxLkK4AREnsYwTTDf8qCelwJHW4kcjni3_RmPFvqzmWvZ9mWMyBsvyn6I3hcUPVMLBPIp23JYY2EsQE90FUjOEZNixHSp0Y-_Mcz9qVn4t43Bzo71LhyXvLXx56tojG_T9bOeK2s58cWaLnMmnOF-Y1Uu4A7y2r4AajBtdWzrX9NmjhkZ8MaHggbuNZmf7xBTzwPZ",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_ykrijSz1bP_3omYBeqQXrwhn4GugUb4UMEa_Fcbd9T9MGpVcbDMb2H3jNEMtuDrZlpr9WwK5pmTSUEHWE6Sdwg0vJXOTXQHfGVpBGi1EgU8Y5152-HRPUdg-WEJb6LdhT3L25UF3_MN5vMzzmMKeL7_z2pS7_qjDCj-MmnR64QnXJzEQDQk40hVABn_HPun015njhOajxtZjxxfLWZD9smJ1myCIy6QvA",
+      "https://lh3.googleusercontent.com/hrppk/ANjXD_xMTf32T6GpCMGvP5MUhitsXrPLni_I1jktl6pTg_FRHvwpIRa7OWx5dJTrlWlerOeoIuUdhkckty31xYwAC7YwjIVab29zTQciv7WMsvpbKUjl2MOWopN6QPXWqvQwSmF02dnYte6DTZnSHfllR3MA6cfPREXtkhpas1-Nem-vbt3jwkLgqhpVQObWOs2byhdR82ZWVORlsTJK3hfH9_6-oS7bviT2SEe0"
+     ],
+     "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQCBoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAIEgIIiPD_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_3kh6KCrCLfNoZeDOuqEiyl-qhxPg&adurl",
+     "num_guests": 8,
+     "rate_per_night": {
+      "display_price": "4.051 €",
+      "extracted_display_price": 4051,
+      "lowest": "4.051 €",
+      "extracted_lowest": 4051
+     },
+     "total_rate": {
+      "display_price": "28.358 €",
+      "extracted_display_price": 28358,
+      "lowest": "28.358 €",
+      "extracted_lowest": 28358
+     },
+     "rates": [
+      {
+       "link": "https://www.google.com/aclk?sa=l&ai=DChsSEwjZ7qi8o_CXAxUdmFAGHUZPBtEYACICCAEQCBoCZGc&co=1&gclid=EAIaIQobChMI2e6ovKPwlwMVHZhQBh1GTwbREAoYASAIEgIIiPD_BwE&cid=CAASmAHkaPRKefXqC4q8VqmJBjFUJV5Pqa5VR6aL9QjFNEtdwJQbOa9GdpviL3vXd4LjWtmxBurWWIP79g-N7p9bvOMQbUBYkHS2AnPMUIY1ZwTmDHC2pAUV8mxBiqhvmYwXiw4lGVOwqy6FR-q4AFjSKrdzEvf9uL3orAgXzocT2hA0JAGr5ScOOZlY5xKTh6hPyvsvnxDo0S0Szg&sig=AOD64_3kh6KCrCLfNoZeDOuqEiyl-qhxPg&adurl",
+       "num_guests": 8,
+       "free_cancellation": true,
+       "free_cancellation_until_date": "6. Apr.",
+       "free_cancellation_until_time": "22:59",
+       "breakfast_included": true,
+       "rate_per_night": {
+        "display_price": "4.051 €",
+        "extracted_display_price": 4051,
+        "lowest": "4.051 €",
+        "extracted_lowest": 4051
+       },
+       "total_rate": {
+        "display_price": "28.358 €",
+        "extracted_display_price": 28358,
+        "lowest": "28.358 €",
+        "extracted_lowest": 28358
+       },
+       "inclusions": [
+        "8 Gäste",
+        "Kostenlose Stornierung bis zum 6. Apr.",
+        "Frühstück"
+       ]
+      }
+     ]
+    }
+   ],
+   "num_guests": 3,
+   "rate_per_night": {
+    "display_price": "977 €",
+    "extracted_display_price": 977,
+    "lowest": "977 €",
+    "extracted_lowest": 977
+   },
+   "total_rate": {
+    "display_price": "6.840 €",
+    "extracted_display_price": 6840,
+    "lowest": "6.840 €",
+    "extracted_lowest": 6840
+   },
+   "free_cancellation": true,
+   "free_cancellation_until_date": "15. Juni",
+   "free_cancellation_until_time": "02:00"
+  }
+ ],
+ "prices": [
+  {
+   "source": "Booking.com",
+   "link": "https://www.google.com/travel/lodging/clk?pc=AJ0xEyj8Fc9UTZ0S2a3OKS9IKxy0DorGp-P7CM29kBaVNXkycvVfNcLalDHviUwWTUf-OWW8H0dxSBn6MVwUL_U4XAwtii86yciuDxTZH3ymTDezUss31bdbRVUBT2ZUtA2FJsI00etbA_RqquWSLRjhlwzYiu3K-sPcB4fdKVqp1mg6YUH_nqfTQV-Wsax08d67CDyrZg&pcurl=https://www.booking.com/searchresults.de.html?dest_id%3D9616140%26highlighted_hotels%3D9616140%26dest_type%3Dhotel%26checkin%3D2027-05-07%26checkout%3D2027-05-14%26group_adults%3D2%26req_adults%3D2%26show_room%3D961614002_369722068_3_85_0%26lang%3Dde%26selected_currency%3DEUR%26exrt%3D1.00000000%26ext_price_total%3D6840.25%26ext_price_tax%3D723.25%26xfc%3DEUR%26hca%3Dm%26group_children%3D1%26req_children%3D1%26%26age%3D8%26req_age%3D8%26ts%3D1793816994%26no_rooms%3D1%26edgtid%3Dd4sOfZ-5SmaNfDmWfmKKwQ%26efpc%3DZ3i3WmhAs1of%26utm_source%3Dmetagha%26utm_medium%3Dlocaluniversal%26utm_campaign%3DGB%26utm_term%3Dhotel-9616140%26utm_content%3Ddev-desktop_los-7_bw-183_dow-Friday_defdate-0_room-0_gstadt-2_rateid-public_aud-0_gacid-_mcid-50_bc-AJK7DA_ppa-0_clrid-0_ad-0_gstkid-1_checkin-20270507_ppt-B%26aid%3D2127493%26label%3Dmetagha-link-LUGB-hotel-9616140_dev-desktop_los-7_bw-183_dow-Friday_defdate-0_room-0_gstadt-2_rateid-public_aud-0_gacid-_mcid-50_bc-AJK7DA_ppa-0_clrid-0_ad-0_gstkid-1_checkin-20270507_ppt-B&s=ALZo0YIk-7rPb6gNipzEqXsdqAe5&ap=1",
+   "logo": "https://www.gstatic.com/travel-hotels/branding/icon_184.png",
+   "num_guests": 3,
+   "rate_per_night": {
+    "display_price": "977 €",
+    "extracted_display_price": 977,
+    "lowest": "977 €",
+    "extracted_lowest": 977
+   },
+   "total_rate": {
+    "display_price": "6.840 €",
+    "extracted_display_price": 6840,
+    "lowest": "6.840 €",
+    "extracted_lowest": 6840
+   },
+   "free_cancellation": true,
+   "free_cancellation_until_date": "15. Juni",
+   "free_cancellation_until_time": "02:00"
+  }
+ ],
+ "typical_price_range": {
+  "extracted_lowest": 168,
+  "extracted_highest": 252
+ },
+ "nearby_places": [
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Spiaggia Mondragó",
+   "link": "https://www.google.com/search?q=Spiaggia+Mondrag%C3%B3&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TKqMLy8uMivWUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgAmtAuhNgAAAA#fpstate=trskp&trifp=kpq%253DSpiaggia%252BMondrag%2525C3%2525B3%2526skpm%253D/g/11by_wsr6s%2526t%253Dd",
+   "thumbnail": "http://t2.gstatic.com/images?q=tbn:ANd9GcS_SRyi8GrSoA4WdYorui7ELSL2PmnWa-KrssgVI727hAtGrurU9BA61g",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "23 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "27 Min."
+    }
+   ],
+   "rating": 4.6,
+   "reviews": 5117,
+   "gps_coordinates": {
+    "latitude": 39.3521418,
+    "longitude": 3.1883581
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Caló des Moro",
+   "link": "https://www.google.com/search?q=Cal%C3%B3+des+Moro&stick=H4sIAAAAAAAAAONgFmJQ4tZP1zc0MipONyoq1FLMTrbSz8lPTizJzM-DM6wSS0qKEpNBzGIAns2nhjQAAAA#fpstate=trskp&trifp=kpq%253DCal%2525C3%2525B3%252Bdes%252BMoro%2526skpm%253D/g/122sg2rq%2526t%253Dd",
+   "thumbnail": "http://t0.gstatic.com/images?q=tbn:ANd9GcQGKrmy0T1SjGOEyyNXwij-yfSSDgG_f2rZ4XnLpeiQdA_MLfY_BLvGncn-KQyOOsDd6pQD",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "25 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "1 Std. 6 Min."
+    }
+   ],
+   "rating": 4.5,
+   "reviews": 9484,
+   "description": "Kleiner Sandstrand in Bucht mit flachem türkisfarbenem Wasser und malerischen Sonnenuntergängen.",
+   "gps_coordinates": {
+    "latitude": 39.3136144,
+    "longitude": 3.1213986
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Parc natural de Mondragó",
+   "link": "https://www.google.com/search?q=Parc+natural+de+Mondrag%C3%B3&stick=H4sIAAAAAAAAAONgFmJQ4tZP1zc0MjJKzirM01LMTrbSz8lPTizJzM-DM6wSS0qKEpNBzGIAsXVzgzQAAAA#fpstate=trskp&trifp=kpq%253DParc%252Bnatural%252Bde%252BMondrag%2525C3%2525B3%2526skpm%253D/g/1222cjqn%2526t%253Dd",
+   "thumbnail": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWnFbh4LN1Pg_cvSABdTWWq08C8LFgvhhr7Fw4olFUjSOnLr35wJVczBh4A_8ZQGvTS04Pg_x-1pd9IjNpD4NIbSWQcaXrMtSZVBJBGrG7i1Yeyv2LD_N2k3DAwudF4uMM1Wg-xe=w160-h120-k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "8 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "26 Min."
+    }
+   ],
+   "rating": 4.7,
+   "reviews": 16611,
+   "description": "766 ha großer Naturpark an der Küste mit Grasland, bewaldeten Schluchten, Dünen und vielen Vogelarten.",
+   "gps_coordinates": {
+    "latitude": 39.3523335,
+    "longitude": 3.1884946
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "S’Amarador",
+   "link": "https://www.google.com/search?q=S%E2%80%99Amarador&stick=H4sIAAAAAAAAAONgFmJQ4tZP1zc0MjIvyC020FLMTrbSz8lPTizJzM-DM6wSS0qKEpNBzGIA62OUuzQAAAA#fpstate=trskp&trifp=kpq%253DS%2525E2%252580%252599Amarador%2526skpm%253D/g/1227pms0%2526t%253Dd",
+   "thumbnail": "http://t0.gstatic.com/images?q=tbn:ANd9GcSwjxQpwKtxqxOHNUycKqcBPx8I-EpajPsBpIuccNluPBIvtD-DnI1Mow",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "25 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "33 Min."
+    }
+   ],
+   "rating": 4.5,
+   "reviews": 1713,
+   "description": "Einfacher Sandstrand mit grünem Naturpark, per Fußweg erreichbar, und einer kleinen Bar mit Kiosk.",
+   "gps_coordinates": {
+    "latitude": 39.3495297,
+    "longitude": 3.1858233
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Es Trenc",
+   "link": "https://www.google.com/search?q=Es+Trenc&stick=H4sIAAAAAAAAAONgFmJQ4tbP1TcwNMoozs6r1FLMTrbSz8lPTizJzM-DM6wSS0qKEpNBzGIALieVmzQAAAA#fpstate=trskp&trifp=kpq%253DEs%252BTrenc%2526skpm%253D/m/012hskny%2526t%253Dd",
+   "thumbnail": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSmA8FAj-3QlktENzOAi1Ng94IvRPMbBh_i1Ir9Bh3jskhmVPAD",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "37 Min."
+    }
+   ],
+   "rating": 4.1,
+   "reviews": 14321,
+   "description": "Familienfreundlicher Strand mit klarem, flachem Wasser zum Baden und einfacher Café-Bar.",
+   "gps_coordinates": {
+    "latitude": 39.3445602,
+    "longitude": 2.9845873999999997
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Cala Egos",
+   "link": "https://www.google.com/search?q=Cala+Egos&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TDYuM8nJNU7WUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgCICN0GNgAAAA#fpstate=trskp&trifp=kpq%253DCala%252BEgos%2526skpm%253D/g/11c3v4lm3c%2526t%253Dd",
+   "thumbnail": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWlMAuaxYPyI2ifePYU4Vx7MLtjzZLxpHNsGcN49FOONcbQqkCJ0jxgJ34DntnZd9RiGcPsrsdAW5XgRmi7Kh10QCxc-vSEOiT_R8c_YXZCQ1yf_oozr6f8nIFiXGJXFud93ph1fF3Yf1pw=w179-h120-k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "10 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "30 Min."
+    }
+   ],
+   "rating": 4.5,
+   "reviews": 2039,
+   "description": "Kleine Bucht mit Sandstrand und blau-grünem Wasser, das sich gut zum Schnorcheln eignet, sowie angrenzende Hotels.",
+   "gps_coordinates": {
+    "latitude": 39.3611125,
+    "longitude": 3.2244406999999997
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Cala Esmeralda",
+   "link": "https://www.google.com/search?q=Cala+Esmeralda&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0zM4yqUwyMzbWUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgBaGuY8NgAAAA#fpstate=trskp&trifp=kpq%253DCala%252BEsmeralda%2526skpm%253D/g/11kj4yb633%2526t%253Dd",
+   "thumbnail": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWl4Kie_XQaAF9xFodoJgeIQaH1pYK8AXnllpimTpNzoz3r7I-HqfGYzOLVn6ShgKy-lE-CqJpDPZvxHFrddQknl0cwZikdfk77yipmQo6GRp020ClgdCrqQByd13aercv9hyIaAKihzcEGx=w160-h120-k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "15 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "34 Min."
+    }
+   ],
+   "rating": 4.6,
+   "reviews": 1279,
+   "gps_coordinates": {
+    "latitude": 39.376165799999995,
+    "longitude": 3.2374731999999997
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Cala s’Almunia",
+   "link": "https://www.google.com/search?q=Cala+s%E2%80%99Almunia&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TC4wLczOSEvSUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgCoLOGVNgAAAA#fpstate=trskp&trifp=kpq%253DCala%252Bs%2525E2%252580%252599Almunia%2526skpm%253D/g/11cp5qkhfb%2526t%253Dd",
+   "thumbnail": "http://t3.gstatic.com/images?q=tbn:ANd9GcRyIto3wX-YRg-9A08bNVs_s2MGXyGqgkEUmXfNNv8Y7gRxhappB_AqSw",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "25 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "1 Std. 8 Min."
+    }
+   ],
+   "rating": 4.6,
+   "reviews": 1559,
+   "description": "Von schroffen Felsen gesäumte, idyllisch gelegene Bucht zum Schwimmen und Bootfahren in türkisfarbenem Wasser.",
+   "gps_coordinates": {
+    "latitude": 39.312597,
+    "longitude": 3.1196381
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Caló d'es Pou",
+   "link": "https://www.google.com/search?q=Cal%C3%B3+d'es+Pou&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TCoztjA0MjbSUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgDqW9kCNgAAAA#fpstate=trskp&trifp=kpq%253DCal%2525C3%2525B3%252Bd'es%252BPou%2526skpm%253D/g/11bv381232%2526t%253Dd",
+   "thumbnail": "http://t2.gstatic.com/images?q=tbn:ANd9GcQ3QKLrm-f-0J75Mx99EVek1Je5L1EZ9q2OTpJaKura-KnPKF7ipqLo_Q",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "10 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "34 Min."
+    }
+   ],
+   "rating": 4.3,
+   "reviews": 1697,
+   "gps_coordinates": {
+    "latitude": 39.3661327,
+    "longitude": 3.2287597
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Caló des Borgit",
+   "link": "https://www.google.com/search?q=Cal%C3%B3+des+Borgit&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TKoqykiqsKjSUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgAxaSIMNgAAAA#fpstate=trskp&trifp=kpq%253DCal%2525C3%2525B3%252Bdes%252BBorgit%2526skpm%253D/g/11bzrhbx8z%2526t%253Dd",
+   "thumbnail": "http://t0.gstatic.com/images?q=tbn:ANd9GcTFC0i2fkw6emG-Qr2mwpd2DzxfBy9DBqJiicWLeCiM3iSZPB7p4UmnRg",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "8 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "25 Min."
+    }
+   ],
+   "rating": 4.6,
+   "reviews": 900,
+   "gps_coordinates": {
+    "latitude": 39.3526533,
+    "longitude": 3.193031
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Cala S'Amarador",
+   "link": "https://www.google.com/search?q=Cala+S'Amarador&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TKqML8woTLbUUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgAow6QtNgAAAA#fpstate=trskp&trifp=kpq%253DCala%252BS'Amarador%2526skpm%253D/g/11by_qhqc9%2526t%253Dd",
+   "thumbnail": "http://t2.gstatic.com/images?q=tbn:ANd9GcRmjsisplZVkd-p6tgUTxcjjM5O-w-XJeUZyQ3_ACyoCEDNp2vU-51aVQ",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "25 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "33 Min."
+    }
+   ],
+   "rating": 4.6,
+   "reviews": 780,
+   "gps_coordinates": {
+    "latitude": 39.349631599999995,
+    "longitude": 3.1856392
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Strand Cala Gran",
+   "link": "https://www.google.com/search?q=Strand+Cala+Gran&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TKqqrLBIzi3SUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgDsw9WvNgAAAA#fpstate=trskp&trifp=kpq%253DStrand%252BCala%252BGran%2526skpm%253D/g/11bzyx8cmr%2526t%253Dd",
+   "thumbnail": "https://lh3.googleusercontent.com/gps-cs-s/AHRPTWkRbxktMNKiuW5ebu48-SbtkoWFilnUI32l07oEbZIaGDbLzeL9z_ThUaBpHcteg10EfkRkNsrvlmvFYZWJ0XHobe0ERqbJSi1DYPOb0C5XpWCYnybxlNeg1Nw-FvBlTWOO8-gbpg=w160-h120-k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "13 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "29 Min."
+    }
+   ],
+   "rating": 4.6,
+   "reviews": 5021,
+   "description": "Schmale Bucht mit Strand, Tretbootverleih und Möglichkeiten zum Schorcheln im türkisblauen Wasser.",
+   "gps_coordinates": {
+    "latitude": 39.37332,
+    "longitude": 3.23211
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Cala Sa Nau",
+   "link": "https://www.google.com/search?q=Cala+Sa+Nau&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TKoqNMgyz4vXUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgCd0JY2NgAAAA#fpstate=trskp&trifp=kpq%253DCala%252BSa%252BNau%2526skpm%253D/g/11bzq0j7n_%2526t%253Dd",
+   "thumbnail": "http://t0.gstatic.com/images?q=tbn:ANd9GcTruRnrW54UdoWZJygI70YpyETUf4Xqsmn9MHG1n8TMWAWnmA3IcTI-iA",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "21 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "1 Std. 1 Min."
+    }
+   ],
+   "rating": 4.4,
+   "reviews": 2833,
+   "gps_coordinates": {
+    "latitude": 39.393209999999996,
+    "longitude": 3.2472605999999997
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Cala Gran",
+   "link": "https://www.google.com/search?q=Cala+Gran&stick=H4sIAAAAAAAAAONgFmJQ4tVP1zc0TM4zszRIKk7TUsxOttLPyU9OLMnMz4MzrBJLSooSk0HMYgAXSJ33NgAAAA#fpstate=trskp&trifp=kpq%253DCala%252BGran%2526skpm%253D/g/11cn690bsf%2526t%253Dd",
+   "thumbnail": "http://t2.gstatic.com/images?q=tbn:ANd9GcQI1vDWRUty5hPy6_8ZAGCHMKzzO7FXOMYX5EIJl-STCkayZTx_z1sLFg",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "14 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "33 Min."
+    }
+   ],
+   "rating": 4.7,
+   "reviews": 276,
+   "description": "Geschützte Bucht mit einem von Resorts gesäumten Sandstrand mit Sonnenschirmen und Badebereich.",
+   "gps_coordinates": {
+    "latitude": 39.3717717,
+    "longitude": 3.2340196
+   }
+  },
+  {
+   "category": "POI - Ort von Interesse",
+   "name": "Cala Varques",
+   "link": "https://www.google.com/search?q=Cala+Varques&stick=H4sIAAAAAAAAAONgFmJQ4tZP1zc0Mqgsyis301LMTrbSz8lPTizJzM-DM6wSS0qKEpNBzGIACxHXjTQAAAA#fpstate=trskp&trifp=kpq%253DCala%252BVarques%2526skpm%253D/g/120yrnw6%2526t%253Dd",
+   "thumbnail": "http://t2.gstatic.com/images?q=tbn:ANd9GcR3zXAMNkLc-2qXhdHuWPZ-3dLMQg09JYXG_2oXWetVqWkvhzmADZWvrg",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "34 Min."
+    }
+   ],
+   "rating": 3.9,
+   "reviews": 954,
+   "description": "Kompakter Sandstrand mit klarem Wasser und idealen Bedingungen zum Schnorcheln und Tauchen.",
+   "gps_coordinates": {
+    "latitude": 39.498808,
+    "longitude": 3.2968819999999996
+   }
+  },
+  {
+   "category": "Flughafen",
+   "name": "Flughafen Palma de Mallorca",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "55 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "1 Std. 53 Min."
+    }
+   ],
+   "gps_coordinates": {
+    "latitude": 39.5516667,
+    "longitude": 2.7388889
+   }
+  },
+  {
+   "category": "Restaurant",
+   "name": "Restaurant El Baul de Portopetro",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLcFWHw9_hLAlfIlI_a7RKmNU8LjF7kWwBSGaAJj5FRkRQ3UHBKBj94C7lhS7fXFixbzWSHqG0zAnEXMrl8buVUtCANmVdqrZ5dfSWi9W4HratzRZdNybXpHy5BZXbbQd-1kQvST=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "2 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "2 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "38 Min."
+    }
+   ],
+   "rating": 4.8,
+   "reviews": 1113,
+   "gps_coordinates": {
+    "latitude": 39.3599421,
+    "longitude": 3.2092628999999997
+   }
+  },
+  {
+   "category": "Mallorquinisches Restaurant",
+   "name": "Capfico Arrocería Restaurante",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLfD_Cw_dAIZZX-5Bl6vMGoS-miyPdP8CP-AhXbAC8NW77qvUghmlUGKPn5Ej6O2vgqu0JK_gG-tHMddXH7L5s8oQbODtd8iwKIfomUGI33Tp533bMK88ee6skahPRzW9dHpWB0Zxxvo9Sc2=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "6 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "37 Min."
+    }
+   ],
+   "rating": 4.9,
+   "reviews": 273,
+   "gps_coordinates": {
+    "latitude": 39.3608732,
+    "longitude": 3.2097344
+   }
+  },
+  {
+   "category": "Mediterranes Restaurant",
+   "name": "Restaurante La Caracola | Porto Petro",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLeZSRjLwj4AGbf6iE2D5xo81XpdkWp2xJNZolKrmiCv9kH7vYrNG-fDA9YjHDJ8M5aFkIpEEe5fL24mt0k2fwA4ec0cpfcqmpuUPp5Jb86icr3NiiFiJK8OpPRjLeoiaY-_-sFw0Q=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "7 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "36 Min."
+    }
+   ],
+   "rating": 4.4,
+   "reviews": 1577,
+   "gps_coordinates": {
+    "latitude": 39.3613515,
+    "longitude": 3.2101425
+   }
+  },
+  {
+   "category": "Mediterranes Restaurant",
+   "name": "Marisma",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLev17RjMgxBaQr-Det9hu1rEH4W4wcuDG0-7jtznnmu3s6ukegSa7s73PBKa5diQnYGGbtrDCc5ASGBUU8J8VBRzqUPFuVf9ZAHwSgcKAdtSxP5xI1F_UA8wttWHefTk6YgfX3-XphI1hU=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "5 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "39 Min."
+    }
+   ],
+   "rating": 4.7,
+   "reviews": 149,
+   "gps_coordinates": {
+    "latitude": 39.361490499999995,
+    "longitude": 3.2078541
+   }
+  },
+  {
+   "category": "Mediterranes Restaurant",
+   "name": "Gastrobar Na Petra",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdeZohbO0uL4jLdSUy-pMX-rT1ZgiJR39HtDdmBFdzvRXxvZkvBuZsopnzhf8ZNsCYZbEba8FCfhlrVQJ-mZJwr5WEnMyIHy73VxBlNSN0EpSJxZXV0AzPUFuYOXlw7BLq2LOk=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "8 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "35 Min."
+    }
+   ],
+   "rating": 4.5,
+   "reviews": 860,
+   "gps_coordinates": {
+    "latitude": 39.3618637,
+    "longitude": 3.2105753999999997
+   }
+  },
+  {
+   "category": "Mediterranes Restaurant",
+   "name": "RESTAURANTE AMURA",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLeBo30c30TzJV-Nkg7ECEEmqJqD8gjYGxDnBkrDMEfWAtsKH3o3gDEIpqr7CWLegtZh_b5qY83qGEN99wg4NIj1qJQYpThFt2aUWZqVH4pNIHWKNdxul9Qr3g0A8GUL5wcum_iicb1zl9Yf=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "8 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "36 Min."
+    }
+   ],
+   "rating": 4.6,
+   "reviews": 142,
+   "gps_coordinates": {
+    "latitude": 39.3611365,
+    "longitude": 3.210451
+   }
+  },
+  {
+   "category": "Mediterranes Restaurant",
+   "name": "Restaurant Es Bergant",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLe33XYsysP9AZlxdtR29j3bN4SW4wvXH-AOLWYgs7wDuVKRtkOK1g4RFasbTwZiPMfsPS3-jne7nNeUQfTZPP_wCYbGc-9OPhxAXif2yi3VN6czq5XOyJ7SV_3dMdth6gkZR6gA=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "7 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "36 Min."
+    }
+   ],
+   "rating": 4.4,
+   "reviews": 910,
+   "gps_coordinates": {
+    "latitude": 39.3614392,
+    "longitude": 3.2102345
+   }
+  },
+  {
+   "category": "Mediterranes Restaurant",
+   "name": "Ca'n Martina",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdJphtrWLK22sZ21t9xOBxgthvvm84L7GpDy1Mvjz3m6ijAUKHGbQJPu163FO9dOz2QulpWpIhGhRKNA98nN_33fj_6P4rV-UHwbKOM0Qxy1fhrVQSqYfVTO9MCMXvTGNv41EphfQ=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "8 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "36 Min."
+    }
+   ],
+   "rating": 4.2,
+   "reviews": 973,
+   "gps_coordinates": {
+    "latitude": 39.36164,
+    "longitude": 3.2103889
+   }
+  },
+  {
+   "category": "Mallorquinisches Restaurant",
+   "name": "Rafael y Flora nautic",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdO9adyLCCamBpMOHyWT_PN-N__K3yWYvquptzwSZ7eIlISEuJSKKe1Kb8h8JwCCUX2IiPuSxD19eLoJikjAc1ps3OXcMyuKGzJqaA6EQE89t1xiwsngiKlOfwq1tdwJy0D8RDzHg=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "8 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "36 Min."
+    }
+   ],
+   "rating": 4.5,
+   "reviews": 466,
+   "gps_coordinates": {
+    "latitude": 39.3612542,
+    "longitude": 3.2104637
+   }
+  },
+  {
+   "category": "Mediterranes Restaurant",
+   "name": "Restaurant Norai",
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdHhRQfSDnO1ZmII8fJaVAH3emZvt5F3aTcrNirr3LTJwWQKwvHZYa0TStI_0Ft_K324cRf3Yy5DftI_noIlygvQ1KwYjt-o1LwWRjaK3i23XF8nRD9p81NBb1TpKOGOwTVpZDBwA=k-no",
+   "transportations": [
+    {
+     "type": "Taxi",
+     "duration": "4 Min."
+    },
+    {
+     "type": "Walking",
+     "duration": "8 Min."
+    },
+    {
+     "type": "Public transport",
+     "duration": "35 Min."
+    }
+   ],
+   "rating": 4.4,
+   "reviews": 668,
+   "gps_coordinates": {
+    "latitude": 39.3617852,
+    "longitude": 3.2105156999999998
+   }
+  }
+ ],
+ "hotel_class": "5-Sterne-Hotel",
+ "extracted_hotel_class": 5,
+ "images": [
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLenVXF0zAQLSPGXRgeMaroqyg8UzpT-Zl__E1c-7-qSCF0u4ESMjoNvG9BVvoHOO2UqfbYeowhplojTlsozxzqcftAFdlg-BMbmMFzIkOEr3MnsJ3ibj9lLpnnCNMqhVIDCNz0l=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLenVXF0zAQLSPGXRgeMaroqyg8UzpT-Zl__E1c-7-qSCF0u4ESMjoNvG9BVvoHOO2UqfbYeowhplojTlsozxzqcftAFdlg-BMbmMFzIkOEr3MnsJ3ibj9lLpnnCNMqhVIDCNz0l=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLfrhJFuX4BLGegteZoXGF8kfDojOZ2tf7NuDLjDCWl_Laylx7uwO2uZQRjvSclMTzbo0LLp5TcOvtNbm3WGqD99RnhD0M9YS-qXPS2V8LuSN44Z-OaknAsXo_zv_NgUoUyVnyhYvTXb14c=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLfrhJFuX4BLGegteZoXGF8kfDojOZ2tf7NuDLjDCWl_Laylx7uwO2uZQRjvSclMTzbo0LLp5TcOvtNbm3WGqD99RnhD0M9YS-qXPS2V8LuSN44Z-OaknAsXo_zv_NgUoUyVnyhYvTXb14c=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdA0pWrXYPZw3MSk28XfeNPvaW1c7nYDcNRutY-w0t6zOpXB59IaDk7X4qr9wbtiIzO66KaUqnqrt3X6vrSSdvikrBXDXFEEc_4QDJnSJ0-8iO-j8wdNTLnYGkfArtCBsNuQn-r=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLdA0pWrXYPZw3MSk28XfeNPvaW1c7nYDcNRutY-w0t6zOpXB59IaDk7X4qr9wbtiIzO66KaUqnqrt3X6vrSSdvikrBXDXFEEc_4QDJnSJ0-8iO-j8wdNTLnYGkfArtCBsNuQn-r=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdgbbmv5j3GSYm3LYvS5gIOB6o7w2m9KL0FvqjXem2DzeySOf9Zm0sAZ4YszWLa6ao0yEwtvs3vGHVc_iOBOL6EBAXLNLw5yf6ZdblT0nLmXu4CodoxqQGjYaP18Lfqp02X5zGo=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLdgbbmv5j3GSYm3LYvS5gIOB6o7w2m9KL0FvqjXem2DzeySOf9Zm0sAZ4YszWLa6ao0yEwtvs3vGHVc_iOBOL6EBAXLNLw5yf6ZdblT0nLmXu4CodoxqQGjYaP18Lfqp02X5zGo=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdjzVMceBPyX4nazRf4dirmub-c8S4lqX8X8tx_B1NwzNLS6gr5oCcn5efyM0BOdGhnKZId-FhyfJhglwT5Fx1dsyUo7Kf-qSJ1AFSg6XgZRaimOvejUN7ROrP8YI7ppXZ3P7hr=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLdjzVMceBPyX4nazRf4dirmub-c8S4lqX8X8tx_B1NwzNLS6gr5oCcn5efyM0BOdGhnKZId-FhyfJhglwT5Fx1dsyUo7Kf-qSJ1AFSg6XgZRaimOvejUN7ROrP8YI7ppXZ3P7hr=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW1aVLJNovJqjLSGyY57RDT_sK5LqmUyh8p27WlBcoq2BZMXP8BQAKr8bJ6Xfu21zJ66E9llGZeZ7D-NwMr-kN10sTnhXVJnkaZEtQnucim8lg1HRq_bInm_VcFzR7kkC-ak9mPQlRAeTEmvZN5YON0BRhEKo5U6oGFEhD5IR-fXWpui1Bkrnb_3=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://photos.hotelbeds.com/giata/original/06/066699/066699a_hb_p_032.jpg"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-proxy/AIM7gW3XpeR-jEPT3bQ7R4_YN0vpG0qH1vYZIx2hfeTUCQyxVhp8OOnpYNDeYXl98Ipl-WjF11PzFYzjEjItRYKgl0264eZJSfGxMAgiqfd5O7Diotysk8d7Mc5gJeMm0JJRWtlgd_GFU5e4O3q5hRbHlsD37OVokJy4-oht42_uFihfzqxm9iPftGrr=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://d2hyz2bfif3cr8.cloudfront.net/imageRepo/2/0/211/450/379/7Sf2PCOgek2ZoqwPXYY1lg_DELUXE1_O.jpg"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLdiBrfCrLnCwTc14BPlGzZljiC1COUGB71snYJWWd44q0PgqmNoSIOB6KTcZkhuJBu32uSXzhaXHsrjfrk9AsWPtkR4XpO4NmGiZzb8lTP7e7lUsFJGtD97WBAl9PTl21XgPMGO=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLdiBrfCrLnCwTc14BPlGzZljiC1COUGB71snYJWWd44q0PgqmNoSIOB6KTcZkhuJBu32uSXzhaXHsrjfrk9AsWPtkR4XpO4NmGiZzb8lTP7e7lUsFJGtD97WBAl9PTl21XgPMGO=s10000"
+  },
+  {
+   "thumbnail": "https://lh3.googleusercontent.com/grass-cs/AABkmLcExOP3vw9jOr5MuBEhPToJqSksMbjGkt-EAW_tQj_5raD2RdhjWW0j7vvk2zBwOSeTLdarNHEIsatxjZHk2ydvLh4sr5popjnkt5Ba6Ak6vvR7fpXMl-hbDMw2rdU9VPfH-7d7=s287-w287-h192-n-k-no-v1",
+   "original_image": "https://lh3.googleusercontent.com/grass-cs/AABkmLcExOP3vw9jOr5MuBEhPToJqSksMbjGkt-EAW_tQj_5raD2RdhjWW0j7vvk2zBwOSeTLdarNHEIsatxjZHk2ydvLh4sr5popjnkt5Ba6Ak6vvR7fpXMl-hbDMw2rdU9VPfH-7d7=s10000"
+  }
+ ],
+ "overall_rating": 4.4,
+ "reviews": 538,
+ "ratings": [
+  {
+   "stars": 5,
+   "count": 425
+  },
+  {
+   "stars": 4,
+   "count": 31
+  },
+  {
+   "stars": 3,
+   "count": 19
+  },
+  {
+   "stars": 2,
+   "count": 19
+  },
+  {
+   "stars": 1,
+   "count": 44
+  }
+ ],
+ "location_rating": 4.1,
+ "reviews_breakdown": [
+  {
+   "name": "Service",
+   "description": "Service",
+   "total_mentioned": 77,
+   "positive": 62,
+   "negative": 12,
+   "neutral": 3,
+   "category_token": "DZ7RYHica1yRnFiSmp5fVDl5eXBqUVlmciojjAEAtX8MDA",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=DZ7RYHica1yRnFiSmp5fVDl5eXBqUVlmciojjAEAtX8MDA&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Dining",
+   "description": "Food and Beverage",
+   "total_mentioned": 46,
+   "positive": 33,
+   "negative": 9,
+   "neutral": 4,
+   "category_token": "2aMhPHica1yRnFiSmp5fVDl5o1t-fopCYl6KglNqWWpRYnoq4zKXzLzMvHQAKAwO6A",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=2aMhPHica1yRnFiSmp5fVDl5o1t-fopCYl6KglNqWWpRYnoq4zKXzLzMvHQAKAwO6A&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Familienfreundlich",
+   "description": "Family friendly",
+   "total_mentioned": 26,
+   "positive": 17,
+   "negative": 3,
+   "neutral": 6,
+   "category_token": "WMxrXnica1yRnFiSmp5fVDl5vVtibmZOpUJaUWZqXkpOJeMmsACQk1aUWgoUyUzOAADjSBOl",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=WMxrXnica1yRnFiSmp5fVDl5vVtibmZOpUJaUWZqXkpOJeMmsACQk1aUWgoUyUzOAADjSBOl&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Nachtleben",
+   "description": "Nightlife",
+   "total_mentioned": 16,
+   "positive": 10,
+   "negative": 5,
+   "neutral": 1,
+   "category_token": "DGRNmXica1yRnFiSmp5fVDl5pV9mekZJTmZaKuMqv8RkIDM1KTUPAPcJDf0",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=DGRNmXica1yRnFiSmp5fVDl5pV9mekZJTmZaKuMqv8RkIDM1KTUPAPcJDf0&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Natur",
+   "description": "Nature and outdoor activities",
+   "total_mentioned": 25,
+   "positive": 20,
+   "negative": 3,
+   "neutral": 2,
+   "category_token": "6_TcoXica1yRnFiSmp5fVDl5r19iSWlRqkJiXopCfmlJSn5-kUJicklmWWZJZmox41KwNAD0HxPL",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=6_TcoXica1yRnFiSmp5fVDl5r19iSWlRqkJiXopCfmlJSn5-kUJicklmWWZJZmox41KwNAD0HxPL&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Gebäude Und Außenanlagen",
+   "description": "Property",
+   "total_mentioned": 54,
+   "positive": 43,
+   "negative": 6,
+   "neutral": 5,
+   "category_token": "x4UB4nica1yRnFiSmp5fVDl5RUBRfkFqUUkl4y731KTDS0pTUhVC81IUHEsPz0_NS8zLSUxPzQMACGEUvg",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=x4UB4nica1yRnFiSmp5fVDl5RUBRfkFqUUkl4y731KTDS0pTUhVC81IUHEsPz0_NS8zLSUxPzQMACGEUvg&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Ort",
+   "description": "Location",
+   "total_mentioned": 22,
+   "positive": 19,
+   "negative": 1,
+   "neutral": 2,
+   "category_token": "zWv_rXica1yRnFiSmp5fVDl5hU8-kJ2Zn8e42L-oBACSYQrV",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=zWv_rXica1yRnFiSmp5fVDl5hU8-kJ2Zn8e42L-oBACSYQrV&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Bar",
+   "description": "Bar or lounge",
+   "total_mentioned": 22,
+   "positive": 17,
+   "negative": 3,
+   "neutral": 2,
+   "category_token": "qI-Rpnica1yRnFiSmp5fVDl5rVNikUJ-kUJOfmleeirjYiAXAMhXDEE",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=qI-Rpnica1yRnFiSmp5fVDl5rVNikUJ-kUJOfmleeirjYiAXAMhXDEE&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Wellness",
+   "description": "Wellness",
+   "total_mentioned": 9,
+   "positive": 8,
+   "negative": 1,
+   "neutral": 0,
+   "category_token": "7tfjx3ica1yRnFiSmp5fVDl5RXhqTk5eanExA5wFAM_uDQU",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=7tfjx3ica1yRnFiSmp5fVDl5RXhqTk5eanExA5wFAM_uDQU&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Frühstück",
+   "description": "Breakfast",
+   "total_mentioned": 17,
+   "positive": 15,
+   "negative": 1,
+   "neutral": 1,
+   "category_token": "0t2w3Xica1yRnFiSmp5fVDl5pVNRamJ2WmJxCeNqt6LDezKKSw7vSc4GAA2HD9Y",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=0t2w3Xica1yRnFiSmp5fVDl5pVNRamJ2WmJxCeNqt6LDezKKSw7vSc4GAA2HD9Y&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Spabereich",
+   "description": "Spa",
+   "total_mentioned": 9,
+   "positive": 8,
+   "negative": 1,
+   "neutral": 0,
+   "category_token": "8BRmQ3ica1yRnFiSmp5fVDl5cXBBIsMqIJGUWpSamZwBAKdeC4I",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=8BRmQ3ica1yRnFiSmp5fVDl5cXBBIsMqIJGUWpSamZwBAKdeC4I&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Fitness",
+   "description": "Fitness",
+   "total_mentioned": 29,
+   "positive": 22,
+   "negative": 4,
+   "neutral": 3,
+   "category_token": "PXioD3ica1yRnFiSmp5fVDl5uVtmSV5qcTEjjAEAtXQMIg",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=PXioD3ica1yRnFiSmp5fVDl5uVtmSV5qcTEjjAEAtXQMIg&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Raum",
+   "description": "Room amenities",
+   "total_mentioned": 22,
+   "positive": 18,
+   "negative": 4,
+   "neutral": 0,
+   "category_token": "7Bky1Hica1yRnFiSmp5fVDl5XVB-fq5CYm5qXmZJZmox45KgxNJcAOftDX8",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=7Bky1Hica1yRnFiSmp5fVDl5XVB-fq5CYm5qXmZJZmox45KgxNJcAOftDX8&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Bad",
+   "description": "Bathroom and toiletries",
+   "total_mentioned": 7,
+   "positive": 1,
+   "negative": 5,
+   "neutral": 1,
+   "category_token": "Rv6T1Xica1yRnFiSmp5fVDl5u1NiSUZRfn6uQmJeikJJfmZOaklRZmoxw2KnxBQAYZkQbw",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=Rv6T1Xica1yRnFiSmp5fVDl5u1NiSUZRfn6uQmJeikJJfmZOaklRZmoxw2KnxBQAYZkQbw&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Sauberkeit",
+   "description": "Cleanliness",
+   "total_mentioned": 11,
+   "positive": 6,
+   "negative": 5,
+   "neutral": 0,
+   "category_token": "Xnu5_Xica1yRnFiSmp5fVDl5tXNOamJeTmZeanExw6rgxNKk1KLs1MwSABVBDvA",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=Xnu5_Xica1yRnFiSmp5fVDl5tXNOamJeTmZeanExw6rgxNKk1KLs1MwSABVBDvA&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Schlafqualität",
+   "description": "Sleep",
+   "total_mentioned": 9,
+   "positive": 3,
+   "negative": 5,
+   "neutral": 1,
+   "category_token": "WQqolXica1yRnFiSmp5fVDl5aXBOamoBw_rg5IycxLTC0sSczJLDS0oABsUPJA",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=WQqolXica1yRnFiSmp5fVDl5aXBOamoBw_rg5IycxLTC0sSczJLDS0oABsUPJA&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Fitnessstudio",
+   "description": "Gym",
+   "total_mentioned": 8,
+   "positive": 6,
+   "negative": 0,
+   "neutral": 2,
+   "category_token": "1F2uD3ica1yRnFiSmp5fVDl5sXtlLsNat8ySvNTi4uKS0pTMfADOdw0M",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=1F2uD3ica1yRnFiSmp5fVDl5sXtlLsNat8ySvNTi4uKS0pTMfADOdw0M&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Paare",
+   "description": "Couple friendly",
+   "total_mentioned": 5,
+   "positive": 4,
+   "negative": 1,
+   "neutral": 0,
+   "category_token": "71JO5Hica1yRnFiSmp5fVDl5vXN-aUFOqkJaUWZqXkpOJcPSgMTEolQABHsOPQ",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=71JO5Hica1yRnFiSmp5fVDl5vXN-aUFOqkJaUWZqXkpOJcPSgMTEolQABHsOPQ&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Ambiente",
+   "description": "Atmosphere",
+   "total_mentioned": 13,
+   "positive": 13,
+   "negative": 0,
+   "neutral": 0,
+   "category_token": "SjdJ73ica1yRnFiSmp5fVDl5lWNJbn5xQUZqUSrjCsfcpMzUvJJUAOpoDas",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=SjdJ73ica1yRnFiSmp5fVDl5lWNJbn5xQUZqUSrjCsfcpMzUvJJUAOpoDas&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  },
+  {
+   "name": "Pool",
+   "description": "Pool",
+   "total_mentioned": 13,
+   "positive": 11,
+   "negative": 2,
+   "neutral": 0,
+   "category_token": "ysOZZnica1yRnFiSmp5fVDl5SUB-fg4jmAQAcoYJmA",
+   "serpapi_link": "https://serpapi.com/search.json?category_token=ysOZZnica1yRnFiSmp5fVDl5SUB-fg4jmAQAcoYJmA&engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+  }
+ ],
+ "amenities": [
+  "Wi-Fi",
+  "Wi-Fi in public areas",
+  "Restaurant",
+  "Bar",
+  "Table service",
+  "Buffet dinner",
+  "Room service",
+  "Breakfast",
+  "Breakfast buffet",
+  "All inclusive available",
+  "Front desk",
+  "Full-service laundry",
+  "Beach access",
+  "Bicycle rental",
+  "Outdoor pool",
+  "Adult-only pool",
+  "Lifeguard",
+  "Kid-friendly",
+  "Babysitting",
+  "Activities for kids",
+  "Kids' club",
+  "Fitness center",
+  "Massage",
+  "Sauna",
+  "Spa",
+  "Hair salon",
+  "Doctor on call",
+  "Parking",
+  "Airport shuttle",
+  "Accessible",
+  "Air conditioning",
+  "Private bathroom",
+  "Bathtub in some rooms",
+  "Shower"
+ ],
+ "excluded_amenities": [
+  "Hot tub"
+ ],
+ "amenities_detailed": {
+  "groups": [
+   {
+    "title": "Internet",
+    "list": [
+     {
+      "title": "Wi-Fi",
+      "label": "free",
+      "available": true
+     },
+     {
+      "title": "Wi-Fi in public areas",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Food & drink",
+    "list": [
+     {
+      "title": "Restaurant",
+      "available": true
+     },
+     {
+      "title": "Bar",
+      "available": true
+     },
+     {
+      "title": "Table service",
+      "available": true
+     },
+     {
+      "title": "Buffet dinner",
+      "available": true
+     },
+     {
+      "title": "Room service",
+      "label": "24 hour",
+      "available": true
+     },
+     {
+      "title": "Breakfast",
+      "label": "free",
+      "available": true
+     },
+     {
+      "title": "Breakfast buffet",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Policies & payments",
+    "list": [
+     {
+      "title": "All inclusive available",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Services",
+    "list": [
+     {
+      "title": "Front desk",
+      "label": "24 hour",
+      "available": true
+     },
+     {
+      "title": "Full-service laundry",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Activities",
+    "list": [
+     {
+      "title": "Beach access",
+      "available": true
+     },
+     {
+      "title": "Bicycle rental",
+      "label": "free",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Pools",
+    "list": [
+     {
+      "title": "Outdoor pool",
+      "available": true
+     },
+     {
+      "title": "Adult-only pool",
+      "available": true
+     },
+     {
+      "title": "Lifeguard",
+      "available": true
+     },
+     {
+      "title": "Hot tub",
+      "available": false
+     }
+    ]
+   },
+   {
+    "title": "Children",
+    "list": [
+     {
+      "title": "Kid-friendly",
+      "available": true
+     },
+     {
+      "title": "Babysitting",
+      "available": true
+     },
+     {
+      "title": "Activities for kids",
+      "available": true
+     },
+     {
+      "title": "Kids' club",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Wellness",
+    "list": [
+     {
+      "title": "Fitness center",
+      "label": "free",
+      "available": true
+     },
+     {
+      "title": "Massage",
+      "available": true
+     },
+     {
+      "title": "Sauna",
+      "available": true
+     },
+     {
+      "title": "Spa",
+      "available": true
+     },
+     {
+      "title": "Hair salon",
+      "available": true
+     },
+     {
+      "title": "Doctor on call",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Parking & transportation",
+    "list": [
+     {
+      "title": "Parking",
+      "label": "free",
+      "available": true
+     },
+     {
+      "title": "Airport shuttle",
+      "label": "extra charge",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Accessibility",
+    "list": [
+     {
+      "title": "Accessible",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Rooms",
+    "list": [
+     {
+      "title": "Air conditioning",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Bathrooms",
+    "list": [
+     {
+      "title": "Private bathroom",
+      "available": true
+     },
+     {
+      "title": "Bathtub in some rooms",
+      "available": true
+     },
+     {
+      "title": "Shower",
+      "available": true
+     }
+    ]
+   }
+  ],
+  "popular": [
+   {
+    "title": "Pool",
+    "available": true
+   },
+   {
+    "title": "Spa",
+    "available": true
+   },
+   {
+    "title": "Parking",
+    "label": "free",
+    "available": true
+   },
+   {
+    "title": "Breakfast",
+    "label": "free",
+    "available": true
+   }
+  ]
+ },
+ "health_and_safety": {
+  "groups": [
+   {
+    "title": "Enhanced cleaning",
+    "list": [
+     {
+      "title": "Enhanced cleaning of guest rooms",
+      "available": true
+     },
+     {
+      "title": "Employees trained in COVID-19 cleaning procedures",
+      "available": true
+     },
+     {
+      "title": "Enhanced cleaning of common areas",
+      "available": true
+     },
+     {
+      "title": "Employees trained in thorough hand-washing",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Personal protection",
+    "list": [
+     {
+      "title": "Hand-sanitizer and/or sanitizing wipes in common areas",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Minimized contact",
+    "list": [
+     {
+      "title": "Plastic key cards are disinfected or discarded",
+      "available": true
+     }
+    ]
+   }
+  ]
+ },
+ "sustainability": {
+  "groups": [
+   {
+    "title": "Energy efficiency",
+    "list": [
+     {
+      "title": "Energy conservation program",
+      "available": true
+     },
+     {
+      "title": "Energy use audited by an independent organization",
+      "available": true
+     },
+     {
+      "title": "Energy from carbon-free sources",
+      "available": true
+     },
+     {
+      "title": "Energy-efficient heating and cooling systems",
+      "available": true
+     },
+     {
+      "title": "Energy-efficient lighting",
+      "available": true
+     },
+     {
+      "title": "Energy-saving thermostats",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Water conservation",
+    "list": [
+     {
+      "title": "Water use audited by an independent organization",
+      "available": true
+     },
+     {
+      "title": "Water-efficient faucets, toilets, and showers",
+      "available": true
+     },
+     {
+      "title": "Towel and linen reuse program",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Waste reduction",
+    "list": [
+     {
+      "title": "Recycling program",
+      "available": true
+     },
+     {
+      "title": "Food waste reduction program",
+      "available": true
+     },
+     {
+      "title": "Donates and composts excess food",
+      "available": true
+     },
+     {
+      "title": "Soap and toiletry donation program",
+      "available": true
+     },
+     {
+      "title": "Safely handles hazardous substances",
+      "available": true
+     },
+     {
+      "title": "Safely disposes of electronics, batteries, and lightbulbs",
+      "available": true
+     },
+     {
+      "title": "Refillable toiletry containers",
+      "available": true
+     },
+     {
+      "title": "No single-use plastic water bottles or straws",
+      "available": true
+     }
+    ]
+   },
+   {
+    "title": "Sustainable sourcing",
+    "list": [
+     {
+      "title": "Responsible purchasing policy",
+      "available": true
+     },
+     {
+      "title": "Organic food and beverages",
+      "available": true
+     },
+     {
+      "title": "Locally sourced food and beverages",
+      "available": true
+     },
+     {
+      "title": "Responsibly sourced seafood",
+      "available": true
+     },
+     {
+      "title": "Organic cage-free eggs",
+      "available": true
+     },
+     {
+      "title": "Vegetarian and vegan meals",
+      "available": true
+     },
+     {
+      "title": "Eco-friendly toiletries",
+      "available": true
+     }
+    ]
+   }
+  ]
+ },
+ "other_reviews": [
+  {
+   "source": "Tripadvisor",
+   "source_icon": "https://www.gstatic.com/travel-hotels/branding/icon_100532569.png",
+   "source_rating": {
+    "score": 4.900000095367432,
+    "max_score": 5
+   },
+   "reviews": 1499,
+   "user_review": {
+    "username": "ennom961",
+    "date": "vor 4 Wochen",
+    "rating": {
+     "score": 5,
+     "max_score": 5
+    },
+    "comment": "Es war ein wunderschöner Urlaub. Wir möchten sehr gern wiederkommen. Es gab viele Highlights, eines war der erste Schwimmkurs unseres 4 jährigen Sohnes Mateo bei der tollen Trainerin Alexandra.",
+    "link": "https://www.tripadvisor.de/Hotel_Review-g1010182-d25432549-r1080726126?m=68573&staydates=2026_11_15_2026_11_16&uguests=1_2_0&supdv=desktop&supuc=GB&supul=de"
+   },
+   "source_number": 100532569,
+   "serpapi_link": "https://serpapi.com/search.json?engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE&source_number=100532569"
+  },
+  {
+   "source": "Tripadvisor",
+   "source_icon": "https://www.gstatic.com/travel-hotels/branding/icon_100532569.png",
+   "source_rating": {
+    "score": 4.900000095367432,
+    "max_score": 5
+   },
+   "reviews": 1475,
+   "user_review": {
+    "username": "SebiEast",
+    "date": "vor einem Monat",
+    "rating": {
+     "score": 5,
+     "max_score": 5
+    },
+    "comment": "Wir haben mittlerweile mehrere Ikos Resorts besucht und waren nun zum ersten Mal im Ikos Porto Petro. Nach einem etwas holprigen Start aufgrund einer fast dreistündigen Flugverspätung hatten wir einen wirklich wunderschönen Urlaub und können das Resort absolut empfehlen.||Besonders beeindruckt haben uns die modernen und außergewöhnlich sauberen Zimmer sowie die sehr gepflegte gesamte Anlage. Ein großes Kompliment an das Housekeeping! Obwohl das Hotel während unseres Aufenthalts ausgebucht war, haben wir dies kaum wahrgenommen. Die Gäste verteilen sich sehr gut über die Anlage und selbst zu den Hauptzeiten gab es beispielsweise keine größeren Warteschlangen vor den Restaurants.||Das größte Lob verdient jedoch das Personal. Trotz Hochsaison und teilweise sehr hoher Temperaturen waren die Mitarbeiter jederzeit unglaublich freundlich, professionell und aufmerksam. Besonders schön finden wir das internationale Team und gleichzeitig die typische griechische Herzlichkeit, die wir seit Jahren mit Ikos verbinden.||Ganz besonders möchten wir Asterios vom Beach Club erwähnen. Er war nicht nur zu uns, sondern zu allen Gästen ausgesprochen aufmerksam und herzlich. Als wir beiläufig erwähnten, dass unsere Kinder alleine auf dem Zimmer Room Service bestellt hatten und wir nicht wussten, ob alles geklappt hatte, rief er von sich aus dort an, um sicherzugehen, dass alles in Ordnung war. Genau solche kleinen Gesten machen für uns echte Gastfreundschaft aus.||Ein großes Dankeschön geht auch an Michelle von der Deluxe Collection. Sie war hervorragend erreichbar, kümmerte sich zuverlässig um unsere Wünsche und gab uns jederzeit das Gefühl, dass sie gerne für uns da ist.||Auch gastronomisch gehört Porto Petro für uns zu den besten Ikos Resorts, die wir bisher besucht haben. Vom Frühstück über Mittag- und Abendessen bis zum Room Service war die Qualität hervorragend, frisch und liebevoll zubereitet. Unsere Kinder haben insbesondere den Room Service geliebt.||Als wir vor rund sieben Jahren zum ersten Mal Ikos kennengelernt haben, waren das hervorragende Essen und die besondere Gastfreundschaft entscheidende Gründe dafür, weitere Ikos Resorts zu besuchen. In Porto Petro hatten wir genau dieses Gefühl wieder.||Vielen Dank an Dirk Smeets und das gesamte Team für einen wunderschönen Aufenthalt. Das beste Kompliment, das wir wohl machen können: Wir überlegen bereits, im Oktober 2027 wiederzukommen.||Familie Simon aus Deutschland",
+    "link": "https://www.tripadvisor.de/Hotel_Review-g1010182-d25432549-r1076593451?m=68573&staydates=2026_11_15_2026_11_16&uguests=1_2_0&supdv=desktop&supuc=GB&supul=de"
+   },
+   "source_number": 100532569,
+   "serpapi_link": "https://serpapi.com/search.json?engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE&source_number=100532569"
+  }
+ ],
+ "serpapi_google_hotels_reviews_link": "https://serpapi.com/search.json?engine=google_hotels_reviews&hl=en&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE",
+ "serpapi_google_hotels_photos_link": "https://serpapi.com/search.json?engine=google_hotels_photos&property_token=ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE"
+}
