@@ -6,9 +6,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from ..models import BookedRule, HotelRate, HotelWatch, PointsRule
-from ..report import money
-
-MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+from ..report import MONTHS, money
 
 
 @dataclass

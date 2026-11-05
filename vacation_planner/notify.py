@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 import smtplib
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from email.message import EmailMessage
 from html import escape
 from typing import TYPE_CHECKING, Callable
@@ -20,7 +20,8 @@ from .calendar import Window
 from .config import Config
 from .explain import explain
 from .models import Cabin, Destination, Provider, Slot
-from .report import NewDeal, ReportData, RouteSummary, build_report, change, money, new_deal
+from .report import MONTHS, NewDeal, ReportData, RouteSummary, build_report, change, money, new_deal
+from .report import date_range as _dates, day_label as _day  # noqa: F401  (_day: old name kept)
 from .storage import SearchRow, Storage
 
 if TYPE_CHECKING:   # only for the annotation; the provider layer is heavy to import
@@ -28,7 +29,6 @@ if TYPE_CHECKING:   # only for the annotation; the provider layer is heavy to im
 
 log = logging.getLogger(__name__)
 
-MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 MONTHS_FULL = ("January", "February", "March", "April", "May", "June", "July", "August",
                "September", "October", "November", "December")
 #: Airport codes worth spelling out in a sentence; anything else stays a code.
@@ -42,17 +42,6 @@ TEST_DATA_WARNING = "TEST DATA — fake provider"
 
 
 # ---- small formatting helpers ----
-
-def _day(d: date) -> str:
-    return f"{d.day} {MONTHS[d.month - 1]}"
-
-
-def _dates(start: date, end: date) -> str:
-    """'19–29 Dec' inside one month, '19 Dec – 3 Jan' across two."""
-    if (start.year, start.month) == (end.year, end.month):
-        return f"{start.day}–{end.day} {MONTHS[end.month - 1]}"
-    return f"{_day(start)} – {_day(end)}"
-
 
 def _stops(n: int) -> str:
     return "nonstop" if n == 0 else f"{n} stop" if n == 1 else f"{n} stops"

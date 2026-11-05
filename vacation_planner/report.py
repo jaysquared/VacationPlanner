@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from statistics import median as _median
 
@@ -88,6 +88,20 @@ def new_deal(storage: Storage, config: Config, row: DealRow) -> NewDeal:
 
 def route_page_name(slot_id: str, origin: str, destination: str, seat: SeatClass) -> str:
     return f"routes/{slot_id}-{origin}-{destination}-{seat.value}.html"
+
+
+MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+
+def day_label(d: date) -> str:
+    return f"{d.day} {MONTHS[d.month - 1]}"
+
+
+def date_range(start: date, end: date) -> str:
+    """'19–29 Dec' inside one month, '19 Dec – 3 Jan' across two."""
+    if (start.year, start.month) == (end.year, end.month):
+        return f"{start.day}–{end.day} {MONTHS[end.month - 1]}"
+    return f"{day_label(start)} – {day_label(end)}"
 
 
 def money(v: float) -> str:
