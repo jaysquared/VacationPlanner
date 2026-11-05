@@ -98,11 +98,29 @@ def test_no_standard_reward_alerts_once(config_dir: Path):
     cfg = load_config(config_dir, env={})
     db = Storage(":memory:")
     cl = clients()
-    del cl[HotelSource.HILTON].prices[("mango-herbst-2027", "award")]
+    cl[HotelSource.HILTON].prices[("mango-herbst-2027", "award")] = [
+        HotelRate("direct", "points", points=900000, room="K", award_type="premium")]
     check_hotels(cfg, db, cl, TODAY, NOW)
     later = NOW + timedelta(days=7)
     check_hotels(cfg, db, cl, later.date(), later)
     assert [a.reason for a in db.pending_hotel_alerts()] == ["no_standard_reward"]
+
+
+def test_award_check_failing_does_not_falsely_alert(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    check_hotels(cfg, db, clients(failing=("award",)), TODAY, NOW)
+    assert db.pending_hotel_alerts() == []
+
+
+def test_no_award_rows_at_all_does_not_falsely_alert(config_dir: Path):
+    cfg = load_config(config_dir, env={})
+    db = Storage(":memory:")
+    cl = clients()
+    del cl[HotelSource.HILTON].prices[("waldorf-herbst-2027", "award")]
+    del cl[HotelSource.HILTON].prices[("mango-herbst-2027", "award")]
+    check_hotels(cfg, db, cl, TODAY, NOW)
+    assert db.pending_hotel_alerts() == []
 
 
 def test_a_failing_source_is_stored_as_error_and_the_rest_still_runs(config_dir: Path):
@@ -136,6 +154,8 @@ def test_without_apify_token_booking_and_hilton_are_skipped_and_google_runs(conf
     assert s.skipped == 7 and s.no_rates == 3
     skipped = [c for c in db.hotel_checks("ikos-pfingsten-2027", NOW.isoformat()) if c.status == "skipped"]
     assert [(c.source, c.error) for c in skipped] == [(HotelSource.BOOKING, "APIFY_TOKEN not set")]
+    assert s.alerts == 0
+    assert db.pending_hotel_alerts() == []
 
 
 def test_with_both_keys_all_three_clients_are_built(config_dir: Path):

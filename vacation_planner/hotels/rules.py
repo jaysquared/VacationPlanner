@@ -53,6 +53,8 @@ def evaluate_points(watch: HotelWatch, rates: list[HotelRate], point_value: floa
     assert isinstance(rule, PointsRule)
     standard = [r for r in rates if r.kind == "points" and r.award_type == "standard" and r.points]
     if not standard:
+        if not any(r.kind == "points" for r in rates):
+            return Verdict(watch.id, "no_rates", "No award availability this week")
         return Verdict(watch.id, "alert",
                        f"Only Premium rewards this week — no Standard Room Reward for {rule.points_adults} adults",
                        "no_standard_reward")

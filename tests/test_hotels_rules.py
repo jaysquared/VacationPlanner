@@ -73,6 +73,12 @@ def test_points_without_any_cash_still_reports_the_points_cost():
     assert (v.state, v.threshold) == ("no_rates", 4090)
 
 
+def test_no_points_rows_at_all_is_no_rates_not_an_alert():
+    v = evaluate_points(WALDORF, [cash(7402.5, channel="direct")], 0.0044)
+    assert (v.state, v.reason) == ("no_rates", None)
+    assert v.headline == "No award availability this week"
+
+
 def test_a_watch_past_until_has_ended():
     v = evaluate(IKOS, [cash(1000)], None, date(2027, 4, 8))
     assert (v.state, v.headline) == ("ended", "Watch ended on 7 Apr 2027")
