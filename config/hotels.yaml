@@ -29,7 +29,7 @@ hotel_watches:
       google: ChYIn-qQ47-Uo-UHGgovbS8wZ2J3N3NiEAE   # 9 nights: searched as 11.-16. + 16.-20.10.
     rule:
       type: booked
-      paid_total: 5535             # booked 2026-11-24, ~615 EUR/night, cancellable
+      paid_total: 5535             # booked on TUI 2026-11-24, ~615 EUR/night, cancellable
       min_saving_ratio: 0.05
       until: 2027-10-10            # cancellation deadline not yet known
 
@@ -37,14 +37,14 @@ hotel_watches:
     name: Four Seasons Resort Mauritius at Anahita
     slot: herbst-2027
     check_in: 2027-10-11
-    check_out: 2027-10-20
+    check_out: 2027-10-15             # 4 nights Four Seasons, then 5 nights St. Regis
     sources:
       booking: https://www.booking.com/hotel/mu/four-seasons-resort-mauritius-at-anahita.html
       google: ChcI1YCH657GtL15GgsvZy8xdGo0X184dhAB
     adults_only: true              # with the son, Booking.com and Google return nothing; a child surcharge may come on top
     rule:
       type: target
-      max_total: 9000              # under 1,000 EUR/night for the family
+      max_total: 4000              # under 1,000 EUR/night
       until: 2027-10-10
 
 hilton:
