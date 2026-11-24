@@ -12,7 +12,7 @@ hotel_watches:
     rule:
       type: booked
       paid_total: 5640
-      min_saving_ratio: 0.10
+      min_saving_ratio: 0.05
       until: 2027-04-07            # free-cancellation deadline
 
   - id: waldorf-herbst-2027
