@@ -11,37 +11,35 @@ hotel_watches:
       google: ChkI2u_o2PSToOZmGg0vZy8xMXQwbTM2Y3piEAE
     rule:
       type: booked
-      paid_total: 5640
+      paid_total: 5300             # rebooked 2026-11-24 (was 5,640)
       min_saving_ratio: 0.05
       until: 2027-04-07            # free-cancellation deadline
 
-  - id: waldorf-herbst-2027
-    name: Waldorf Astoria Seychelles Platte Island
+  - id: st-regis-herbst-2027
+    name: The St. Regis Le Morne Resort, Mauritius
     slot: herbst-2027
-    check_in: 2027-10-10
-    check_out: 2027-10-15
+    check_in: 2027-10-11
+    check_out: 2027-10-20
+    room: ["Junior Suite mit Meerblick", "Ocean View Junior Suite", "Ocean Junior Suite", "Junior Suite Ocean"]
     sources:
-      hilton: SEZPIWA
-      google: ChkInpaOvMuKrLtZGg0vZy8xMWw3M3ZodDQ1EAE
+      booking: https://www.booking.com/hotel/mu/the-st-regis-mauritius-resort.html   # 9 nights: too long for Google Hotels
     rule:
-      type: points
-      points_adults: 2             # the award is booked for 2 adults
-      surcharge: 350               # cash upgrade for the son on site
-      until: 2027-10-09
+      type: booked
+      paid_total: 5535             # booked 2026-11-24, ~615 EUR/night, cancellable
+      min_saving_ratio: 0.05
+      until: 2027-10-10            # cancellation deadline not yet known
 
-  - id: mango-herbst-2027
-    name: Mango House Seychelles
+  - id: four-seasons-herbst-2027
+    name: Four Seasons Resort Mauritius at Anahita
     slot: herbst-2027
-    check_in: 2027-10-15
+    check_in: 2027-10-11
     check_out: 2027-10-20
     sources:
-      hilton: SEZITOL
-      google: ChoI4ML8m8ni8aHiARoNL2cvMTFsbDlfNnhrZBAB
+      booking: https://www.booking.com/hotel/mu/four-seasons-resort-mauritius-at-anahita.html
     rule:
-      type: points
-      points_adults: 2
-      surcharge: 0                 # no cost for the son
-      until: 2027-10-14
+      type: target
+      max_total: 9000              # under 1,000 EUR/night for the family
+      until: 2027-10-10
 
 hilton:
   point_value_eur: 0.0044

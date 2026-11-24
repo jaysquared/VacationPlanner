@@ -162,6 +162,14 @@ class PointsRule:
     until: date
 
 
+@dataclass(frozen=True)
+class TargetRule:
+    """A hotel the family would switch to: alert when a refundable rate for the stay is at most `max_total`."""
+
+    max_total: float
+    until: date
+
+
 @dataclass
 class HotelWatch:
     id: str
@@ -172,7 +180,7 @@ class HotelWatch:
     #: room-name substrings, any of which identifies the watched room; empty matches every room
     room: tuple[str, ...]
     sources: dict[HotelSource, str]
-    rule: BookedRule | PointsRule
+    rule: BookedRule | PointsRule | TargetRule
 
     @property
     def nights(self) -> int:

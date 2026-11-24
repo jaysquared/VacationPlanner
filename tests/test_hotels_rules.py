@@ -1,7 +1,7 @@
 from datetime import date
 
-from vacation_planner.hotels.rules import evaluate, evaluate_booked, evaluate_points
-from vacation_planner.models import BookedRule, HotelRate, HotelSource, HotelWatch, PointsRule
+from vacation_planner.hotels.rules import evaluate, evaluate_booked, evaluate_points, evaluate_target
+from vacation_planner.models import BookedRule, HotelRate, HotelSource, HotelWatch, PointsRule, TargetRule
 
 IKOS = HotelWatch("ikos-pfingsten-2027", "Ikos Porto Petro", "pfingsten-2027", date(2027, 5, 7), date(2027, 5, 14),
                   ("Junior Suite mit eigenem Garten",), {HotelSource.BOOKING: "u"},
@@ -91,3 +91,30 @@ def test_a_watch_past_until_has_ended():
     v = evaluate(IKOS, [cash(1000)], None, date(2027, 4, 8))
     assert (v.state, v.headline) == ("ended", "Watch ended on 7 Apr 2027")
     assert evaluate(IKOS, [cash(1000)], None, date(2027, 4, 7)).state == "alert"
+
+
+ANAHITA = HotelWatch("four-seasons-herbst-2027", "Four Seasons Resort Mauritius at Anahita", "herbst-2027",
+                     date(2027, 10, 11), date(2027, 10, 20), (), {HotelSource.BOOKING: "u"},
+                     TargetRule(9000, date(2027, 10, 10)))
+
+
+def test_target_alerts_at_exactly_the_target():
+    v = evaluate_target(ANAHITA, [cash(9000, room="Garden Pool Villa"), cash(9500, room="Beach Villa")])
+    assert (v.state, v.reason, v.value, v.threshold) == ("alert", "under_target", 9000, 9000)
+    assert v.headline == "Offer: Garden Pool Villa 9,000 € on booking (target ≤ 9,000 €)"
+
+
+def test_target_one_euro_above_is_fine():
+    v = evaluate_target(ANAHITA, [cash(9001, room="Garden Pool Villa")])
+    assert (v.state, v.value) == ("fine", 9001)
+    assert v.headline == "Cheapest Garden Pool Villa 9,001 € on booking (target ≤ 9,000 €)"
+
+
+def test_target_ignores_non_refundable_rates():
+    v = evaluate_target(ANAHITA, [cash(8000, room="Garden Pool Villa", refundable=False)])
+    assert v.state == "no_rates" and v.threshold == 9000
+
+
+def test_target_watch_is_dispatched_by_evaluate():
+    v = evaluate(ANAHITA, [cash(8500, room="Garden Pool Villa")], None, date(2026, 11, 24))
+    assert v.reason == "under_target"

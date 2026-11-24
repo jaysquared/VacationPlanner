@@ -196,10 +196,12 @@ and each origin keeps its own history page.
 `config/hotels.yaml` lists hotel stays the family has chosen. Every Monday run checks each one
 and the digest carries one verdict per hotel:
 
-- `booked` (Ikos Porto Petro): alerts when the same room type, refundable, costs at least
+- `booked` (Ikos Porto Petro, St. Regis Le Morne): alerts when the same room type, refundable, costs at least
   `min_saving_ratio` less than `paid_total` — rebook and cancel the old booking. Ends at `until`
   (the free-cancellation deadline).
-- `points` (Waldorf Astoria, Mango House): alerts when refundable cash for the whole family is
+- `target` (Four Seasons Anahita): alerts when a refundable rate (in `room`, if given) costs at most
+  `max_total` for the stay.
+- `points` (Hilton award stays): alerts when refundable cash for the whole family is
   cheaper than the Standard Room Reward for `points_adults` × `hilton.point_value_eur` + `surcharge`,
   or when no Standard Room Reward is offered.
 

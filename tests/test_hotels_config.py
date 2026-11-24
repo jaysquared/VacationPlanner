@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from vacation_planner.config import ConfigError, guests_on, load_config
-from vacation_planner.models import BookedRule, HotelSource, PointsRule, Travellers, Child
+from vacation_planner.models import BookedRule, HotelSource, PointsRule, TargetRule, Travellers, Child
 
 
 def test_loads_the_three_watches(config_dir: Path):
@@ -77,4 +77,25 @@ def test_duplicate_watch_ids_are_rejected(config_dir: Path):
     f = config_dir / "hotels.yaml"
     f.write_text(f.read_text().replace("id: mango-herbst-2027", "id: waldorf-herbst-2027", 1))
     with pytest.raises(ConfigError, match="hotels.yaml: duplicate watch id waldorf-herbst-2027"):
+        load_config(config_dir, env={})
+
+
+def test_a_target_watch_loads(config_dir: Path):
+    f = config_dir / "hotels.yaml"
+    f.write_text(f.read_text().replace(
+        "hotel_watches:\n",
+        "hotel_watches:\n"
+        "  - id: anahita\n    name: Four Seasons\n    slot: pfingsten-2027\n"
+        "    check_in: 2027-05-07\n    check_out: 2027-05-14\n"
+        "    sources: { booking: https://www.booking.com/hotel/mu/x.html }\n"
+        "    rule: { type: target, max_total: 9000, until: 2027-05-06 }\n", 1))
+    w = load_config(config_dir, env={}).hotels[0]
+    assert w.rule == TargetRule(9000, date(2027, 5, 6))
+
+
+def test_a_target_watch_needs_max_total(config_dir: Path):
+    f = config_dir / "hotels.yaml"
+    f.write_text(f.read_text().replace(
+        "      type: booked\n      paid_total: 5640\n", "      type: target\n", 1))
+    with pytest.raises(ConfigError, match="target rule needs max_total"):
         load_config(config_dir, env={})

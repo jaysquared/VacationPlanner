@@ -10,7 +10,7 @@ from pydantic import BaseModel, ValidationError, ValidationInfo, field_validator
 
 from .calendar import child_age_on
 from .models import (BookedRule, Cabin, Child, Destination, HotelSource, HotelWatch, Nights,
-                      PointsRule, Provider, Slot, Travellers)
+                      PointsRule, Provider, Slot, TargetRule, Travellers)
 
 
 class ConfigError(Exception):
@@ -60,12 +60,13 @@ class _Holidays(BaseModel):
 
 
 class _HotelRule(BaseModel):
-    type: Literal["booked", "points"]
+    type: Literal["booked", "points", "target"]
     until: date
     paid_total: float | None = None
     min_saving_ratio: float = 0.10
     points_adults: int = 2
     surcharge: float = 0
+    max_total: float | None = None
 
 
 class _HotelWatch(BaseModel):
@@ -336,7 +337,12 @@ def _hotel_watches(config_dir: Path, slot_ids: set[str]) -> tuple[list[HotelWatc
         if w.rule.type == "booked":
             if w.rule.paid_total is None:
                 raise ConfigError(f"{where}: booked rule needs paid_total")
-            rule: BookedRule | PointsRule = BookedRule(w.rule.paid_total, w.rule.min_saving_ratio, w.rule.until)
+            rule: BookedRule | PointsRule | TargetRule = BookedRule(w.rule.paid_total, w.rule.min_saving_ratio,
+                                                                    w.rule.until)
+        elif w.rule.type == "target":
+            if w.rule.max_total is None:
+                raise ConfigError(f"{where}: target rule needs max_total")
+            rule = TargetRule(w.rule.max_total, w.rule.until)
         else:
             if HotelSource.HILTON not in w.sources:
                 raise ConfigError(f"{where}: points rule needs a hilton source")

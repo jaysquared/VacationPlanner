@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Iterable
 
-from ..models import BookedRule, HotelRate, HotelWatch, PointsRule
+from ..models import BookedRule, HotelRate, HotelWatch, PointsRule, TargetRule
 from ..report import MONTHS, money
 
 
@@ -15,7 +15,7 @@ class Verdict:
     watch_id: str
     state: str                    # alert | fine | no_rates | ended
     headline: str
-    reason: str | None = None     # cheaper_room | cash_beats_points | no_standard_reward
+    reason: str | None = None     # cheaper_room | cash_beats_points | no_standard_reward | under_target
     value: float | None = None    # the cash price compared
     threshold: float | None = None
     best: HotelRate | None = None
@@ -52,6 +52,19 @@ def evaluate_booked(watch: HotelWatch, rates: list[HotelRate]) -> Verdict:
     return Verdict(watch.id, "fine", headline, None, best.total, threshold, best)
 
 
+def evaluate_target(watch: HotelWatch, rates: list[HotelRate]) -> Verdict:
+    rule = watch.rule
+    assert isinstance(rule, TargetRule)
+    refundable = [r for r in _refundable_cash(rates) if watch.matches_room(r.room)]
+    if not refundable:
+        return Verdict(watch.id, "no_rates", "No refundable rate this week", threshold=rule.max_total)
+    best = min(refundable, key=lambda r: r.total)
+    what = f"{best.room or 'room'} {money(best.total)} on {best.channel} (target ≤ {money(rule.max_total)})"
+    if best.total <= rule.max_total:
+        return Verdict(watch.id, "alert", f"Offer: {what}", "under_target", best.total, rule.max_total, best)
+    return Verdict(watch.id, "fine", f"Cheapest {what}", None, best.total, rule.max_total, best)
+
+
 def evaluate_points(watch: HotelWatch, rates: list[HotelRate], point_value: float) -> Verdict:
     rule = watch.rule
     assert isinstance(rule, PointsRule)
@@ -84,6 +97,8 @@ def evaluate(watch: HotelWatch, rates: list[HotelRate], point_value: float | Non
         return Verdict(watch.id, "ended", f"Watch ended on {u.day} {MONTHS[u.month - 1]} {u.year}")
     if isinstance(watch.rule, BookedRule):
         return evaluate_booked(watch, rates)
+    if isinstance(watch.rule, TargetRule):
+        return evaluate_target(watch, rates)
     assert point_value is not None, "config validation guarantees a point value for points watches"
     return evaluate_points(watch, rates, point_value)
 
