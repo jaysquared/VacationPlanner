@@ -6,7 +6,10 @@ is `no_rates`, never a price. Tested live 2026-11-03/05; the fixtures are those 
 
 from __future__ import annotations
 
+import math
 import re
+from dataclasses import replace
+from datetime import date, timedelta
 from typing import Protocol
 from urllib.parse import parse_qs, urlencode, urlsplit
 
@@ -23,6 +26,8 @@ SERPAPI_URL = "https://serpapi.com/search.json"
 APIFY_TIMEOUT = 300
 #: Google's wrong-date fallback prices one night; a real total is about nightly x nights.
 TOTAL_TOLERANCE = 0.15
+#: Google Hotels prices at most this many nights in one search; longer stays are split.
+GOOGLE_MAX_NIGHTS = 8
 #: "Advance Purchase", "Adv Purchase", "Adv. Purchase" (any casing) are always prepaid.
 _ADVANCE_PURCHASE_RE = re.compile(r"\badv(ance|\.)?\s+purchase\b", re.IGNORECASE)
 #: Booking's own API reports its price currency with the symbol, not the ISO code.
@@ -276,6 +281,47 @@ def parse_google(data: dict, stay: HotelStay) -> HotelResult:
     return HotelResult(stay, "ok", rates) if rates else _no_rates(stay, "Google Hotels: no price")
 
 
+def google_parts(stay: HotelStay) -> list[tuple[date, date]]:
+    """The stay cut into as few, as even parts of at most GOOGLE_MAX_NIGHTS nights as possible."""
+    n = math.ceil(stay.nights / GOOGLE_MAX_NIGHTS)
+    base, extra = divmod(stay.nights, n)
+    parts, start = [], stay.check_in
+    for i in range(n):
+        end = start + timedelta(days=base + (1 if i < extra else 0))
+        parts.append((start, end))
+        start = end
+    return parts
+
+
+def google_credits(stay: HotelStay) -> int:
+    """SerpApi searches a Google check may spend: one per part, and one retry each."""
+    return 2 * len(google_parts(stay))
+
+
+def _add_parts(stay: HotelStay, results: list[HotelResult]) -> HotelResult:
+    """One total per (room, refundability) offered in every part: the sum of each part's cheapest site.
+
+    Sites come and go between parts (Hotels.com in one, Expedia.de in the other), so a total may mix
+    sites; the channel then names each part's site, e.g. "Hotels.com + Expedia.de".
+    """
+    per_part: list[dict[tuple, HotelRate]] = []
+    for res in results:
+        cheapest: dict[tuple, HotelRate] = {}
+        for r in res.rates:
+            k = (r.room, r.refundable)
+            if k not in cheapest or r.total < cheapest[k].total:
+                cheapest[k] = r
+        per_part.append(cheapest)
+    rates = []
+    for k, first in per_part[0].items():
+        if not all(k in p for p in per_part[1:]):
+            continue
+        picks = [p[k] for p in per_part]
+        channels = list(dict.fromkeys(r.channel for r in picks))
+        rates.append(replace(first, channel=" + ".join(channels), total=round(sum(r.total for r in picks), 2)))
+    return HotelResult(stay, "ok", rates) if rates else _no_rates(stay, "Google Hotels: no room offered in every part")
+
+
 class GoogleHotelsClient:
     source = HotelSource.GOOGLE
 
@@ -284,12 +330,33 @@ class GoogleHotelsClient:
         self.http = http or httpx.Client(timeout=60)
 
     def check(self, stay: HotelStay) -> HotelResult:
+        parts = google_parts(stay)
+        if len(parts) == 1:
+            return self._check_once(stay)
+        results = []
+        for check_in, check_out in parts:
+            res = self._check_once(replace(stay, check_in=check_in, check_out=check_out))
+            if res.status != "ok":
+                return _no_rates(stay, f"{res.note} ({check_in:%d.%m.}–{check_out:%d.%m.})")
+            results.append(res)
+        return _add_parts(stay, results)
+
+    def _check_once(self, stay: HotelStay) -> HotelResult:
+        res = self._fetch(stay, no_cache=False)
+        if res.status == "no_rates" and res.note == "Google Hotels: no price":
+            # Google fills in prices a moment after the first answer; SerpApi may have cached that empty answer
+            res = self._fetch(stay, no_cache=True)
+        return res
+
+    def _fetch(self, stay: HotelStay, no_cache: bool) -> HotelResult:
         params = {"engine": "google_hotels", "q": stay.watch_id, "property_token": stay.ref,
                   "check_in_date": stay.check_in.isoformat(), "check_out_date": stay.check_out.isoformat(),
                   "adults": str(stay.adults), "currency": "EUR", "gl": "de", "hl": "de", "api_key": self.api_key}
         if stay.child_ages:
             params["children"] = str(len(stay.child_ages))
             params["children_ages"] = ",".join(str(a) for a in stay.child_ages)
+        if no_cache:
+            params["no_cache"] = "true"
         try:
             r = self.http.get(SERPAPI_URL, params=params)
         except httpx.HTTPError as e:

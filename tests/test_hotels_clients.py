@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 import pytest
 
-from vacation_planner.hotels.clients import (BOOKING_ACTOR, HILTON_ACTOR, ApifyActor, BookingClient,
+from vacation_planner.hotels.clients import (BOOKING_ACTOR, google_parts, HILTON_ACTOR, ApifyActor, BookingClient,
                                              GoogleHotelsClient, HiltonClient, booking_url, parse_booking,
                                              parse_google, parse_hilton)
 from vacation_planner.models import HotelSource, HotelStay
@@ -246,6 +246,68 @@ def test_google_auth_failure_is_an_auth_error_without_the_key(httpx_mock):
     with pytest.raises(AuthError) as e:
         GoogleHotelsClient("KEY", http=httpx.Client()).check(IKOS_GOOGLE)
     assert "KEY" not in str(e.value)
+
+
+
+def _google_answer(total, nights, room="Junior Suite Ocean", free=True, adults=2):
+    return {"search_parameters": {"currency": "EUR", "adults": adults},
+            "rate_per_night": {"extracted_lowest": total / nights}, "total_rate": {"extracted_lowest": total},
+            "prices": [{"source": "Expedia.de", "total_rate": {"extracted_lowest": total}}],
+            "featured_prices": [{"source": "Expedia.de", "rooms": [{
+                "name": room, "total_rate": {"extracted_lowest": total},
+                "rates": [{"free_cancellation": free, "total_rate": {"extracted_lowest": total},
+                           "inclusions": [f"Kostenlose Stornierung bis zum {nights}. Okt."]}]}]}]}
+
+
+ST_REGIS = HotelStay("st-regis-herbst-2027", HotelSource.GOOGLE, "tok", "rooms",
+                     date(2027, 10, 11), date(2027, 10, 20), 2, ())
+
+
+def test_google_parts_split_long_stays_into_at_most_eight_nights():
+    assert google_parts(IKOS_GOOGLE) == [(date(2027, 5, 7), date(2027, 5, 14))]
+    assert google_parts(ST_REGIS) == [(date(2027, 10, 11), date(2027, 10, 16)), (date(2027, 10, 16), date(2027, 10, 20))]
+
+
+def test_google_adds_up_the_parts_of_a_long_stay(httpx_mock):
+    httpx_mock.add_response(json=_google_answer(3000, 5))
+    httpx_mock.add_response(json=_google_answer(2400, 4))
+    res = GoogleHotelsClient("KEY", http=httpx.Client()).check(ST_REGIS)
+    assert res.status == "ok"
+    room = [r for r in res.rates if r.room == "Junior Suite Ocean"]
+    assert len(room) == 1 and room[0].total == 5400 and room[0].refundable is True
+    assert any(r.room is None and r.channel == "Expedia.de" and r.total == 5400 for r in res.rates)
+    sent = [dict(r.url.params) for r in httpx_mock.get_requests()]
+    assert [(q["check_in_date"], q["check_out_date"]) for q in sent] == [("2027-10-11", "2027-10-16"),
+                                                                       ("2027-10-16", "2027-10-20")]
+
+
+def test_parts_from_different_sites_add_up_and_name_both(httpx_mock):
+    httpx_mock.add_response(json=_google_answer(3000, 5))
+    second = _google_answer(2400, 4)
+    second["featured_prices"][0]["source"] = "Hotels.com"
+    httpx_mock.add_response(json=second)
+    res = GoogleHotelsClient("KEY", http=httpx.Client()).check(ST_REGIS)
+    room = [r for r in res.rates if r.room == "Junior Suite Ocean"]
+    assert len(room) == 1 and room[0].total == 5400 and room[0].channel == "Expedia.de + Hotels.com"
+
+
+def test_a_room_missing_from_one_part_is_dropped(httpx_mock):
+    httpx_mock.add_response(json=_google_answer(3000, 5))
+    httpx_mock.add_response(json=_google_answer(2400, 4, room="Other Suite"))
+    res = GoogleHotelsClient("KEY", http=httpx.Client()).check(ST_REGIS)
+    assert {r.room for r in res.rates} == {None}
+
+
+def test_google_asks_again_without_cache_when_the_first_answer_has_no_price(httpx_mock):
+    httpx_mock.add_response(json={"search_parameters": {"currency": "EUR", "adults": 2, "children": 1,
+                                                        "children_ages": "8"}, "name": "Ikos"})
+    answer = _google_answer(4900, 7)
+    answer["search_parameters"].update(children=1, children_ages="8")
+    httpx_mock.add_response(json=answer)
+    res = GoogleHotelsClient("KEY", http=httpx.Client()).check(IKOS_GOOGLE)
+    assert res.status == "ok"
+    first, second = [dict(r.url.params) for r in httpx_mock.get_requests()]
+    assert "no_cache" not in first and second["no_cache"] == "true"
 
 
 # ---- Apify ----

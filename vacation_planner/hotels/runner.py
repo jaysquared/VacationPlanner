@@ -33,6 +33,8 @@ class HotelSummary:
 
 def _stays(watch: HotelWatch, config: Config) -> list[HotelStay]:
     adults, ages = guests_on(config.travellers, watch.check_in)
+    if watch.adults_only:
+        ages = ()
 
     def stay(source: HotelSource, mode: str, a: int = adults, ch: tuple[int, ...] = ages) -> HotelStay:
         return HotelStay(watch.id, source, watch.sources[source], mode, watch.check_in, watch.check_out, a, ch)

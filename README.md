@@ -206,5 +206,10 @@ and the digest carries one verdict per hotel:
   or when no Standard Room Reward is offered.
 
 Sources: Booking.com and Hilton (incl. Booking/Expedia/Hotels.com/Agoda prices for Hilton hotels)
-through Apify (`APIFY_TOKEN`), Google Hotels through SerpApi (`SERPAPI_KEY`, at most 8 nights).
+through Apify (`APIFY_TOKEN`), Google Hotels through SerpApi (`SERPAPI_KEY`). Google prices at most
+8 nights per search, so longer stays are searched in parts and each room's cheapest refundable
+offer per part is added up (the channel then reads e.g. "Hotels.com + Expedia.de"). An empty Google
+answer is asked once more with `no_cache` (Google fills prices in late). With a child in the
+search Google mostly shows only Booking.com; `adults_only: true` prices a watch for the adults,
+which is how the Ikos and St. Regis bookings were made and how Expedia & co. quote.
 `vacation-planner plan` lists the checks; `vacation-planner hotels` runs them on their own.

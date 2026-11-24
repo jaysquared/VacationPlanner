@@ -42,7 +42,6 @@ def test_missing_hotels_file_means_no_watches(config_dir: Path):
 @pytest.mark.parametrize("old,new,message", [
     ("slot: pfingsten-2027", "slot: nowhere", "unknown slot nowhere"),
     ("check_out: 2027-05-14", "check_out: 2027-05-07", "check_out must be after check_in"),
-    ("check_out: 2027-05-14", "check_out: 2027-05-17", "Google Hotels prices at most 8 nights"),
     ("type: booked", "type: maybe", "rule"),
 ])
 def test_invalid_watches_are_rejected(config_dir: Path, old, new, message):
@@ -99,3 +98,13 @@ def test_a_target_watch_needs_max_total(config_dir: Path):
         "      type: booked\n      paid_total: 5640\n", "      type: target\n", 1))
     with pytest.raises(ConfigError, match="target rule needs max_total"):
         load_config(config_dir, env={})
+
+
+def test_an_adults_only_watch_is_priced_without_the_son(config_dir: Path):
+    from vacation_planner.hotels.runner import planned_stays
+    f = config_dir / "hotels.yaml"
+    f.write_text(f.read_text().replace("    room: [\"Junior Suite mit eigenem Garten\"", "    adults_only: true\n    room: [\"Junior Suite mit eigenem Garten\"", 1))
+    cfg = load_config(config_dir, env={})
+    assert cfg.hotels[0].adults_only and not cfg.hotels[1].adults_only
+    ikos = [(s.adults, s.child_ages) for s in planned_stays(cfg, date(2026, 11, 24)) if s.watch_id == "ikos-pfingsten-2027"]
+    assert ikos == [(2, ()), (2, ())]

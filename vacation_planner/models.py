@@ -181,6 +181,8 @@ class HotelWatch:
     room: tuple[str, ...]
     sources: dict[HotelSource, str]
     rule: BookedRule | PointsRule | TargetRule
+    #: price the stay for the adults only, e.g. when the booking compared against was made that way
+    adults_only: bool = False
 
     @property
     def nights(self) -> int:

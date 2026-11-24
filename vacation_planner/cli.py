@@ -11,6 +11,7 @@ import typer
 from .calendar import free_window
 from .config import Config, ConfigError, load_config
 from .deals import DetectedDeal, detect_for_run
+from .hotels.clients import google_credits
 from .hotels.runner import HotelSummary, build_hotel_clients, check_hotels, planned_stays
 from .models import HotelSource, Provider
 from .planner import plan as make_plan
@@ -137,7 +138,7 @@ def _echo_send(result) -> None:
 
 
 def _hotel_reservation(config: Config, today: date) -> dict[Provider, int]:
-    google = sum(1 for s in planned_stays(config, today) if s.source is HotelSource.GOOGLE)
+    google = sum(google_credits(s) for s in planned_stays(config, today) if s.source is HotelSource.GOOGLE)
     return {Provider.SERPAPI: google} if google and config.secrets.serpapi_key else {}
 
 
@@ -175,8 +176,8 @@ def plan_cmd(ctx: typer.Context):
     for s in stays:
         ages = f" ({', '.join(map(str, s.child_ages))})" if s.child_ages else ""
         typer.echo(f"hotel   {s.watch_id:24} {s.source.value:8} {s.mode:7} {s.check_in}..{s.check_out} {s.adults}A{ages}")
-    google = sum(1 for s in stays if s.source is HotelSource.GOOGLE)
-    typer.echo(f"{len(stays)} hotel checks ({google} via SerpApi)")
+    google = sum(google_credits(s) for s in stays if s.source is HotelSource.GOOGLE)
+    typer.echo(f"{len(stays)} hotel checks (up to {google} SerpApi credits)")
 
 
 @app.command()

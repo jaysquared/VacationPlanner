@@ -76,6 +76,7 @@ class _HotelWatch(BaseModel):
     check_in: date
     check_out: date
     room: list[str] = []
+    adults_only: bool = False
     sources: dict[HotelSource, str]
     rule: _HotelRule
 
@@ -90,7 +91,6 @@ class _Hotels(BaseModel):
 
 
 #: Google Hotels returns nothing for longer stays (tested 2026-11-03: 7 nights priced, 9+ empty).
-GOOGLE_MAX_NIGHTS = 8
 
 
 class BridgeDays(BaseModel):
@@ -331,9 +331,6 @@ def _hotel_watches(config_dir: Path, slot_ids: set[str]) -> tuple[list[HotelWatc
             raise ConfigError(f"{where}: unknown slot {w.slot}")
         if w.check_out <= w.check_in:
             raise ConfigError(f"{where}: check_out must be after check_in")
-        nights = (w.check_out - w.check_in).days
-        if HotelSource.GOOGLE in w.sources and nights > GOOGLE_MAX_NIGHTS:
-            raise ConfigError(f"{where}: Google Hotels prices at most {GOOGLE_MAX_NIGHTS} nights, this stay has {nights}")
         if w.rule.type == "booked":
             if w.rule.paid_total is None:
                 raise ConfigError(f"{where}: booked rule needs paid_total")
@@ -350,7 +347,7 @@ def _hotel_watches(config_dir: Path, slot_ids: set[str]) -> tuple[list[HotelWatc
                 raise ConfigError(f"{where}: points rule needs hilton.point_value_eur")
             rule = PointsRule(w.rule.points_adults, w.rule.surcharge, w.rule.until)
         watches.append(HotelWatch(w.id, w.name, w.slot, w.check_in, w.check_out,
-                                  tuple(w.room), dict(w.sources), rule))
+                                  tuple(w.room), dict(w.sources), rule, w.adults_only))
     return watches, point_value
 
 
